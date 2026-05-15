@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.DonationsController"
+            prefWidth="1180" prefHeight="700"
+            stylesheets="@../com/mycompany/charitymanagement/style.css">
+
+    <left>
+        <VBox spacing="8" styleClass="sidebar">
+            <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
+            <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
+            <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
+            <Button text="♟  Tình nguyện viên" onAction="#handleParticipants" styleClass="menu-button"/>
+            <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
+            <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button-active"/>
+            <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
+            <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
+            <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
+            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="16" styleClass="main-content">
+            <Label text="QUẢN LÝ QUYÊN GÓP" styleClass="page-title"/>
+
+            <HBox spacing="18">
+                <VBox styleClass="stat-card wide-stat-card">
+                    <Label text="Tổng quyên góp bằng tiền" styleClass="muted-text"/>
+                    <Label fx:id="lblTotalDonation" text="0 VNĐ" styleClass="stat-number purple"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="12" styleClass="action-bar">
+                <Button text="Thêm" onAction="#handleAddDonation" styleClass="primary-button"/>
+                <Button text="Cập nhật" onAction="#handleUpdateDonation" styleClass="quick-button"/>
+                <Button text="Xóa" onAction="#handleDeleteDonation" styleClass="danger-button"/>
+            </HBox>
+
+            <TableView fx:id="tableDonations" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colMaQuyenGop" text="Mã" prefWidth="80"/>
+                    <TableColumn fx:id="colNguoiQuyenGop" text="Email" prefWidth="150"/>
+                    <TableColumn fx:id="colHoatDong" text="Chiến dịch" prefWidth="100"/>
+                    <TableColumn fx:id="colNgayQuyenGop" text="Ngày" prefWidth="105"/>
+                    <TableColumn fx:id="colHinhThuc" text="Hình thức" prefWidth="125"/>
+                    <TableColumn fx:id="colNoiDungQuyenGop" text="Nội dung quyên góp" prefWidth="280"/>
+                    <TableColumn fx:id="colSoTien" text="Giá trị" prefWidth="125"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

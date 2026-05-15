@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.VolunteerController"
+            prefWidth="1180" prefHeight="700"
+            stylesheets="@../com/mycompany/charitymanagement/style.css">
+
+    <left>
+        <VBox spacing="8" styleClass="sidebar">
+            <Label text="TÌNH NGUYỆN VIÊN" styleClass="sidebar-title"/>
+            <Button text="⌂  Tổng quan" styleClass="menu-button-active"/>
+            <Button text="▣  Chiến dịch" onAction="#handleCampaigns" styleClass="menu-button"/>
+            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="16" styleClass="main-content">
+            <Label text="CỔNG TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
+            <Label fx:id="lblWelcome" text="Xin chào" styleClass="section-title"/>
+
+            <HBox spacing="14">
+                <VBox styleClass="stat-card wide-stat-card">
+                    <Label text="Chiến dịch hiện tại" styleClass="muted-text"/>
+                    <Label fx:id="lblCampaign" text="Chưa tham gia" styleClass="activity-title"/>
+                </VBox>
+                <VBox styleClass="stat-card">
+                    <Label text="Trạng thái duyệt" styleClass="muted-text"/>
+                    <Label fx:id="lblStatus" text="Chưa đăng ký" styleClass="stat-number green"/>
+                </VBox>
+                <VBox styleClass="stat-card">
+                    <Label text="Điểm đánh giá" styleClass="muted-text"/>
+                    <Label fx:id="lblScore" text="Chưa có" styleClass="stat-number"/>
+                </VBox>
+                <VBox styleClass="stat-card">
+                    <Label text="Thông báo" styleClass="muted-text"/>
+                    <Label fx:id="lblNotificationCount" text="0" styleClass="stat-number purple"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="12" styleClass="action-bar">
+                <Button text="Đăng ký chiến dịch" onAction="#handleRegisterCampaign" styleClass="primary-button"/>
+                <Button text="Điểm danh" onAction="#handleCheckIn" styleClass="quick-button"/>
+                <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
+            </HBox>
+
+            <HBox spacing="16" VBox.vgrow="ALWAYS">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Chiến dịch đang mở" styleClass="section-title"/>
+                    <TableView fx:id="tableCampaigns" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colMaChienDich" text="Mã" prefWidth="75"/>
+                            <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="190"/>
+                            <TableColumn fx:id="colNgayBatDau" text="Bắt đầu" prefWidth="90"/>
+                            <TableColumn fx:id="colNgayKetThuc" text="Kết thúc" prefWidth="90"/>
+                            <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="110"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Công việc / điểm danh" styleClass="section-title"/>
+                    <TableView fx:id="tableTasks" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colTaskType" text="Nhóm" prefWidth="120"/>
+                            <TableColumn fx:id="colTaskTitle" text="Nội dung" prefWidth="220"/>
+                            <TableColumn fx:id="colTaskDate" text="Ngày" prefWidth="90"/>
+                            <TableColumn fx:id="colTaskStatus" text="Trạng thái" prefWidth="110"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="8">
+                <Label text="Thông báo của tôi" styleClass="section-title"/>
+                <TableView fx:id="tableNotifications" prefHeight="135" styleClass="activity-table">
+                    <columns>
+                        <TableColumn fx:id="colNoticeTitle" text="Tiêu đề" prefWidth="420"/>
+                        <TableColumn fx:id="colNoticeDate" text="Ngày" prefWidth="120"/>
+                        <TableColumn fx:id="colNoticeStatus" text="Trạng thái" prefWidth="140"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.SponsorsController"
+            prefWidth="1180" prefHeight="700"
+            stylesheets="@../com/mycompany/charitymanagement/style.css">
+
+    <left>
+        <VBox spacing="8" styleClass="sidebar">
+            <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
+            <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
+            <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
+            <Button text="♟  Tình nguyện viên" onAction="#handleParticipants" styleClass="menu-button"/>
+            <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button-active"/>
+            <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
+            <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
+            <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
+            <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
+            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="16" styleClass="main-content">
+            <Label text="QUẢN LÝ ĐỐI TÁC - TÀI TRỢ" styleClass="page-title"/>
+
+            <HBox spacing="18">
+                <VBox styleClass="stat-card wide-stat-card">
+                    <Label text="Tổng giá trị tài trợ" styleClass="muted-text"/>
+                    <Label fx:id="lblTotalSponsor" text="0 VNĐ" styleClass="stat-number green"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="12" styleClass="action-bar">
+                <Button text="Thêm" onAction="#handleAddSponsor" styleClass="primary-button"/>
+                <Button text="Cập nhật" onAction="#handleUpdateSponsor" styleClass="quick-button"/>
+                <Button text="Xóa" onAction="#handleDeleteSponsor" styleClass="danger-button"/>
+            </HBox>
+
+            <TableView fx:id="tableSponsors" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colMaDoiTac" text="Mã" prefWidth="70"/>
+                    <TableColumn fx:id="colTenDoiTac" text="Tên đối tác" prefWidth="155"/>
+                    <TableColumn fx:id="colLinhVuc" text="Lĩnh vực" prefWidth="120"/>
+                    <TableColumn fx:id="colSoDienThoai" text="SĐT" prefWidth="100"/>
+                    <TableColumn fx:id="colEmail" text="Email" prefWidth="130"/>
+                    <TableColumn fx:id="colDiaChi" text="Địa chỉ" prefWidth="130"/>
+                    <TableColumn fx:id="colMaChienDich" text="Chiến dịch" prefWidth="85"/>
+                    <TableColumn fx:id="colGiaTriTaiTro" text="Giá trị" prefWidth="120"/>
+                    <TableColumn fx:id="colNgayKyKet" text="Ngày ký" prefWidth="90"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

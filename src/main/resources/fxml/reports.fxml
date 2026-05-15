@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.ReportsController"
+            prefWidth="1180" prefHeight="700"
+            stylesheets="@../com/mycompany/charitymanagement/style.css">
+
+    <left>
+        <VBox spacing="8" styleClass="sidebar">
+            <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
+            <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
+            <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
+            <Button text="♟  Tình nguyện viên" onAction="#handleParticipants" styleClass="menu-button"/>
+            <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
+            <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
+            <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
+            <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
+            <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button-active"/>
+            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="16" styleClass="main-content">
+            <Label text="THỐNG KÊ - BÁO CÁO" styleClass="page-title"/>
+
+            <HBox spacing="14">
+                <VBox styleClass="stat-card">
+                    <Label fx:id="lblTotalActivities" text="0" styleClass="stat-number"/>
+                    <Label text="Chiến dịch"/>
+                </VBox>
+                <VBox styleClass="stat-card">
+                    <Label fx:id="lblTotalParticipants" text="0" styleClass="stat-number red"/>
+                    <Label text="Sinh viên/TNV"/>
+                </VBox>
+                <VBox styleClass="stat-card">
+                    <Label fx:id="lblTotalSponsors" text="0" styleClass="stat-number green"/>
+                    <Label text="Đối tác"/>
+                </VBox>
+                <VBox styleClass="stat-card">
+                    <Label fx:id="lblTotalDonations" text="0" styleClass="stat-number purple"/>
+                    <Label text="Quyên góp"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="14">
+                <VBox styleClass="stat-card wide-stat-card">
+                    <Label text="Tổng tài trợ" styleClass="muted-text"/>
+                    <Label fx:id="lblSponsorAmount" text="0 VNĐ" styleClass="stat-number green"/>
+                </VBox>
+                <VBox styleClass="stat-card wide-stat-card">
+                    <Label text="Tổng quyên góp tiền" styleClass="muted-text"/>
+                    <Label fx:id="lblDonationAmount" text="0 VNĐ" styleClass="stat-number purple"/>
+                </VBox>
+                <VBox styleClass="stat-card wide-stat-card">
+                    <Label text="Tổng nguồn lực tiền tệ" styleClass="muted-text"/>
+                    <Label fx:id="lblTotalFund" text="0 VNĐ" styleClass="stat-number"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="14">
+                <VBox styleClass="stat-card">
+                    <Label fx:id="lblOperationCount" text="0" styleClass="stat-number"/>
+                    <Label text="Bản ghi vận hành"/>
+                </VBox>
+                <VBox styleClass="stat-card">
+                    <Label fx:id="lblContentCount" text="0" styleClass="stat-number green"/>
+                    <Label text="Bản ghi nội dung"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="12" styleClass="action-bar">
+                <Button text="Làm mới báo cáo" onAction="#handleRefreshReport" styleClass="primary-button"/>
+            </HBox>
+
+            <TextArea fx:id="txtReport" editable="false" wrapText="true" styleClass="report-area" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </center>
+</BorderPane>

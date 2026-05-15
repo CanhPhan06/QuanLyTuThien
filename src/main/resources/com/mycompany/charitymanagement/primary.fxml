@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.PrimaryController"
+            prefWidth="420" prefHeight="560"
+            stylesheets="@style.css">
+
+    <VBox alignment="CENTER" spacing="14"
+          AnchorPane.topAnchor="0"
+          AnchorPane.bottomAnchor="0"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0"
+          styleClass="login-container">
+
+        <Label text="ĐĂNG NHẬP" styleClass="login-title"/>
+
+        <TextField fx:id="txtUsername"
+                   promptText="Tên đăng nhập"
+                   maxWidth="280"
+                   styleClass="input-field"/>
+
+        <PasswordField fx:id="txtPassword"
+                       promptText="Mật khẩu"
+                       maxWidth="280"
+                       styleClass="input-field"/>
+
+        <Button text="Đăng nhập"
+                onAction="#handleLogin"
+                maxWidth="280"
+                styleClass="primary-button"/>
+
+        <VBox alignment="CENTER" spacing="4">
+            <Label text="ADMIN001 - ADMIN010 / 123" styleClass="muted-text"/>
+            <Label text="TNV001 - TNV010 / 123" styleClass="muted-text"/>
+            <Label text="NTT001 - NTT010 / 123" styleClass="muted-text"/>
+            <Label text="ADMIN / 123 vẫn dùng được" styleClass="muted-text"/>
+        </VBox>
+
+        <Label fx:id="lblMessage" styleClass="error-text"/>
+
+    </VBox>
+</AnchorPane>

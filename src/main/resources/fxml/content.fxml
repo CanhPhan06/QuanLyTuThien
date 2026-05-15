@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.ContentController"
+            prefWidth="1180" prefHeight="700"
+            stylesheets="@../com/mycompany/charitymanagement/style.css">
+
+    <left>
+        <VBox spacing="8" styleClass="sidebar">
+            <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
+            <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
+            <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
+            <Button text="♟  Tình nguyện viên" onAction="#handleParticipants" styleClass="menu-button"/>
+            <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
+            <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
+            <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
+            <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button-active"/>
+            <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
+            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="16" styleClass="main-content">
+            <Label text="NỘI DUNG - HỆ THỐNG" styleClass="page-title"/>
+
+            <HBox spacing="12" styleClass="action-bar">
+                <Button text="Thêm" onAction="#handleAddRecord" styleClass="primary-button"/>
+                <Button text="Cập nhật" onAction="#handleUpdateRecord" styleClass="quick-button"/>
+                <Button text="Xóa" onAction="#handleDeleteRecord" styleClass="danger-button"/>
+            </HBox>
+
+            <TableView fx:id="tableRecords" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colNhomBang" text="Nhóm bảng" prefWidth="130"/>
+                    <TableColumn fx:id="colMaChinh" text="Mã" prefWidth="75"/>
+                    <TableColumn fx:id="colMaLienKet" text="Liên kết" prefWidth="95"/>
+                    <TableColumn fx:id="colTieuDe" text="Tiêu đề" prefWidth="170"/>
+                    <TableColumn fx:id="colNoiDung" text="Nội dung" prefWidth="240"/>
+                    <TableColumn fx:id="colNgay" text="Ngày" prefWidth="95"/>
+                    <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="105"/>
+                    <TableColumn fx:id="colGhiChu" text="Ghi chú" prefWidth="135"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+</BorderPane>

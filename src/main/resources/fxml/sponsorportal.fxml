@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.SponsorPortalController"
+            prefWidth="1180" prefHeight="700"
+            stylesheets="@../com/mycompany/charitymanagement/style.css">
+
+    <left>
+        <VBox spacing="8" styleClass="sidebar">
+            <Label text="NHÀ TÀI TRỢ" styleClass="sidebar-title"/>
+            <Button text="⌂  Tổng quan" styleClass="menu-button-active"/>
+            <Button text="▣  Chiến dịch" onAction="#handleCampaigns" styleClass="menu-button"/>
+            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="16" styleClass="main-content">
+            <Label text="CỔNG NHÀ TÀI TRỢ" styleClass="page-title"/>
+            <Label fx:id="lblWelcome" text="Xin chào" styleClass="section-title"/>
+
+            <HBox spacing="14">
+                <VBox styleClass="stat-card">
+                    <Label text="Mã đối tác" styleClass="muted-text"/>
+                    <Label fx:id="lblPartnerId" text="DT001" styleClass="stat-number"/>
+                </VBox>
+                <VBox styleClass="stat-card">
+                    <Label text="Lượt tài trợ" styleClass="muted-text"/>
+                    <Label fx:id="lblSupportCount" text="0" styleClass="stat-number green"/>
+                </VBox>
+                <VBox styleClass="stat-card wide-stat-card">
+                    <Label text="Tổng tài trợ bằng tiền" styleClass="muted-text"/>
+                    <Label fx:id="lblSupportTotal" text="0 VNĐ" styleClass="stat-number purple"/>
+                </VBox>
+            </HBox>
+
+            <GridPane hgap="12" vgap="12" styleClass="form-card">
+                <TextField fx:id="txtCampaignId" promptText="Mã chiến dịch" styleClass="input-field" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="txtSupportType" promptText="Hình thức tài trợ" styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <TextField fx:id="txtSupportValue" promptText="Số tiền/giá trị ước tính" styleClass="input-field" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <TextField fx:id="txtSupportContent" promptText="Nội dung tài trợ: tiền, vật phẩm, vật tư..." styleClass="input-field" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+            </GridPane>
+
+            <HBox spacing="12" styleClass="action-bar">
+                <Button text="Gửi đề xuất tài trợ" onAction="#handleCreateSupport" styleClass="primary-button"/>
+                <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
+            </HBox>
+
+            <HBox spacing="16" VBox.vgrow="ALWAYS">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Chiến dịch cần hỗ trợ" styleClass="section-title"/>
+                    <TableView fx:id="tableCampaigns" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colMaChienDich" text="Mã" prefWidth="80"/>
+                            <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="210"/>
+                            <TableColumn fx:id="colMucTieu" text="Mục tiêu" prefWidth="130"/>
+                            <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="120"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                    <Label text="Tài trợ của tôi" styleClass="section-title"/>
+                    <TableView fx:id="tableSupport" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colMaQuyenGop" text="Mã" prefWidth="75"/>
+                            <TableColumn fx:id="colHoatDong" text="Chiến dịch" prefWidth="95"/>
+                            <TableColumn fx:id="colNgayQuyenGop" text="Ngày" prefWidth="95"/>
+                            <TableColumn fx:id="colHinhThuc" text="Hình thức" prefWidth="115"/>
+                            <TableColumn fx:id="colNoiDungQuyenGop" text="Nội dung" prefWidth="220"/>
+                            <TableColumn fx:id="colSoTien" text="Giá trị" prefWidth="115"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
