@@ -18,14 +18,14 @@
     </left>
 
     <center>
-        <VBox spacing="16" styleClass="main-content">
+        <VBox spacing="14" styleClass="main-content">
             <Label text="CỔNG NHÀ TÀI TRỢ" styleClass="page-title"/>
             <Label fx:id="lblWelcome" text="Xin chào" styleClass="section-title"/>
 
             <HBox spacing="14">
                 <VBox styleClass="stat-card">
-                    <Label text="Mã đối tác" styleClass="muted-text"/>
-                    <Label fx:id="lblPartnerId" text="DT001" styleClass="stat-number"/>
+                    <Label text="Nhà tài trợ" styleClass="muted-text"/>
+                    <Label fx:id="lblPartnerId" text="Nhà tài trợ" styleClass="stat-number"/>
                 </VBox>
                 <VBox styleClass="stat-card">
                     <Label text="Lượt tài trợ" styleClass="muted-text"/>
@@ -38,44 +38,62 @@
             </HBox>
 
             <GridPane hgap="12" vgap="12" styleClass="form-card">
-                <TextField fx:id="txtCampaignId" promptText="Mã chiến dịch" styleClass="input-field" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                <TextField fx:id="txtSupportType" promptText="Hình thức tài trợ" styleClass="input-field" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                <TextField fx:id="txtSupportValue" promptText="Số tiền/giá trị ước tính" styleClass="input-field" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                <TextField fx:id="txtSupportContent" promptText="Nội dung tài trợ: tiền, vật phẩm, vật tư..." styleClass="input-field" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                <ComboBox fx:id="cboCampaign" promptText="Chọn chiến dịch" styleClass="input-field" maxWidth="Infinity"
+                          GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <ComboBox fx:id="cboSupportType" promptText="Chọn hình thức quyên góp" styleClass="input-field" maxWidth="Infinity"
+                          GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <TextField fx:id="txtSupportValue" promptText="Số tiền/giá trị ước tính" styleClass="input-field"
+                           GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <TextField fx:id="txtSupportContent" promptText="Nội dung/ghi chú tài trợ" styleClass="input-field"
+                           GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <Label text="Chiến dịch đang chọn" styleClass="muted-text"/>
+                    <Label fx:id="lblSelectedCampaign" text="Chưa chọn chiến dịch" styleClass="dashboard-main-text"/>
+                </VBox>
+                <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <Label text="Mục tiêu chiến dịch" styleClass="muted-text"/>
+                    <Label fx:id="lblCampaignGoal" text="-" styleClass="dashboard-main-text"/>
+                </VBox>
+                <VBox spacing="4" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <Label text="Đã ghi nhận" styleClass="muted-text"/>
+                    <Label fx:id="lblCampaignProgress" text="-" styleClass="dashboard-main-text"/>
+                </VBox>
             </GridPane>
 
             <HBox spacing="12" styleClass="action-bar">
                 <Button text="Gửi đề xuất tài trợ" onAction="#handleCreateSupport" styleClass="primary-button"/>
+                <Button text="Xem chi tiết chiến dịch" onAction="#handleViewCampaignDetail" styleClass="quick-button"/>
+                <Button text="Xuất lịch sử" onAction="#handleExportSupport" styleClass="quick-button"/>
                 <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
             </HBox>
 
-            <HBox spacing="16" VBox.vgrow="ALWAYS">
-                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                    <Label text="Chiến dịch cần hỗ trợ" styleClass="section-title"/>
-                    <TableView fx:id="tableCampaigns" styleClass="activity-table" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="colMaChienDich" text="Mã" prefWidth="80"/>
-                            <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="210"/>
-                            <TableColumn fx:id="colMucTieu" text="Mục tiêu" prefWidth="130"/>
-                            <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="120"/>
-                        </columns>
-                    </TableView>
-                </VBox>
-
-                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                    <Label text="Tài trợ của tôi" styleClass="section-title"/>
-                    <TableView fx:id="tableSupport" styleClass="activity-table" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="colMaQuyenGop" text="Mã" prefWidth="75"/>
-                            <TableColumn fx:id="colHoatDong" text="Chiến dịch" prefWidth="95"/>
-                            <TableColumn fx:id="colNgayQuyenGop" text="Ngày" prefWidth="95"/>
-                            <TableColumn fx:id="colHinhThuc" text="Hình thức" prefWidth="115"/>
-                            <TableColumn fx:id="colNoiDungQuyenGop" text="Nội dung" prefWidth="220"/>
-                            <TableColumn fx:id="colSoTien" text="Giá trị" prefWidth="115"/>
-                        </columns>
-                    </TableView>
-                </VBox>
-            </HBox>
+            <TabPane VBox.vgrow="ALWAYS">
+                <tabs>
+                    <Tab text="Chiến dịch cần hỗ trợ" closable="false">
+                        <TableView fx:id="tableCampaigns" styleClass="activity-table">
+                            <columns>
+                                <TableColumn fx:id="colMaChienDich" text="Mã" prefWidth="80"/>
+                                <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="360"/>
+                                <TableColumn fx:id="colMucTieu" text="Mục tiêu" prefWidth="160"/>
+                                <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="150"/>
+                            </columns>
+                        </TableView>
+                    </Tab>
+                    <Tab text="Lịch sử tài trợ của tôi" closable="false">
+                        <TableView fx:id="tableSupport" styleClass="activity-table">
+                            <columns>
+                                <TableColumn fx:id="colMaQuyenGop" text="Mã" prefWidth="90"/>
+                                <TableColumn fx:id="colHoatDong" text="Chiến dịch" prefWidth="120"/>
+                                <TableColumn fx:id="colNgayQuyenGop" text="Ngày" prefWidth="120"/>
+                                <TableColumn fx:id="colHinhThuc" text="Hình thức" prefWidth="150"/>
+                                <TableColumn fx:id="colNoiDungQuyenGop" text="Nội dung" prefWidth="360"/>
+                                <TableColumn fx:id="colSoTien" text="Giá trị" prefWidth="150"/>
+                            </columns>
+                        </TableView>
+                    </Tab>
+                </tabs>
+            </TabPane>
         </VBox>
     </center>
 </BorderPane>

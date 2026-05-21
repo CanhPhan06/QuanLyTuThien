@@ -144,9 +144,9 @@ public final class AppData {
 
     private static void addDonations() {
         donations.addAll(
-                new DonationModel("QG001", "ntt001@gmail.com", "CD001", "05/04/2026", "Chuyển khoản", "Tiền mặt hỗ trợ chương trình", 3000000),
-                new DonationModel("QG002", "tnv002@gmail.com", "CD001", "10/04/2026", "Vật phẩm", "Sách vở và đồ dùng học tập", 0),
-                new DonationModel("QG003", "ntt003@gmail.com", "CD003", "12/04/2026", "Vật tư", "Thuốc, khẩu trang và dụng cụ y tế", 0)
+                new DonationModel("QG001", "Công ty An Phát", "CD001", "05/04/2026", "Chuyển khoản", "Tiền mặt hỗ trợ chương trình", 3000000),
+                new DonationModel("QG002", "Nguyễn Văn Bình", "CD001", "10/04/2026", "Vật phẩm", "Sách vở và đồ dùng học tập", 0),
+                new DonationModel("QG003", "Quỹ Thiện Tâm", "CD003", "12/04/2026", "Vật tư", "Thuốc, khẩu trang và dụng cụ y tế", 0)
         );
     }
 
@@ -172,7 +172,16 @@ public final class AppData {
                         "Chờ xác nhận", "TNV001", "ADMIN006", "Bảng MinhChungTNV"),
                 new SystemRecord("Xuất vật phẩm", "VH007", "CD001", "PX001", "Xuất vật phẩm",
                         "Xuất sách vở cho điểm trường", "11/04/2026", "11/04/2026",
-                        "Đã xuất", "ADMIN004", "ADMIN007", "Bảng PhieuXuatVatPham/ChiTietXuatVP")
+                        "Đã xuất", "ADMIN004", "ADMIN007", "Bảng PhieuXuatVatPham/ChiTietXuatVP"),
+                new SystemRecord("Quyên góp", "VH008", "CD001", "QG001", "Xác nhận quyên góp tiền",
+                  "Đã đối soát giao dịch của Công ty An Phát", "05/04/2026", "05/04/2026",
+                        "Đã xác nhận", "NTT001", "ADMIN001", "Bảng QuyenGopTien/ThanhToan"),
+                new SystemRecord("Quyên góp", "VH009", "CD001", "QG002", "Xác nhận quyên góp vật phẩm",
+                        "Chờ kiểm đếm sách vở và đồ dùng học tập", "10/04/2026", "",
+                        "Chờ xác nhận", "TNV002", "ADMIN002", "Bảng PhieuQuyenGopVP/ChiTietQuyenGopVP"),
+                new SystemRecord("Quyên góp", "VH010", "CD003", "QG003", "Xác nhận quyên góp vật tư",
+                        "Chờ kiểm tra thuốc, khẩu trang và dụng cụ y tế", "12/04/2026", "",
+                        "Chờ xác nhận", "NTT003", "ADMIN003", "Bảng PhieuQuyenGopVP/ChiTietQuyenGopVP")
         );
     }
 
@@ -291,12 +300,48 @@ public final class AppData {
         return id;
     }
 
+    public static String nextCampaignId() {
+        int index = activities.size() + 1;
+        String id;
+        do {
+            id = String.format("CD%03d", index++);
+        } while (campaignIdExists(id));
+        return id;
+    }
+
+    public static String nextProfileId() {
+        int index = participants.size() + 1;
+        String id;
+        do {
+            id = String.format("HS%03d", index++);
+        } while (profileIdExists(id));
+        return id;
+    }
+
+    public static String nextSponsorId() {
+        int index = sponsors.size() + 1;
+        String id;
+        do {
+            id = String.format("DT%03d", index++);
+        } while (sponsorIdExists(id));
+        return id;
+    }
+
     public static String nextOperationId(String prefix) {
         int index = operations.size() + 1;
         String id;
         do {
             id = prefix + String.format("%03d", index++);
         } while (operationIdExists(id));
+        return id;
+    }
+
+    public static String nextContentId(String prefix) {
+        int index = contents.size() + 1;
+        String id;
+        do {
+            id = prefix + String.format("%03d", index++);
+        } while (contentIdExists(id));
         return id;
     }
 
@@ -309,8 +354,44 @@ public final class AppData {
         return false;
     }
 
+    private static boolean campaignIdExists(String id) {
+        for (ActivityModel item : activities) {
+            if (item.getMaChienDich().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean profileIdExists(String id) {
+        for (ParticipantModel item : participants) {
+            if (item.getMaHoSo().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean sponsorIdExists(String id) {
+        for (SponsorModel item : sponsors) {
+            if (item.getMaDoiTac().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean operationIdExists(String id) {
         for (SystemRecord item : operations) {
+            if (item.getMaChinh().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean contentIdExists(String id) {
+        for (SystemRecord item : contents) {
             if (item.getMaChinh().equalsIgnoreCase(id)) {
                 return true;
             }

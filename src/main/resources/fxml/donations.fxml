@@ -25,30 +25,51 @@
 
     <center>
         <VBox spacing="16" styleClass="main-content">
-            <Label text="QUẢN LÝ QUYÊN GÓP" styleClass="page-title"/>
+            <Label text="QUYÊN GÓP &amp; ĐÓNG GÓP" styleClass="page-title"/>
 
             <HBox spacing="18">
                 <VBox styleClass="stat-card wide-stat-card">
-                    <Label text="Tổng quyên góp bằng tiền" styleClass="muted-text"/>
+                    <Label text="Tổng tiền đã ghi nhận" styleClass="muted-text"/>
                     <Label fx:id="lblTotalDonation" text="0 VNĐ" styleClass="stat-number purple"/>
+                </VBox>
+                <VBox styleClass="stat-card wide-stat-card">
+                    <Label text="Lượt đóng góp" styleClass="muted-text"/>
+                    <Label fx:id="lblDonationCount" text="0" styleClass="stat-number"/>
+                </VBox>
+                <VBox styleClass="stat-card wide-stat-card">
+                    <Label text="Vật phẩm / vật tư" styleClass="muted-text"/>
+                    <Label fx:id="lblMaterialDonation" text="0" styleClass="stat-number green"/>
+                </VBox>
+                <VBox styleClass="stat-card wide-stat-card">
+                    <Label text="Chờ xác nhận" styleClass="muted-text"/>
+                    <Label fx:id="lblPendingDonation" text="0" styleClass="stat-number red"/>
                 </VBox>
             </HBox>
 
+            <HBox spacing="12" styleClass="filter-card">
+                <ComboBox fx:id="cboCampaignFilter" promptText="Lọc theo chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="cboTypeFilter" promptText="Lọc theo hình thức" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="txtDonationSearch" promptText="Tìm người/tổ chức, mô tả, trạng thái..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+                <Button text="Bỏ lọc" onAction="#handleClearDonationFilters" styleClass="quick-button"/>
+            </HBox>
+
             <HBox spacing="12" styleClass="action-bar">
-                <Button text="Thêm" onAction="#handleAddDonation" styleClass="primary-button"/>
-                <Button text="Cập nhật" onAction="#handleUpdateDonation" styleClass="quick-button"/>
-                <Button text="Xóa" onAction="#handleDeleteDonation" styleClass="danger-button"/>
+                <Button text="Ghi nhận đóng góp" onAction="#handleAddDonation" styleClass="primary-button"/>
+                <Button text="Cập nhật thông tin" onAction="#handleUpdateDonation" styleClass="quick-button"/>
+                <Button text="Xóa ghi nhận" onAction="#handleDeleteDonation" styleClass="danger-button"/>
+                <Button text="Xuất danh sách" onAction="#handleExportDonations" styleClass="quick-button"/>
             </HBox>
 
             <TableView fx:id="tableDonations" styleClass="activity-table" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colMaQuyenGop" text="Mã" prefWidth="80"/>
-                    <TableColumn fx:id="colNguoiQuyenGop" text="Email" prefWidth="150"/>
-                    <TableColumn fx:id="colHoatDong" text="Chiến dịch" prefWidth="100"/>
-                    <TableColumn fx:id="colNgayQuyenGop" text="Ngày" prefWidth="105"/>
-                    <TableColumn fx:id="colHinhThuc" text="Hình thức" prefWidth="125"/>
-                    <TableColumn fx:id="colNoiDungQuyenGop" text="Nội dung quyên góp" prefWidth="280"/>
+                    <TableColumn fx:id="colNguoiQuyenGop" text="Người / tổ chức đóng góp" prefWidth="185"/>
+                    <TableColumn fx:id="colHoatDong" text="Chiến dịch" prefWidth="185"/>
+                    <TableColumn fx:id="colNgayQuyenGop" text="Ngày ghi nhận" prefWidth="105"/>
+                    <TableColumn fx:id="colHinhThuc" text="Hình thức" prefWidth="130"/>
+                    <TableColumn fx:id="colNoiDungQuyenGop" text="Mô tả đóng góp" prefWidth="280"/>
                     <TableColumn fx:id="colSoTien" text="Giá trị" prefWidth="125"/>
+                    <TableColumn fx:id="colTrangThaiXuLy" text="Trạng thái" prefWidth="125"/>
                 </columns>
             </TableView>
         </VBox>

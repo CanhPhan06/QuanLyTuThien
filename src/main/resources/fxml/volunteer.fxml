@@ -11,79 +11,121 @@
     <left>
         <VBox spacing="8" styleClass="sidebar">
             <Label text="TÌNH NGUYỆN VIÊN" styleClass="sidebar-title"/>
-            <Button text="⌂  Tổng quan" styleClass="menu-button-active"/>
-            <Button text="▣  Chiến dịch" onAction="#handleCampaigns" styleClass="menu-button"/>
+            <Button text="⌂  Tổng quan" onAction="#handleShowOverview" styleClass="menu-button-active"/>
+            <Button text="▣  Chiến dịch" onAction="#handleShowCampaigns" styleClass="menu-button"/>
+            <Button text="▤  Công việc" onAction="#handleShowTasks" styleClass="menu-button"/>
+            <Button text="✎  Minh chứng" onAction="#handleShowProof" styleClass="menu-button"/>
+            <Button text="◉  Thông báo" onAction="#handleShowNotifications" styleClass="menu-button"/>
             <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
         </VBox>
     </left>
 
     <center>
-        <VBox spacing="16" styleClass="main-content">
-            <Label text="CỔNG TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
-            <Label fx:id="lblWelcome" text="Xin chào" styleClass="section-title"/>
+        <StackPane styleClass="main-content">
+            <VBox fx:id="overviewSection" spacing="16">
+                <Label text="CỔNG TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
+                <Label fx:id="lblWelcome" text="Xin chào" styleClass="section-title"/>
 
-            <HBox spacing="14">
-                <VBox styleClass="stat-card wide-stat-card">
-                    <Label text="Chiến dịch hiện tại" styleClass="muted-text"/>
-                    <Label fx:id="lblCampaign" text="Chưa tham gia" styleClass="activity-title"/>
-                </VBox>
-                <VBox styleClass="stat-card">
-                    <Label text="Trạng thái duyệt" styleClass="muted-text"/>
-                    <Label fx:id="lblStatus" text="Chưa đăng ký" styleClass="stat-number green"/>
-                </VBox>
-                <VBox styleClass="stat-card">
-                    <Label text="Điểm đánh giá" styleClass="muted-text"/>
-                    <Label fx:id="lblScore" text="Chưa có" styleClass="stat-number"/>
-                </VBox>
-                <VBox styleClass="stat-card">
-                    <Label text="Thông báo" styleClass="muted-text"/>
-                    <Label fx:id="lblNotificationCount" text="0" styleClass="stat-number purple"/>
-                </VBox>
-            </HBox>
+                <HBox spacing="14">
+                    <VBox styleClass="stat-card wide-stat-card">
+                        <Label text="Chiến dịch hiện tại" styleClass="muted-text"/>
+                        <Label fx:id="lblCampaign" text="Chưa tham gia" styleClass="activity-title"/>
+                    </VBox>
+                    <VBox styleClass="stat-card">
+                        <Label text="Trạng thái duyệt" styleClass="muted-text"/>
+                        <Label fx:id="lblStatus" text="Chưa đăng ký" styleClass="stat-number green"/>
+                    </VBox>
+                    <VBox styleClass="stat-card">
+                        <Label text="Điểm đánh giá" styleClass="muted-text"/>
+                        <Label fx:id="lblScore" text="Chưa có" styleClass="stat-number"/>
+                    </VBox>
+                    <VBox styleClass="stat-card">
+                        <Label text="Thông báo" styleClass="muted-text"/>
+                        <Label fx:id="lblNotificationCount" text="0" styleClass="stat-number purple"/>
+                    </VBox>
+                </HBox>
 
-            <HBox spacing="12" styleClass="action-bar">
-                <Button text="Đăng ký chiến dịch" onAction="#handleRegisterCampaign" styleClass="primary-button"/>
-                <Button text="Điểm danh" onAction="#handleCheckIn" styleClass="quick-button"/>
-                <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
-            </HBox>
+                <HBox spacing="12" styleClass="action-bar">
+                    <Button text="Xem chiến dịch" onAction="#handleShowCampaigns" styleClass="primary-button"/>
+                    <Button text="Xem công việc" onAction="#handleShowTasks" styleClass="quick-button"/>
+                    <Button text="Gửi minh chứng" onAction="#handleShowProof" styleClass="quick-button"/>
+                </HBox>
+            </VBox>
 
-            <HBox spacing="16" VBox.vgrow="ALWAYS">
-                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                    <Label text="Chiến dịch đang mở" styleClass="section-title"/>
-                    <TableView fx:id="tableCampaigns" styleClass="activity-table" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="colMaChienDich" text="Mã" prefWidth="75"/>
-                            <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="190"/>
-                            <TableColumn fx:id="colNgayBatDau" text="Bắt đầu" prefWidth="90"/>
-                            <TableColumn fx:id="colNgayKetThuc" text="Kết thúc" prefWidth="90"/>
-                            <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="110"/>
-                        </columns>
-                    </TableView>
-                </VBox>
-
-                <VBox spacing="8" HBox.hgrow="ALWAYS">
-                    <Label text="Công việc / điểm danh" styleClass="section-title"/>
-                    <TableView fx:id="tableTasks" styleClass="activity-table" VBox.vgrow="ALWAYS">
-                        <columns>
-                            <TableColumn fx:id="colTaskType" text="Nhóm" prefWidth="120"/>
-                            <TableColumn fx:id="colTaskTitle" text="Nội dung" prefWidth="220"/>
-                            <TableColumn fx:id="colTaskDate" text="Ngày" prefWidth="90"/>
-                            <TableColumn fx:id="colTaskStatus" text="Trạng thái" prefWidth="110"/>
-                        </columns>
-                    </TableView>
-                </VBox>
-            </HBox>
-
-            <VBox spacing="8">
-                <Label text="Thông báo của tôi" styleClass="section-title"/>
-                <TableView fx:id="tableNotifications" prefHeight="135" styleClass="activity-table">
+            <VBox fx:id="campaignsSection" spacing="14" visible="false" managed="false">
+                <Label text="CHIẾN DỊCH" styleClass="page-title"/>
+                <GridPane hgap="12" vgap="12" styleClass="form-card">
+                    <ComboBox fx:id="cboCampaign" promptText="Chọn chiến dịch" styleClass="input-field" maxWidth="Infinity"
+                              GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="Chiến dịch đang chọn" styleClass="muted-text"/>
+                        <Label fx:id="lblSelectedCampaign" text="Chưa chọn chiến dịch" styleClass="dashboard-main-text"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="Thời gian" styleClass="muted-text"/>
+                        <Label fx:id="lblSelectedTime" text="-" styleClass="dashboard-main-text"/>
+                    </VBox>
+                    <VBox spacing="4" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                        <Label text="Địa điểm" styleClass="muted-text"/>
+                        <Label fx:id="lblSelectedPlace" text="-" styleClass="dashboard-main-text"/>
+                    </VBox>
+                </GridPane>
+                <HBox spacing="12" styleClass="action-bar">
+                    <Button text="Đăng ký chiến dịch" onAction="#handleRegisterCampaign" styleClass="primary-button"/>
+                    <Button text="Xem chi tiết chiến dịch" onAction="#handleViewCampaignDetail" styleClass="quick-button"/>
+                    <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
+                </HBox>
+                <TableView fx:id="tableCampaigns" styleClass="activity-table" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colNoticeTitle" text="Tiêu đề" prefWidth="420"/>
-                        <TableColumn fx:id="colNoticeDate" text="Ngày" prefWidth="120"/>
-                        <TableColumn fx:id="colNoticeStatus" text="Trạng thái" prefWidth="140"/>
+                        <TableColumn fx:id="colMaChienDich" text="Mã" prefWidth="90"/>
+                        <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="360"/>
+                        <TableColumn fx:id="colNgayBatDau" text="Bắt đầu" prefWidth="130"/>
+                        <TableColumn fx:id="colNgayKetThuc" text="Kết thúc" prefWidth="130"/>
+                        <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="150"/>
                     </columns>
                 </TableView>
             </VBox>
-        </VBox>
+
+            <VBox fx:id="tasksSection" spacing="14" visible="false" managed="false">
+                <Label text="CÔNG VIỆC - ĐIỂM DANH" styleClass="page-title"/>
+                <HBox spacing="12" styleClass="action-bar">
+                    <Button text="Điểm danh" onAction="#handleCheckIn" styleClass="primary-button"/>
+                    <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
+                </HBox>
+                <TableView fx:id="tableTasks" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colTaskType" text="Nhóm" prefWidth="150"/>
+                        <TableColumn fx:id="colTaskTitle" text="Nội dung" prefWidth="420"/>
+                        <TableColumn fx:id="colTaskDate" text="Ngày" prefWidth="120"/>
+                        <TableColumn fx:id="colTaskStatus" text="Trạng thái" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <VBox fx:id="proofSection" spacing="14" visible="false" managed="false">
+                <Label text="MINH CHỨNG TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
+                <GridPane hgap="12" vgap="12" styleClass="form-card">
+                    <ComboBox fx:id="cboProofType" promptText="Chọn loại minh chứng" styleClass="input-field" maxWidth="Infinity"
+                              GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <TextField fx:id="txtProofNote" promptText="Nội dung/ghi chú minh chứng" styleClass="input-field"
+                               GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                </GridPane>
+                <HBox spacing="12" styleClass="action-bar">
+                    <Button text="Gửi minh chứng" onAction="#handleSubmitProof" styleClass="primary-button"/>
+                    <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
+                </HBox>
+            </VBox>
+
+            <VBox fx:id="notificationsSection" spacing="14" visible="false" managed="false">
+                <Label text="THÔNG BÁO CỦA TÔI" styleClass="page-title"/>
+                <TableView fx:id="tableNotifications" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colNoticeTitle" text="Tiêu đề" prefWidth="520"/>
+                        <TableColumn fx:id="colNoticeDate" text="Ngày" prefWidth="140"/>
+                        <TableColumn fx:id="colNoticeStatus" text="Trạng thái" prefWidth="170"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </StackPane>
     </center>
 </BorderPane>

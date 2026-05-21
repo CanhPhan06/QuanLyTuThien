@@ -140,4 +140,9 @@ public class SponsorModel {
     public String getSoTienText() {
         return FormatUtils.money(giaTriTaiTro);
     }
+
+    public String getTenChienDich() {
+        ActivityModel campaign = AppData.findCampaign(maChienDich);
+        return campaign == null ? maChienDich : campaign.getTenChienDich();
+    }
 }

@@ -53,6 +53,11 @@ public class ReportsController {
     }
 
     @FXML
+    private void handleExportReport() {
+        ExportUtils.exportTextToCsv("Xuất báo cáo tổng hợp", "bao-cao-tong-hop.csv", txtReport.getText());
+    }
+
+    @FXML
     private void handleBackHome() throws IOException {
         App.setRoot("secondary");
     }

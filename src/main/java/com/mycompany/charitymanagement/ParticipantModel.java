@@ -134,4 +134,9 @@ public class ParticipantModel {
     public void setHoatDong(String hoatDong) {
         this.maChienDich = hoatDong;
     }
+
+    public String getTenChienDich() {
+        ActivityModel campaign = AppData.findCampaign(maChienDich);
+        return campaign == null ? maChienDich : campaign.getTenChienDich();
+    }
 }

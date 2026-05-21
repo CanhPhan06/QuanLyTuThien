@@ -25,46 +25,58 @@
 
     <center>
         <VBox spacing="12" styleClass="main-content">
-            <SplitPane orientation="VERTICAL" dividerPositions="0.5" VBox.vgrow="ALWAYS">
-                <VBox spacing="8">
-                    <Label text="CHỜ XỬ LÝ: Chờ duyệt / Đang xét / Đang phân công / Chờ xác nhận" styleClass="section-title"/>
+            <Label text="VẬN HÀNH CHIẾN DỊCH" styleClass="page-title"/>
+
+            <HBox spacing="10" styleClass="filter-card">
+                <ComboBox fx:id="cboOperationTypeFilter" promptText="Loại nghiệp vụ" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="cboOperationCampaignFilter" promptText="Chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="cboOperationStatusFilter" promptText="Trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="txtOperationSearch" promptText="Tìm theo tiêu đề, người xử lý, đối tượng..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+                <Button text="Bỏ lọc" onAction="#handleClearOperationFilters" styleClass="quick-button"/>
+            </HBox>
+
+            <VBox spacing="10" styleClass="operation-board" VBox.vgrow="ALWAYS">
+                <VBox spacing="6" styleClass="table-section-card" VBox.vgrow="ALWAYS">
+                    <Label text="CHỜ XỬ LÝ: Chờ duyệt / Đang xét / Đang phân công / Chờ xác nhận" styleClass="table-section-title"/>
                     <TableView fx:id="tablePendingRecords" styleClass="activity-table" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="colPendingLoai" text="Loại" prefWidth="110"/>
+                            <TableColumn fx:id="colPendingLoai" text="Loại" prefWidth="120"/>
                             <TableColumn fx:id="colPendingMa" text="Mã" prefWidth="75"/>
-                            <TableColumn fx:id="colPendingChienDich" text="Chiến dịch" prefWidth="85"/>
-                            <TableColumn fx:id="colPendingDoiTuong" text="Đối tượng" prefWidth="90"/>
-                            <TableColumn fx:id="colPendingTieuDe" text="Tiêu đề" prefWidth="175"/>
-                            <TableColumn fx:id="colPendingNguoiXuLy" text="Người xử lý" prefWidth="100"/>
-                            <TableColumn fx:id="colPendingNgayTao" text="Ngày tạo" prefWidth="90"/>
-                            <TableColumn fx:id="colPendingNgayXuLy" text="Ngày xử lý" prefWidth="90"/>
-                            <TableColumn fx:id="colPendingTrangThai" text="Trạng thái" prefWidth="105"/>
+                            <TableColumn fx:id="colPendingChienDich" text="Chiến dịch" prefWidth="170"/>
+                            <TableColumn fx:id="colPendingDoiTuong" text="Đối tượng liên quan" prefWidth="170"/>
+                            <TableColumn fx:id="colPendingTieuDe" text="Tiêu đề" prefWidth="190"/>
+                            <TableColumn fx:id="colPendingNguoiXuLy" text="Người xử lý" prefWidth="120"/>
+                            <TableColumn fx:id="colPendingNgayTao" text="Ngày tạo" prefWidth="100"/>
+                            <TableColumn fx:id="colPendingNgayXuLy" text="Ngày xử lý" prefWidth="100"/>
+                            <TableColumn fx:id="colPendingTrangThai" text="Trạng thái" prefWidth="120"/>
                         </columns>
                     </TableView>
                 </VBox>
 
-                <VBox spacing="8">
-                    <Label text="ĐÃ XỬ LÝ: Đã duyệt / Đã phân công / Có mặt / Xác nhận / Đã xuất" styleClass="section-title"/>
+                <VBox spacing="6" styleClass="table-section-card" VBox.vgrow="ALWAYS">
+                    <Label text="ĐÃ XỬ LÝ: Đã duyệt / Đã phân công / Có mặt / Xác nhận / Đã xuất / Từ chối" styleClass="table-section-title"/>
                     <TableView fx:id="tableDoneRecords" styleClass="activity-table" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="colDoneLoai" text="Loại" prefWidth="110"/>
+                            <TableColumn fx:id="colDoneLoai" text="Loại" prefWidth="120"/>
                             <TableColumn fx:id="colDoneMa" text="Mã" prefWidth="75"/>
-                            <TableColumn fx:id="colDoneChienDich" text="Chiến dịch" prefWidth="85"/>
-                            <TableColumn fx:id="colDoneDoiTuong" text="Đối tượng" prefWidth="90"/>
-                            <TableColumn fx:id="colDoneTieuDe" text="Tiêu đề" prefWidth="175"/>
-                            <TableColumn fx:id="colDoneNguoiXuLy" text="Người xử lý" prefWidth="100"/>
-                            <TableColumn fx:id="colDoneNgayTao" text="Ngày tạo" prefWidth="90"/>
-                            <TableColumn fx:id="colDoneNgayXuLy" text="Ngày xử lý" prefWidth="90"/>
-                            <TableColumn fx:id="colDoneTrangThai" text="Trạng thái" prefWidth="105"/>
+                            <TableColumn fx:id="colDoneChienDich" text="Chiến dịch" prefWidth="170"/>
+                            <TableColumn fx:id="colDoneDoiTuong" text="Đối tượng liên quan" prefWidth="170"/>
+                            <TableColumn fx:id="colDoneTieuDe" text="Tiêu đề" prefWidth="190"/>
+                            <TableColumn fx:id="colDoneNguoiXuLy" text="Người xử lý" prefWidth="120"/>
+                            <TableColumn fx:id="colDoneNgayTao" text="Ngày tạo" prefWidth="100"/>
+                            <TableColumn fx:id="colDoneNgayXuLy" text="Ngày xử lý" prefWidth="100"/>
+                            <TableColumn fx:id="colDoneTrangThai" text="Trạng thái" prefWidth="120"/>
                         </columns>
                     </TableView>
                 </VBox>
-            </SplitPane>
+            </VBox>
 
             <HBox spacing="12" styleClass="action-bar">
                 <Button text="Thêm mới" onAction="#handleShowAddForm" styleClass="primary-button"/>
                 <Button fx:id="btnSaveRecord" text="Lưu" onAction="#handleSaveRecord" styleClass="quick-button"/>
                 <Button text="Xóa" onAction="#handleDeleteRecord" styleClass="danger-button"/>
+                <Button text="Xuất chờ xử lý" onAction="#handleExportPendingRecords" styleClass="quick-button"/>
+                <Button text="Xuất đã xử lý" onAction="#handleExportDoneRecords" styleClass="quick-button"/>
                 <Button fx:id="btnCloseForm" text="Đóng form" onAction="#handleClearForm" styleClass="quick-button"/>
             </HBox>
 

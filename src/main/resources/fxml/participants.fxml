@@ -25,26 +25,35 @@
 
     <center>
         <VBox spacing="16" styleClass="main-content">
-            <Label text="QUẢN LÝ SINH VIÊN / TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
+            <Label text="SINH VIÊN / TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
+
+            <HBox spacing="12" styleClass="filter-card">
+                <ComboBox fx:id="cboParticipantCampaignFilter" promptText="Lọc chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="cboParticipantSchoolFilter" promptText="Lọc trường" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="cboParticipantStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="txtParticipantSearch" promptText="Tìm họ tên, MSSV, SĐT, khoa..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+                <Button text="Bỏ lọc" onAction="#handleClearParticipantFilters" styleClass="quick-button"/>
+            </HBox>
 
             <HBox spacing="12" styleClass="action-bar">
-                <Button text="Thêm" onAction="#handleAddParticipant" styleClass="primary-button"/>
-                <Button text="Cập nhật" onAction="#handleUpdateParticipant" styleClass="quick-button"/>
-                <Button text="Xóa" onAction="#handleDeleteParticipant" styleClass="danger-button"/>
+                <Button text="+  Thêm" onAction="#handleAddParticipant" styleClass="primary-button"/>
+                <Button text="✎  Cập nhật" onAction="#handleUpdateParticipant" styleClass="quick-button"/>
+                <Button text="⌫  Xóa" onAction="#handleDeleteParticipant" styleClass="danger-button"/>
+                <Button text="⇩  Xuất file" onAction="#handleExportParticipants" styleClass="quick-button"/>
             </HBox>
 
             <TableView fx:id="tableParticipants" styleClass="activity-table" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colMaTaiKhoan" text="Tài khoản" prefWidth="80"/>
                     <TableColumn fx:id="colMaHoSo" text="Hồ sơ" prefWidth="75"/>
-                    <TableColumn fx:id="colHoTen" text="Họ tên" prefWidth="145"/>
-                    <TableColumn fx:id="colMssv" text="MSSV" prefWidth="90"/>
-                    <TableColumn fx:id="colSoDienThoai" text="SĐT" prefWidth="100"/>
-                    <TableColumn fx:id="colKhoa" text="Khoa" prefWidth="120"/>
-                    <TableColumn fx:id="colTruong" text="Trường" prefWidth="150"/>
-                    <TableColumn fx:id="colMaChienDich" text="Chiến dịch" prefWidth="85"/>
-                    <TableColumn fx:id="colTrangThaiDuyet" text="Duyệt" prefWidth="100"/>
-                    <TableColumn fx:id="colDiemDanhGia" text="Điểm" prefWidth="60"/>
+                    <TableColumn fx:id="colHoTen" text="Họ tên" prefWidth="150"/>
+                    <TableColumn fx:id="colMssv" text="MSSV" prefWidth="95"/>
+                    <TableColumn fx:id="colSoDienThoai" text="SĐT" prefWidth="105"/>
+                    <TableColumn fx:id="colKhoa" text="Khoa" prefWidth="155"/>
+                    <TableColumn fx:id="colTruong" text="Trường" prefWidth="95"/>
+                    <TableColumn fx:id="colMaChienDich" text="Chiến dịch" prefWidth="180"/>
+                    <TableColumn fx:id="colTrangThaiDuyet" text="Trạng thái" prefWidth="105"/>
+                    <TableColumn fx:id="colDiemDanhGia" text="Điểm" prefWidth="65"/>
                 </columns>
             </TableView>
         </VBox>

@@ -1,23 +1,38 @@
 package com.mycompany.charitymanagement;
 
 import java.io.IOException;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 
 public class SponsorsController {
 
     private static final String[] FORM_LABELS = {
-        "Mã đối tác", "Tên đối tác", "Lĩnh vực", "Số điện thoại", "Email",
-        "Địa chỉ", "Mã chiến dịch", "Giá trị tài trợ", "Ngày ký kết"
+        "Tên đối tác / nhà tài trợ", "Lĩnh vực", "Số điện thoại", "Email",
+        "Địa chỉ", "Chiến dịch tài trợ", "Giá trị tài trợ", "Ngày ký kết"
     };
 
     @FXML
     private Label lblTotalSponsor;
+    @FXML
+    private Label lblSponsorCount;
+    @FXML
+    private Label lblSponsorCampaignCount;
+    @FXML
+    private ComboBox<String> cboSponsorCampaignFilter;
+    @FXML
+    private ComboBox<String> cboSponsorFieldFilter;
+    @FXML
+    private TextField txtSponsorSearch;
 
     @FXML
     private TableView<SponsorModel> tableSponsors;
@@ -40,31 +55,37 @@ public class SponsorsController {
     @FXML
     private TableColumn<SponsorModel, String> colNgayKyKet;
 
+    private FilteredList<SponsorModel> filteredSponsors;
+
     @FXML
     private void initialize() {
         colMaDoiTac.setCellValueFactory(new PropertyValueFactory<>("maDoiTac"));
+        colMaDoiTac.setVisible(false);
         colTenDoiTac.setCellValueFactory(new PropertyValueFactory<>("tenDoiTac"));
         colLinhVuc.setCellValueFactory(new PropertyValueFactory<>("linhVuc"));
         colSoDienThoai.setCellValueFactory(new PropertyValueFactory<>("soDienThoai"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colDiaChi.setCellValueFactory(new PropertyValueFactory<>("diaChi"));
-        colMaChienDich.setCellValueFactory(new PropertyValueFactory<>("maChienDich"));
+        colMaChienDich.setText("Chiến dịch");
+        colMaChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
         colGiaTriTaiTro.setCellValueFactory(new PropertyValueFactory<>("giaTriTaiTroText"));
         colNgayKyKet.setCellValueFactory(new PropertyValueFactory<>("ngayKyKet"));
 
         tableSponsors.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tableSponsors.setItems(AppData.getSponsors());
+        filteredSponsors = new FilteredList<>(AppData.getSponsors(), item -> true);
+        tableSponsors.setItems(filteredSponsors);
+        setupSponsorFilters();
         tableSponsors.setRowFactory(table -> {
             TableRow<SponsorModel> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1) {
+                if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                     tableSponsors.getSelectionModel().select(row.getItem());
                     showSponsorDetail(row.getItem());
                 }
             });
             return row;
         });
-        updateTotal();
+        updateSponsorDashboard();
     }
 
     @FXML
@@ -80,7 +101,7 @@ public class SponsorsController {
 
         AppData.getSponsors().add(sponsor);
         tableSponsors.getSelectionModel().clearSelection();
-        updateTotal();
+        refreshSponsorView();
         DialogUtils.info("Đã thêm đối tác/tài trợ.");
     }
 
@@ -112,7 +133,7 @@ public class SponsorsController {
         selected.setNgayKyKet(form.getNgayKyKet());
         tableSponsors.refresh();
         tableSponsors.getSelectionModel().clearSelection();
-        updateTotal();
+        refreshSponsorView();
         DialogUtils.info("Đã cập nhật đối tác/tài trợ.");
     }
 
@@ -123,11 +144,27 @@ public class SponsorsController {
             DialogUtils.warning("Vui lòng chọn đối tác/tài trợ cần xóa.");
             return;
         }
+        if (!DialogUtils.confirm("Bạn có chắc muốn xóa đối tác/tài trợ " + selected.getMaDoiTac() + "?")) {
+            return;
+        }
 
         AppData.getSponsors().remove(selected);
         tableSponsors.getSelectionModel().clearSelection();
-        updateTotal();
+        refreshSponsorView();
         DialogUtils.info("Đã xóa đối tác/tài trợ.");
+    }
+
+    @FXML
+    private void handleClearSponsorFilters() {
+        cboSponsorCampaignFilter.setValue("Tất cả chiến dịch");
+        cboSponsorFieldFilter.setValue("Tất cả lĩnh vực");
+        txtSponsorSearch.clear();
+        applySponsorFilters();
+    }
+
+    @FXML
+    private void handleExportSponsors() {
+        ExportUtils.exportTableToCsv(tableSponsors, "Xuất danh sách nhà tài trợ", "danh-sach-nha-tai-tro.csv");
     }
 
     @FXML
@@ -176,10 +213,11 @@ public class SponsorsController {
     }
 
     private SponsorModel showSponsorDialog(String title, SponsorModel current) {
-        String[] values = current == null ? new String[]{"", "", "", "", "", "", "CD001", "0", AppData.todayText()}
+        String[] values = current == null ? new String[]{"", "", "", "", "", defaultCampaignOption(), "0", AppData.todayText()}
                 : new String[]{
-                    current.getMaDoiTac(), current.getTenDoiTac(), current.getLinhVuc(), current.getSoDienThoai(),
-                    current.getEmail(), current.getDiaChi(), current.getMaChienDich(),
+                    current.getTenDoiTac(), current.getLinhVuc(), current.getSoDienThoai(),
+                    current.getEmail(), current.getDiaChi(),
+                    current.getMaChienDich() + " - " + campaignName(current.getMaChienDich()),
                     current.getGiaTriTaiTro() == 0 ? "" : String.format("%.0f", current.getGiaTriTaiTro()),
                     current.getNgayKyKet()
                 };
@@ -187,31 +225,28 @@ public class SponsorsController {
         if (result == null) {
             return null;
         }
-        return buildSponsor(result);
+        return buildSponsor(result, current);
     }
 
-    private SponsorModel buildSponsor(String[] values) {
-        String maDoiTac = values[0];
-        String tenDoiTac = values[1];
-        String maChienDich = values[6];
+    private SponsorModel buildSponsor(String[] values, SponsorModel current) {
+        String maDoiTac = current == null ? AppData.nextSponsorId() : current.getMaDoiTac();
+        String tenDoiTac = values[0];
+        String maChienDich = codeOf(values[5]);
 
         if (maDoiTac.isEmpty() || tenDoiTac.isEmpty() || maChienDich.isEmpty()) {
-            DialogUtils.warning("Vui lòng nhập mã đối tác, tên đối tác và mã chiến dịch.");
+            DialogUtils.warning("Vui lòng nhập tên đối tác và chọn chiến dịch tài trợ.");
             return null;
         }
-        if (!values[3].isEmpty() && !values[3].startsWith("09")) {
-            DialogUtils.warning("Số điện thoại nên bắt đầu bằng 09.");
-            return null;
-        }
-        if (!values[4].isEmpty() && !values[4].toLowerCase().endsWith("@gmail.com")) {
-            DialogUtils.warning("Email nhà tài trợ phải có dạng @gmail.com.");
-            return null;
-        }
-
         try {
-            double giaTriTaiTro = values[7].isEmpty() ? 0 : FormatUtils.parseMoney(values[7]);
-            return new SponsorModel(maDoiTac, tenDoiTac, values[2], values[3], values[4],
-                    values[5], maChienDich, giaTriTaiTro, values[8]);
+            double giaTriTaiTro = values[6].isEmpty() ? 0 : FormatUtils.parseMoney(values[6]);
+            SponsorModel sponsor = new SponsorModel(maDoiTac, tenDoiTac, values[1], values[2], values[3],
+                    values[4], maChienDich, giaTriTaiTro, values[7]);
+            String error = BusinessRules.validateSponsor(sponsor);
+            if (error != null) {
+                DialogUtils.warning(error);
+                return null;
+            }
+            return sponsor;
         } catch (NumberFormatException ex) {
             DialogUtils.warning("Giá trị tài trợ không hợp lệ.");
             return null;
@@ -225,14 +260,12 @@ public class SponsorsController {
 
     private void showSponsorDetail(SponsorModel sponsor) {
         ActivityModel campaign = AppData.findCampaign(sponsor.getMaChienDich());
-        DetailDialogUtils.showDetails(tableSponsors, "Chi tiết nhà tài trợ - " + sponsor.getMaDoiTac(), new String[][]{
-            {"Mã đối tác", sponsor.getMaDoiTac()},
+        DetailDialogUtils.showDetails(tableSponsors, "Chi tiết nhà tài trợ - " + sponsor.getTenDoiTac(), new String[][]{
             {"Tên đối tác / nhà tài trợ", sponsor.getTenDoiTac()},
             {"Lĩnh vực", sponsor.getLinhVuc()},
             {"Số điện thoại", sponsor.getSoDienThoai()},
             {"Email", sponsor.getEmail()},
             {"Địa chỉ", sponsor.getDiaChi()},
-            {"Mã chiến dịch tài trợ", sponsor.getMaChienDich()},
             {"Tên chiến dịch", campaign == null ? "" : campaign.getTenChienDich()},
             {"Giá trị tài trợ", FormatUtils.money(sponsor.getGiaTriTaiTro())},
             {"Ngày ký kết", sponsor.getNgayKyKet()},
@@ -242,6 +275,110 @@ public class SponsorsController {
     }
 
     private void updateTotal() {
+        updateSponsorDashboard();
+    }
+
+    private void setupSponsorFilters() {
+        cboSponsorCampaignFilter.setItems(buildCampaignFilterChoices());
+        cboSponsorFieldFilter.setItems(buildFieldFilterChoices());
+        cboSponsorCampaignFilter.setValue("Tất cả chiến dịch");
+        cboSponsorFieldFilter.setValue("Tất cả lĩnh vực");
+        cboSponsorCampaignFilter.valueProperty().addListener((observable, oldValue, newValue) -> applySponsorFilters());
+        cboSponsorFieldFilter.valueProperty().addListener((observable, oldValue, newValue) -> applySponsorFilters());
+        txtSponsorSearch.textProperty().addListener((observable, oldValue, newValue) -> applySponsorFilters());
+    }
+
+    private void refreshSponsorView() {
+        updateSponsorDashboard();
+        String currentField = cboSponsorFieldFilter.getValue();
+        cboSponsorFieldFilter.setItems(buildFieldFilterChoices());
+        cboSponsorFieldFilter.setValue(cboSponsorFieldFilter.getItems().contains(currentField)
+                ? currentField : "Tất cả lĩnh vực");
+        applySponsorFilters();
+        tableSponsors.refresh();
+    }
+
+    private void updateSponsorDashboard() {
         lblTotalSponsor.setText(FormatUtils.money(AppData.getTotalSponsorAmount()));
+        lblSponsorCount.setText(String.valueOf(AppData.getSponsors().size()));
+        long campaignCount = AppData.getSponsors().stream()
+                .map(SponsorModel::getMaChienDich)
+                .distinct()
+                .count();
+        lblSponsorCampaignCount.setText(String.valueOf(campaignCount));
+    }
+
+    private void applySponsorFilters() {
+        if (filteredSponsors == null) {
+            return;
+        }
+        String campaignId = codeOf(cboSponsorCampaignFilter.getValue());
+        String field = cboSponsorFieldFilter.getValue() == null ? "" : cboSponsorFieldFilter.getValue();
+        String query = normalized(value(txtSponsorSearch));
+        boolean allCampaigns = campaignId.isEmpty() || "Tất cả chiến dịch".equals(cboSponsorCampaignFilter.getValue());
+        boolean allFields = field.isEmpty() || "Tất cả lĩnh vực".equals(field);
+
+        filteredSponsors.setPredicate(sponsor
+                -> (allCampaigns || sponsor.getMaChienDich().equalsIgnoreCase(campaignId))
+                && (allFields || safe(sponsor.getLinhVuc()).equalsIgnoreCase(field))
+                && (query.isEmpty() || normalized(sponsor.getTenDoiTac() + " "
+                + sponsor.getLinhVuc() + " " + sponsor.getSoDienThoai() + " "
+                + sponsor.getEmail() + " " + sponsor.getDiaChi() + " "
+                + sponsor.getTenChienDich()).contains(query)));
+    }
+
+    private ObservableList<String> buildCampaignFilterChoices() {
+        ObservableList<String> choices = FXCollections.observableArrayList("Tất cả chiến dịch");
+        for (ActivityModel activity : AppData.getActivities()) {
+            choices.add(activity.getMaChienDich() + " - " + activity.getTenChienDich());
+        }
+        return choices;
+    }
+
+    private ObservableList<String> buildFieldFilterChoices() {
+        ObservableList<String> choices = FXCollections.observableArrayList("Tất cả lĩnh vực");
+        AppData.getSponsors().stream()
+                .map(SponsorModel::getLinhVuc)
+                .filter(value -> value != null && !value.trim().isEmpty())
+                .distinct()
+                .forEach(choices::add);
+        return choices;
+    }
+
+    private String defaultCampaignOption() {
+        return AppData.getActivities().stream()
+                .findFirst()
+                .map(activity -> activity.getMaChienDich() + " - " + activity.getTenChienDich())
+                .orElse("");
+    }
+
+    private String campaignName(String campaignId) {
+        ActivityModel campaign = AppData.findCampaign(campaignId);
+        return campaign == null ? campaignId : campaign.getTenChienDich();
+    }
+
+    private String codeOf(String option) {
+        if (option == null) {
+            return "";
+        }
+        int split = option.indexOf(" - ");
+        return split >= 0 ? option.substring(0, split).trim() : option.trim();
+    }
+
+    private String value(TextField textField) {
+        return textField == null || textField.getText() == null ? "" : textField.getText().trim();
+    }
+
+    private String normalized(String value) {
+        if (value == null) {
+            return "";
+        }
+        return java.text.Normalizer.normalize(value.toLowerCase(), java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replace("đ", "d");
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 }

@@ -74,6 +74,7 @@
 
             <HBox spacing="12" styleClass="action-bar">
                 <Button text="Làm mới báo cáo" onAction="#handleRefreshReport" styleClass="primary-button"/>
+                <Button text="Xuất file" onAction="#handleExportReport" styleClass="quick-button"/>
             </HBox>
 
             <TextArea fx:id="txtReport" editable="false" wrapText="true" styleClass="report-area" VBox.vgrow="ALWAYS"/>

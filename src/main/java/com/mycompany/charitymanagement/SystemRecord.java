@@ -54,6 +54,26 @@ public class SystemRecord {
         return nhomBang;
     }
 
+    public String getTenNhomBang() {
+        String value = nhomBang == null ? "" : nhomBang.toLowerCase();
+        if (value.contains("tintuc")) {
+            return "Tin tức";
+        }
+        if (value.contains("binhluan")) {
+            return "Bình luận";
+        }
+        if (value.contains("thongbao")) {
+            return "Thông báo";
+        }
+        if (value.contains("nhatky")) {
+            return "Nhật ký";
+        }
+        if (value.contains("thamso")) {
+            return "Tham số";
+        }
+        return nhomBang;
+    }
+
     public String getMaChinh() {
         return maChinh;
     }
@@ -84,6 +104,24 @@ public class SystemRecord {
 
     public String getDoiTuongLienKet() {
         return maLienKet;
+    }
+
+    public String getTenLienKet() {
+        ActivityModel campaign = AppData.findCampaign(maLienKet);
+        if (campaign != null) {
+            return campaign.getTenChienDich();
+        }
+        for (UserAccount account : AppData.getAccounts()) {
+            if (account.getUsername().equalsIgnoreCase(maLienKet)) {
+                return account.getDisplayName();
+            }
+        }
+        return maLienKet;
+    }
+
+    public String getTenChienDich() {
+        ActivityModel campaign = AppData.findCampaign(maChienDich);
+        return campaign == null ? maChienDich : campaign.getTenChienDich();
     }
 
     public String getTieuDe() {

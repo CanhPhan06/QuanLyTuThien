@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.Normalizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -22,6 +23,7 @@ public class OperationsController {
     private static final String TYPE_EXPENSE = "Chi tiêu";
     private static final String TYPE_VOLUNTEER_PROOF = "Minh chứng TNV";
     private static final String TYPE_ITEM_EXPORT = "Xuất vật phẩm";
+    private static final String TYPE_DONATION = "Quyên góp";
 
     @FXML
     private VBox formSection;
@@ -54,6 +56,14 @@ public class OperationsController {
     private TextField txtNoiDung;
     @FXML
     private TextField txtGhiChu;
+    @FXML
+    private ComboBox<String> cboOperationTypeFilter;
+    @FXML
+    private ComboBox<String> cboOperationCampaignFilter;
+    @FXML
+    private ComboBox<String> cboOperationStatusFilter;
+    @FXML
+    private TextField txtOperationSearch;
 
     @FXML
     private TableView<SystemRecord> tablePendingRecords;
@@ -99,6 +109,8 @@ public class OperationsController {
 
     private final ObservableList<SystemRecord> pendingRecords = FXCollections.observableArrayList();
     private final ObservableList<SystemRecord> doneRecords = FXCollections.observableArrayList();
+    private FilteredList<SystemRecord> filteredPendingRecords;
+    private FilteredList<SystemRecord> filteredDoneRecords;
     private boolean addMode;
 
     @FXML
@@ -110,10 +122,12 @@ public class OperationsController {
                 TYPE_ATTENDANCE,
                 TYPE_EXPENSE,
                 TYPE_VOLUNTEER_PROOF,
-                TYPE_ITEM_EXPORT
+                TYPE_ITEM_EXPORT,
+                TYPE_DONATION
         ));
         cboNguoiXuLy.setItems(buildUserOptions());
         cboChienDich.setItems(buildCampaignOptions());
+        setupOperationFilters();
 
         cboLoaiNghiepVu.valueProperty().addListener((observable, oldValue, newValue) -> {
             updateStatusOptions(cboTrangThai.getValue());
@@ -126,11 +140,15 @@ public class OperationsController {
                 colPendingTieuDe, colPendingNguoiXuLy, colPendingNgayTao, colPendingNgayXuLy, colPendingTrangThai);
         configureColumns(colDoneLoai, colDoneMa, colDoneChienDich, colDoneDoiTuong,
                 colDoneTieuDe, colDoneNguoiXuLy, colDoneNgayTao, colDoneNgayXuLy, colDoneTrangThai);
+        txtMaVanHanh.setVisible(false);
+        txtMaVanHanh.setManaged(false);
 
         tablePendingRecords.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableDoneRecords.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tablePendingRecords.setItems(pendingRecords);
-        tableDoneRecords.setItems(doneRecords);
+        filteredPendingRecords = new FilteredList<>(pendingRecords, item -> true);
+        filteredDoneRecords = new FilteredList<>(doneRecords, item -> true);
+        tablePendingRecords.setItems(filteredPendingRecords);
+        tableDoneRecords.setItems(filteredDoneRecords);
 
         tablePendingRecords.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, selected) -> {
@@ -201,11 +219,24 @@ public class OperationsController {
             DialogUtils.warning("Vui lòng chọn bản ghi cần xóa.");
             return;
         }
+        if (!DialogUtils.confirm("Bạn có chắc muốn xóa bản ghi vận hành " + selected.getMaChinh() + "?")) {
+            return;
+        }
 
         AppData.getOperations().remove(selected);
         refreshTables();
         handleClearForm();
         DialogUtils.info("Đã xóa bản ghi vận hành.");
+    }
+
+    @FXML
+    private void handleExportPendingRecords() {
+        ExportUtils.exportTableToCsv(tablePendingRecords, "Xuất danh sách chờ xử lý", "van-hanh-cho-xu-ly.csv");
+    }
+
+    @FXML
+    private void handleExportDoneRecords() {
+        ExportUtils.exportTableToCsv(tableDoneRecords, "Xuất danh sách đã xử lý", "van-hanh-da-xu-ly.csv");
     }
 
     @FXML
@@ -215,6 +246,15 @@ public class OperationsController {
         clearManualFields();
         resetForm();
         hideForm();
+    }
+
+    @FXML
+    private void handleClearOperationFilters() {
+        cboOperationTypeFilter.setValue("Tất cả nghiệp vụ");
+        cboOperationCampaignFilter.setValue("Tất cả chiến dịch");
+        cboOperationStatusFilter.setValue("Tất cả trạng thái");
+        txtOperationSearch.clear();
+        applyOperationFilters();
     }
 
     @FXML
@@ -268,6 +308,11 @@ public class OperationsController {
             DialogUtils.warning("Mã vận hành đã tồn tại.");
             return;
         }
+        String error = BusinessRules.validateOperation(record);
+        if (error != null) {
+            DialogUtils.warning(error);
+            return;
+        }
 
         AppData.getOperations().add(record);
         syncRelatedData(record);
@@ -279,6 +324,11 @@ public class OperationsController {
     private void updateRecord(SystemRecord selected, SystemRecord form) {
         if (existsById(form.getMaChinh(), selected)) {
             DialogUtils.warning("Mã vận hành đã tồn tại.");
+            return;
+        }
+        String error = BusinessRules.validateOperation(form);
+        if (error != null) {
+            DialogUtils.warning(error);
             return;
         }
 
@@ -311,8 +361,11 @@ public class OperationsController {
             TableColumn<SystemRecord, String> colTrangThai) {
         colLoai.setCellValueFactory(new PropertyValueFactory<>("nhomBang"));
         colMa.setCellValueFactory(new PropertyValueFactory<>("maChinh"));
-        colChienDich.setCellValueFactory(new PropertyValueFactory<>("maChienDich"));
-        colDoiTuong.setCellValueFactory(new PropertyValueFactory<>("maLienKet"));
+        colMa.setVisible(false);
+        colChienDich.setText("Chiến dịch");
+        colChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
+        colDoiTuong.setText("Đối tượng liên quan");
+        colDoiTuong.setCellValueFactory(new PropertyValueFactory<>("tenLienKet"));
         colTieuDe.setCellValueFactory(new PropertyValueFactory<>("tieuDe"));
         colNguoiXuLy.setCellValueFactory(new PropertyValueFactory<>("nguoiXuLy"));
         colNgayTao.setCellValueFactory(new PropertyValueFactory<>("ngayTao"));
@@ -376,8 +429,72 @@ public class OperationsController {
                 pendingRecords.add(record);
             }
         }
+        applyOperationFilters();
         tablePendingRecords.refresh();
         tableDoneRecords.refresh();
+    }
+
+    private void setupOperationFilters() {
+        cboOperationTypeFilter.setItems(FXCollections.observableArrayList(
+                "Tất cả nghiệp vụ",
+                TYPE_CAMPAIGN,
+                TYPE_REGISTRATION,
+                TYPE_WORK,
+                TYPE_ATTENDANCE,
+                TYPE_EXPENSE,
+                TYPE_VOLUNTEER_PROOF,
+                TYPE_ITEM_EXPORT,
+                TYPE_DONATION
+        ));
+        cboOperationCampaignFilter.setItems(buildCampaignFilterOptions());
+        cboOperationStatusFilter.setItems(FXCollections.observableArrayList(
+                "Tất cả trạng thái", "Chờ duyệt", "Đang xét", "Đang phân công",
+                "Chờ xác nhận", "Đã duyệt", "Đã phân công", "Có mặt",
+                "Xác nhận", "Đã xác nhận", "Đã xuất", "Từ chối"
+        ));
+        cboOperationTypeFilter.setValue("Tất cả nghiệp vụ");
+        cboOperationCampaignFilter.setValue("Tất cả chiến dịch");
+        cboOperationStatusFilter.setValue("Tất cả trạng thái");
+        cboOperationTypeFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyOperationFilters());
+        cboOperationCampaignFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyOperationFilters());
+        cboOperationStatusFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyOperationFilters());
+        txtOperationSearch.textProperty().addListener((observable, oldValue, newValue) -> applyOperationFilters());
+    }
+
+    private ObservableList<String> buildCampaignFilterOptions() {
+        ObservableList<String> options = FXCollections.observableArrayList("Tất cả chiến dịch");
+        options.addAll(buildCampaignOptions());
+        return options;
+    }
+
+    private void applyOperationFilters() {
+        if (filteredPendingRecords == null || filteredDoneRecords == null) {
+            return;
+        }
+        filteredPendingRecords.setPredicate(this::matchesOperationFilters);
+        filteredDoneRecords.setPredicate(this::matchesOperationFilters);
+    }
+
+    private boolean matchesOperationFilters(SystemRecord record) {
+        String type = cboOperationTypeFilter.getValue();
+        String campaignId = extractCode(cboOperationCampaignFilter.getValue());
+        String status = cboOperationStatusFilter.getValue();
+        String query = normalize(value(txtOperationSearch));
+
+        boolean typeMatches = type == null || type.equals("Tất cả nghiệp vụ") || sameType(type, record.getNhomBang());
+        boolean campaignMatches = campaignId.isEmpty() || record.getMaChienDich().equalsIgnoreCase(campaignId);
+        boolean statusMatches = status == null || status.equals("Tất cả trạng thái")
+                || normalize(record.getTrangThai()).equals(normalize(status));
+        boolean queryMatches = query.isEmpty() || normalize(String.join(" ",
+                safe(record.getNhomBang()),
+                safe(record.getTenChienDich()),
+                safe(record.getTenLienKet()),
+                safe(record.getTieuDe()),
+                safe(record.getNoiDung()),
+                safe(record.getNguoiXuLy()),
+                safe(record.getTrangThai())
+        )).contains(query);
+        return typeMatches && campaignMatches && statusMatches && queryMatches;
     }
 
     private ObservableList<String> buildCampaignOptions() {
@@ -430,6 +547,9 @@ public class OperationsController {
         if (sameType(type, TYPE_ITEM_EXPORT)) {
             return FXCollections.observableArrayList("Chờ xác nhận", "Đã xuất");
         }
+        if (sameType(type, TYPE_DONATION)) {
+            return FXCollections.observableArrayList("Chờ xác nhận", "Đã xác nhận", "Từ chối");
+        }
         return FXCollections.observableArrayList("Chờ duyệt", "Đã duyệt");
     }
 
@@ -442,11 +562,13 @@ public class OperationsController {
             options.setAll(buildCampaignOptions());
         } else if (sameType(type, TYPE_REGISTRATION) || sameType(type, TYPE_ATTENDANCE)) {
             addParticipantOptions(options, campaignId);
+        } else if (sameType(type, TYPE_DONATION)) {
+            addDonationOptions(options, campaignId);
         } else {
             addOperationLinkOptions(options, type, campaignId);
         }
 
-        if (options.isEmpty() && !campaignId.isEmpty()) {
+        if (options.isEmpty() && !campaignId.isEmpty() && !sameType(type, TYPE_DONATION)) {
             String code = defaultLinkCode(type);
             options.add(code + " - Tạo liên kết mới cho " + campaignName(campaignId));
         }
@@ -480,6 +602,15 @@ public class OperationsController {
             if (sameType(record.getNhomBang(), type)) {
                 options.add(record.getMaLienKet() + " - " + record.getTieuDe()
                         + " - " + record.getMaChienDich());
+            }
+        }
+    }
+
+    private void addDonationOptions(ObservableList<String> options, String campaignId) {
+        for (DonationModel donation : AppData.getDonations()) {
+            if (campaignId.isEmpty() || donation.getHoatDong().equalsIgnoreCase(campaignId)) {
+                options.add(donation.getMaQuyenGop() + " - " + donation.getHinhThuc()
+                        + " - " + FormatUtils.money(donation.getSoTien()));
             }
         }
     }
@@ -551,6 +682,7 @@ public class OperationsController {
     }
 
     private void syncRelatedData(SystemRecord record) {
+        BusinessService.applyOperation(record);
         if (sameType(record.getNhomBang(), TYPE_CAMPAIGN)) {
             ActivityModel campaign = AppData.findCampaign(record.getMaLienKet());
             if (campaign == null) {
@@ -593,6 +725,7 @@ public class OperationsController {
         return normalized.contains("da")
                 || normalized.contains("co mat")
                 || normalized.contains("xac nhan")
+                || normalized.contains("tu choi")
                 || normalized.contains("hoan tat");
     }
 
@@ -605,7 +738,7 @@ public class OperationsController {
             return "";
         }
         String text = Normalizer.normalize(value.trim().toLowerCase(), Normalizer.Form.NFD);
-        return text.replaceAll("\\p{M}", "").replace('đ', 'd');
+        return text.replaceAll("\\p{M}", "").replace("đ", "d");
     }
 
     private String extractCode(String option) {
@@ -641,6 +774,9 @@ public class OperationsController {
         if (sameType(type, TYPE_ITEM_EXPORT)) {
             return nextLinkCode("PX");
         }
+        if (sameType(type, TYPE_DONATION)) {
+            return AppData.nextDonationId();
+        }
         return extractCode(cboChienDich.getValue());
     }
 
@@ -674,5 +810,9 @@ public class OperationsController {
 
     private String value(TextField textField) {
         return textField.getText() == null ? "" : textField.getText().trim();
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 }

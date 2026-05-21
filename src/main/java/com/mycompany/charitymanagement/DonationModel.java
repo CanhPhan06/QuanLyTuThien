@@ -83,4 +83,18 @@ public class DonationModel {
     public String getSoTienText() {
         return FormatUtils.money(soTien);
     }
+
+    public String getTenChienDich() {
+        ActivityModel campaign = AppData.findCampaign(hoatDong);
+        return campaign == null ? hoatDong : campaign.getTenChienDich();
+    }
+
+    public String getTrangThaiXuLy() {
+        return AppData.getOperations().stream()
+                .filter(record -> "Quyên góp".equals(record.getNhomBang())
+                && record.getMaLienKet().equalsIgnoreCase(maQuyenGop))
+                .map(SystemRecord::getTrangThai)
+                .findFirst()
+                .orElse("Đã ghi nhận");
+    }
 }

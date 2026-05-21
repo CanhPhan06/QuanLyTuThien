@@ -24,26 +24,32 @@
     </left>
 
     <center>
-        <VBox spacing="12" styleClass="main-content">
+        <VBox spacing="14" styleClass="main-content">
             <Label text="CHIẾN DỊCH" styleClass="page-title"/>
 
-            <VBox spacing="8" VBox.vgrow="ALWAYS">
-                <Label text="DANH SÁCH CHIẾN DỊCH" styleClass="section-title"/>
-                <HBox spacing="10" styleClass="action-bar">
-                    <Button text="Xem chi tiết chiến dịch" onAction="#handleOpenSelectedCampaignDetail" styleClass="primary-button"/>
-                </HBox>
-                <TableView fx:id="tableActivities" styleClass="activity-table" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="colMaChienDich" text="Mã chiến dịch" prefWidth="110"/>
-                        <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="260"/>
-                        <TableColumn fx:id="colNgayBatDau" text="Ngày bắt đầu" prefWidth="115"/>
-                        <TableColumn fx:id="colNgayKetThuc" text="Ngày kết thúc" prefWidth="115"/>
-                        <TableColumn fx:id="colMucTieuTien" text="Mục tiêu tiền" prefWidth="135"/>
-                        <TableColumn fx:id="colDiaDiem" text="Địa điểm" prefWidth="140"/>
-                        <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="130"/>
-                    </columns>
-                </TableView>
-            </VBox>
+            <HBox spacing="12" styleClass="filter-card">
+                <ComboBox fx:id="cboActivityStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="cboActivityLocationFilter" promptText="Lọc địa điểm" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="txtActivitySearch" promptText="Tìm tên chiến dịch, mô tả, địa điểm..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+                <Button text="Bỏ lọc" onAction="#handleClearActivityFilters" styleClass="quick-button"/>
+            </HBox>
+
+            <HBox spacing="10" styleClass="action-bar">
+                <Button text="Xem chi tiết chiến dịch" onAction="#handleOpenSelectedCampaignDetail" styleClass="primary-button"/>
+                <Button text="Xuất file" onAction="#handleExportActivities" styleClass="quick-button"/>
+            </HBox>
+
+            <TableView fx:id="tableActivities" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colMaChienDich" text="Mã chiến dịch" prefWidth="110"/>
+                    <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="260"/>
+                    <TableColumn fx:id="colNgayBatDau" text="Ngày bắt đầu" prefWidth="115"/>
+                    <TableColumn fx:id="colNgayKetThuc" text="Ngày kết thúc" prefWidth="115"/>
+                    <TableColumn fx:id="colMucTieuTien" text="Mục tiêu tiền" prefWidth="135"/>
+                    <TableColumn fx:id="colDiaDiem" text="Địa điểm" prefWidth="140"/>
+                    <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="130"/>
+                </columns>
+            </TableView>
 
             <HBox fx:id="adminActionBar" spacing="10" styleClass="action-bar">
                 <Button text="Thêm chiến dịch" onAction="#handleAddActivity" styleClass="primary-button"/>

@@ -74,7 +74,7 @@
     -fx-border-width: 0;
     -fx-border-radius: 6px;
     -fx-text-fill: white;
-    -fx-font-size: 16px;
+    -fx-font-size: 18px;
     -fx-alignment: CENTER_LEFT;
     -fx-text-alignment: LEFT;
     -fx-wrap-text: true;
@@ -106,7 +106,7 @@
     -fx-border-width: 0;
     -fx-border-radius: 6px;
     -fx-text-fill: white;
-    -fx-font-size: 16px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-alignment: CENTER_LEFT;
     -fx-text-alignment: LEFT;
@@ -281,6 +281,10 @@
     -fx-text-fill: #6f35c5;
 }
 
+.orange {
+    -fx-text-fill: #d97706;
+}
+
 .muted-text {
     -fx-text-fill: #6b7280;
     -fx-font-size: 13px;
@@ -293,6 +297,65 @@
     -fx-background-radius: 8px;
     -fx-padding: 16px;
     -fx-effect: dropshadow(gaussian, rgba(15,35,65,0.08), 9, 0, 0, 3);
+}
+
+.filter-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-padding: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-effect: dropshadow(gaussian, rgba(15,35,65,0.08), 10, 0, 0, 3);
+}
+
+.metric-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-padding: 16px 18px;
+    -fx-min-width: 190px;
+    -fx-effect: dropshadow(gaussian, rgba(15,35,65,0.09), 11, 0, 0, 4);
+}
+
+.metric-title {
+    -fx-text-fill: #1f2d3d;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.metric-icon {
+    -fx-min-width: 58px;
+    -fx-min-height: 58px;
+    -fx-pref-width: 58px;
+    -fx-pref-height: 58px;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12px;
+}
+
+.blue-soft {
+    -fx-background-color: #e8f1ff;
+    -fx-text-fill: #1768d1;
+}
+
+.green-soft {
+    -fx-background-color: #e8f7ee;
+    -fx-text-fill: #159447;
+}
+
+.orange-soft {
+    -fx-background-color: #fff2df;
+    -fx-text-fill: #d97706;
+}
+
+.purple-soft {
+    -fx-background-color: #f1eafe;
+    -fx-text-fill: #6f35c5;
+}
+
+.wide-search-field {
+    -fx-min-width: 250px;
+    -fx-pref-width: 360px;
 }
 
 .detail-overlay {
@@ -381,6 +444,27 @@
 
 .operation-form-panel {
     -fx-spacing: 12px;
+}
+
+.operation-board {
+    -fx-background-color: transparent;
+}
+
+.table-section-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(15,35,65,0.07), 8, 0, 0, 2);
+}
+
+.table-section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102a43;
+}
+
+.content-table .table-row-cell {
+    -fx-cell-size: 48px;
 }
 
 .content-scroll {

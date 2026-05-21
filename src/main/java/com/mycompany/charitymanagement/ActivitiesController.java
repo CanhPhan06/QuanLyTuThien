@@ -1,18 +1,24 @@
 package com.mycompany.charitymanagement;
 
 import java.io.IOException;
+import java.text.Normalizer;
 import javafx.fxml.FXML;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
@@ -24,8 +30,8 @@ import javafx.stage.Stage;
 public class ActivitiesController {
 
     private static final String[] FORM_LABELS = {
-        "Mã chiến dịch", "Tên chiến dịch", "Mô tả", "Địa điểm",
-        "Ngày bắt đầu", "Ngày kết thúc", "Mục tiêu tiền", "Trạng thái", "Mã người tạo"
+        "Tên chiến dịch", "Mô tả", "Địa điểm",
+        "Ngày bắt đầu", "Ngày kết thúc", "Mục tiêu tiền", "Trạng thái chiến dịch"
     };
 
     @FXML
@@ -43,6 +49,12 @@ public class ActivitiesController {
 
     @FXML
     private HBox adminActionBar;
+    @FXML
+    private ComboBox<String> cboActivityStatusFilter;
+    @FXML
+    private ComboBox<String> cboActivityLocationFilter;
+    @FXML
+    private TextField txtActivitySearch;
 
     @FXML
     private TableView<ActivityModel> tableActivities;
@@ -62,6 +74,7 @@ public class ActivitiesController {
     private TableColumn<ActivityModel, String> colTrangThai;
 
     private UserAccount currentUser;
+    private FilteredList<ActivityModel> filteredActivities;
 
     @FXML
     private void initialize() {
@@ -71,6 +84,7 @@ public class ActivitiesController {
         }
 
         colMaChienDich.setCellValueFactory(new PropertyValueFactory<>("maChienDich"));
+        colMaChienDich.setVisible(false);
         colTenChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
         colNgayBatDau.setCellValueFactory(new PropertyValueFactory<>("ngayBatDau"));
         colNgayKetThuc.setCellValueFactory(new PropertyValueFactory<>("ngayKetThuc"));
@@ -79,11 +93,13 @@ public class ActivitiesController {
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
 
         tableActivities.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tableActivities.setItems(AppData.getActivities());
+        filteredActivities = new FilteredList<>(AppData.getActivities(), item -> true);
+        tableActivities.setItems(filteredActivities);
+        setupActivityFilters();
         tableActivities.setRowFactory(table -> {
             TableRow<ActivityModel> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1) {
+                if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                     tableActivities.getSelectionModel().select(row.getItem());
                     openCampaignDetailWindow(row.getItem());
                 }
@@ -111,6 +127,7 @@ public class ActivitiesController {
 
         AppData.getActivities().add(activity);
         tableActivities.getSelectionModel().clearSelection();
+        refreshActivityView();
         DialogUtils.info("Đã thêm chiến dịch mới.");
     }
 
@@ -147,6 +164,7 @@ public class ActivitiesController {
         tableActivities.refresh();
         closeCampaignDetailWindow();
         tableActivities.getSelectionModel().clearSelection();
+        refreshActivityView();
         DialogUtils.info("Đã cập nhật chiến dịch.");
     }
 
@@ -161,16 +179,38 @@ public class ActivitiesController {
             DialogUtils.warning("Vui lòng chọn chiến dịch cần xóa.");
             return;
         }
+        String deleteError = BusinessRules.canDeleteCampaign(selected);
+        if (deleteError != null) {
+            DialogUtils.warning(deleteError);
+            return;
+        }
+        if (!DialogUtils.confirm("Bạn có chắc muốn xóa chiến dịch " + selected.getMaChienDich() + "?")) {
+            return;
+        }
 
         AppData.getActivities().remove(selected);
         tableActivities.getSelectionModel().clearSelection();
         closeCampaignDetailWindow();
+        refreshActivityView();
         DialogUtils.info("Đã xóa chiến dịch.");
+    }
+
+    @FXML
+    private void handleExportActivities() {
+        ExportUtils.exportTableToCsv(tableActivities, "Xuất danh sách chiến dịch", "danh-sach-chien-dich.csv");
     }
 
     @FXML
     private void handleClearForm() {
         tableActivities.getSelectionModel().clearSelection();
+    }
+
+    @FXML
+    private void handleClearActivityFilters() {
+        cboActivityStatusFilter.setValue("Tất cả trạng thái");
+        cboActivityLocationFilter.setValue("Tất cả địa điểm");
+        txtActivitySearch.clear();
+        applyActivityFilters();
     }
 
     @FXML
@@ -186,31 +226,11 @@ public class ActivitiesController {
     @FXML
     private void handleVolunteerRegister() {
         ActivityModel selected = selectedCampaign();
-        if (selected == null) {
-            DialogUtils.warning("Vui lòng chọn chiến dịch muốn đăng ký.");
+        String error = BusinessService.registerVolunteer(currentUser, selected);
+        if (error != null) {
+            DialogUtils.warning(error);
             return;
         }
-        if (hasJoinedCampaign(selected.getMaChienDich())) {
-            DialogUtils.info("Bạn đã có hồ sơ tham gia chiến dịch này.");
-            return;
-        }
-
-        AppData.getParticipants().add(new ParticipantModel(
-                currentUser.getUsername(),
-                currentUser.getLinkedId(),
-                currentUser.getDisplayName(),
-                "",
-                "",
-                "",
-                "",
-                selected.getMaChienDich(),
-                "Chờ duyệt",
-                ""
-        ));
-        AppData.getOperations().add(new SystemRecord("Đăng ký TNV", AppData.nextOperationId("VH"),
-                selected.getMaChienDich(), currentUser.getUsername(), "Đăng ký tham gia chiến dịch",
-                currentUser.getDisplayName() + " đăng ký tham gia " + selected.getTenChienDich(),
-                AppData.todayText(), "", "Chờ duyệt", currentUser.getUsername(), "ADMIN", "Bảng ThamGiaTNV"));
         DialogUtils.info("Đã gửi đăng ký tham gia chiến dịch.");
         openCampaignDetailWindow(selected);
     }
@@ -223,10 +243,11 @@ public class ActivitiesController {
             return;
         }
 
-        AppData.getContents().add(new SystemRecord("TheoDoi", "TD" + currentUser.getUsername() + selected.getMaChienDich(),
-                selected.getMaChienDich(), "Theo dõi chiến dịch",
-                currentUser.getDisplayName() + " theo dõi " + selected.getTenChienDich(),
-                AppData.todayText(), "Đang theo dõi", "Bảng TheoDoi"));
+        String error = BusinessService.followCampaign(currentUser, selected);
+        if (error != null) {
+            DialogUtils.warning(error);
+            return;
+        }
         DialogUtils.info("Đã theo dõi chiến dịch.");
     }
 
@@ -244,11 +265,17 @@ public class ActivitiesController {
             return;
         }
 
-        String proofId = "MC" + String.format("%03d", AppData.getOperations().size() + 1);
-        AppData.getOperations().add(new SystemRecord("Minh chứng TNV", AppData.nextOperationId("VH"),
-                selected.getMaChienDich(), proofId, "Gửi minh chứng TNV",
-                currentUser.getDisplayName() + " gửi minh chứng cho " + selected.getTenChienDich(),
-                AppData.todayText(), "", "Chờ xác nhận", currentUser.getUsername(), "ADMIN", "Bảng MinhChungTNV"));
+        ParticipantModel profile = AppData.getParticipants().stream()
+                .filter(item -> item.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername())
+                && item.getMaChienDich().equalsIgnoreCase(selected.getMaChienDich()))
+                .findFirst()
+                .orElse(null);
+        String error = BusinessService.submitProof(currentUser, profile, "Ghi chú sau hoạt động",
+                "Minh chứng gửi từ màn hình chi tiết chiến dịch " + selected.getTenChienDich());
+        if (error != null) {
+            DialogUtils.warning(error);
+            return;
+        }
         DialogUtils.info("Đã gửi minh chứng, chờ quản lý xác nhận.");
     }
 
@@ -260,9 +287,12 @@ public class ActivitiesController {
             return;
         }
 
-        AppData.getDonations().add(new DonationModel(AppData.nextDonationId(), userGmail(),
-                selected.getMaChienDich(), AppData.todayText(), "Tài trợ chiến dịch",
-                "Đề xuất tài trợ cho " + selected.getTenChienDich(), 0));
+        String error = BusinessService.recordDonation(currentUser, selected.getMaChienDich(),
+                "Tài trợ vật phẩm", "Đề xuất tài trợ cho " + selected.getTenChienDich(), 0);
+        if (error != null) {
+            DialogUtils.warning(error);
+            return;
+        }
         DialogUtils.info("Đã ghi nhận đề xuất tài trợ. Bạn có thể nhập chi tiết ở cổng nhà tài trợ.");
         openCampaignDetailWindow(selected);
     }
@@ -281,10 +311,13 @@ public class ActivitiesController {
             return;
         }
 
-        AppData.getDonations().add(new DonationModel(AppData.nextDonationId(), userGmail(),
-                selected.getMaChienDich(), AppData.todayText(), "Vật phẩm",
-                "Đề xuất quyên góp vật phẩm cho " + selected.getTenChienDich(), 0));
-        DialogUtils.info("Đã ghi nhận đề xuất quyên góp vật phẩm.");
+        String error = BusinessService.recordDonation(currentUser, selected.getMaChienDich(),
+                "Vật phẩm", "Đề xuất quyên góp vật phẩm cho " + selected.getTenChienDich(), 0);
+        if (error != null) {
+            DialogUtils.warning(error);
+            return;
+        }
+        DialogUtils.info("Đã ghi nhận đề xuất quyên góp vật phẩm, chờ quản lý xác nhận.");
         openCampaignDetailWindow(selected);
     }
 
@@ -382,40 +415,104 @@ public class ActivitiesController {
 
     }
 
+    private void setupActivityFilters() {
+        cboActivityStatusFilter.setItems(buildStatusFilterChoices());
+        cboActivityLocationFilter.setItems(buildLocationFilterChoices());
+        cboActivityStatusFilter.setValue("Tất cả trạng thái");
+        cboActivityLocationFilter.setValue("Tất cả địa điểm");
+        cboActivityStatusFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyActivityFilters());
+        cboActivityLocationFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyActivityFilters());
+        txtActivitySearch.textProperty().addListener((observable, oldValue, newValue) -> applyActivityFilters());
+    }
+
+    private void refreshActivityView() {
+        String currentStatus = cboActivityStatusFilter.getValue();
+        String currentLocation = cboActivityLocationFilter.getValue();
+        cboActivityStatusFilter.setItems(buildStatusFilterChoices());
+        cboActivityLocationFilter.setItems(buildLocationFilterChoices());
+        cboActivityStatusFilter.setValue(cboActivityStatusFilter.getItems().contains(currentStatus) ? currentStatus : "Tất cả trạng thái");
+        cboActivityLocationFilter.setValue(cboActivityLocationFilter.getItems().contains(currentLocation) ? currentLocation : "Tất cả địa điểm");
+        applyActivityFilters();
+        tableActivities.refresh();
+    }
+
+    private void applyActivityFilters() {
+        if (filteredActivities == null) {
+            return;
+        }
+        String status = cboActivityStatusFilter.getValue() == null ? "" : cboActivityStatusFilter.getValue();
+        String location = cboActivityLocationFilter.getValue() == null ? "" : cboActivityLocationFilter.getValue();
+        String query = normalize(value(txtActivitySearch));
+        boolean allStatuses = status.isEmpty() || "Tất cả trạng thái".equals(status);
+        boolean allLocations = location.isEmpty() || "Tất cả địa điểm".equals(location);
+        filteredActivities.setPredicate(activity
+                -> (allStatuses || safe(activity.getTrangThai()).equalsIgnoreCase(status))
+                && (allLocations || safe(activity.getDiaDiem()).equalsIgnoreCase(location))
+                && (query.isEmpty() || normalize(safe(activity.getTenChienDich()) + " "
+                + safe(activity.getMoTa()) + " " + safe(activity.getDiaDiem()) + " "
+                + safe(activity.getTrangThai())).contains(query)));
+    }
+
+    private ObservableList<String> buildStatusFilterChoices() {
+        ObservableList<String> choices = FXCollections.observableArrayList("Tất cả trạng thái");
+        AppData.getActivities().stream()
+                .map(ActivityModel::getTrangThai)
+                .filter(value -> value != null && !value.trim().isEmpty())
+                .distinct()
+                .forEach(choices::add);
+        return choices;
+    }
+
+    private ObservableList<String> buildLocationFilterChoices() {
+        ObservableList<String> choices = FXCollections.observableArrayList("Tất cả địa điểm");
+        AppData.getActivities().stream()
+                .map(ActivityModel::getDiaDiem)
+                .filter(value -> value != null && !value.trim().isEmpty())
+                .distinct()
+                .forEach(choices::add);
+        return choices;
+    }
+
     private ActivityModel showActivityDialog(String title, ActivityModel current) {
-        String[] values = current == null ? new String[]{"", "", "", "", AppData.todayText(), "", "0", "Đang xét", currentUser.getUsername()}
+        String[] values = current == null ? new String[]{"", "", "", AppData.todayText(), "", "0", "Đang xét"}
                 : new String[]{
-                    current.getMaChienDich(), current.getTenChienDich(), current.getMoTa(), current.getDiaDiem(),
+                    current.getTenChienDich(), current.getMoTa(), current.getDiaDiem(),
                     current.getNgayBatDau(), current.getNgayKetThuc(),
                     current.getMucTieuTien() == 0 ? "" : String.format("%.0f", current.getMucTieuTien()),
-                    current.getTrangThai(), current.getMaNguoiTao()
+                    current.getTrangThai()
                 };
         String[] result = CrudDialogUtils.showForm(title, FORM_LABELS, values);
         if (result == null) {
             return null;
         }
-        return buildActivity(result);
+        return buildActivity(result, current);
     }
 
-    private ActivityModel buildActivity(String[] values) {
-        String ma = values[0];
-        String ten = values[1];
-        String moTa = values[2];
-        String diaDiem = values[3];
-        String ngayBatDau = values[4];
-        String ngayKetThuc = values[5];
-        String mucTieuTienText = values[6];
-        String trangThai = values[7];
-        String maNguoiTao = values[8].isEmpty() ? currentUser.getUsername() : values[8];
+    private ActivityModel buildActivity(String[] values, ActivityModel current) {
+        String ma = current == null ? AppData.nextCampaignId() : current.getMaChienDich();
+        String ten = values[0];
+        String moTa = values[1];
+        String diaDiem = values[2];
+        String ngayBatDau = values[3];
+        String ngayKetThuc = values[4];
+        String mucTieuTienText = values[5];
+        String trangThai = values[6];
+        String maNguoiTao = current == null ? currentUser.getUsername() : current.getMaNguoiTao();
 
-        if (ma.isEmpty() || ten.isEmpty() || ngayBatDau.isEmpty() || trangThai.isEmpty()) {
-            DialogUtils.warning("Vui lòng nhập mã, tên, ngày bắt đầu và trạng thái chiến dịch.");
+        if (ten.isEmpty() || ngayBatDau.isEmpty() || trangThai.isEmpty()) {
+            DialogUtils.warning("Vui lòng nhập tên, ngày bắt đầu và trạng thái chiến dịch.");
             return null;
         }
 
         try {
             double mucTieuTien = mucTieuTienText.isEmpty() ? 0 : FormatUtils.parseMoney(mucTieuTienText);
-            return new ActivityModel(ma, ten, moTa, diaDiem, ngayBatDau, ngayKetThuc, mucTieuTien, trangThai, maNguoiTao);
+            ActivityModel activity = new ActivityModel(ma, ten, moTa, diaDiem, ngayBatDau, ngayKetThuc, mucTieuTien, trangThai, maNguoiTao);
+            String error = BusinessRules.validateCampaign(activity);
+            if (error != null) {
+                DialogUtils.warning(error);
+                return null;
+            }
+            return activity;
         } catch (NumberFormatException ex) {
             DialogUtils.warning("Mục tiêu tiền không hợp lệ.");
             return null;
@@ -430,14 +527,12 @@ public class ActivitiesController {
         closeCampaignDetailWindow();
 
         String campaignId = selected.getMaChienDich();
-        DetailDialogUtils.showDetails(tableActivities, "Chi tiết chiến dịch - " + campaignId, new String[][]{
+        DetailDialogUtils.showDetails(tableActivities, "Chi tiết chiến dịch - " + selected.getTenChienDich(), new String[][]{
             {"Tên chiến dịch", selected.getTenChienDich()},
-            {"Mã chiến dịch", campaignId},
             {"Mô tả", selected.getMoTa()},
             {"Thời gian", selected.getNgayBatDau() + " - " + selected.getNgayKetThuc()},
             {"Địa điểm", selected.getDiaDiem()},
             {"Mục tiêu quyên góp", FormatUtils.money(selected.getMucTieuTien())},
-            {"Người tạo", selected.getMaNguoiTao()},
             {"Đã quyên góp / tài trợ", FormatUtils.money(AppData.getCampaignMoneyTotal(campaignId))},
             {"Số TNV tham gia", String.valueOf(AppData.getCampaignParticipantCount(campaignId))},
             {"Tin tức liên quan", AppData.getCampaignNewsSummary(campaignId)}
@@ -555,8 +650,21 @@ public class ActivitiesController {
         return value == null || value.trim().isEmpty() ? "-" : value;
     }
 
-    private String userGmail() {
-        return currentUser.getUsername().toLowerCase() + "@gmail.com";
+    private String value(TextField textField) {
+        return textField == null || textField.getText() == null ? "" : textField.getText().trim();
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
+    }
+
+    private String normalize(String value) {
+        if (value == null) {
+            return "";
+        }
+        return Normalizer.normalize(value.toLowerCase(), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replace("đ", "d");
     }
 
     @FunctionalInterface
