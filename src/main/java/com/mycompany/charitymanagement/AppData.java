@@ -16,6 +16,12 @@ public final class AppData {
     private static final ObservableList<DonationModel> donations = FXCollections.observableArrayList();
     private static final ObservableList<SystemRecord> operations = FXCollections.observableArrayList();
     private static final ObservableList<SystemRecord> contents = FXCollections.observableArrayList();
+    private static final ObservableList<TrainingCourse> trainingCourses = FXCollections.observableArrayList();
+    private static final ObservableList<InventoryItem> inventoryItems = FXCollections.observableArrayList();
+    private static final ObservableList<Expense> expenses = FXCollections.observableArrayList();
+    private static final ObservableList<Alert> alerts = FXCollections.observableArrayList();
+    private static final ObservableList<MaterialNorm> materialNorms = FXCollections.observableArrayList();
+    private static final ObservableList<TrainingEnrollment> trainingEnrollments = FXCollections.observableArrayList();
 
     static {
         addAccounts();
@@ -25,6 +31,12 @@ public final class AppData {
         addDonations();
         addOperations();
         addContents();
+        addTrainingCourses();
+        addInventoryItems();
+        addExpenses();
+        addAlerts();
+        addMaterialNorms();
+        addTrainingEnrollments();
     }
 
     private AppData() {
@@ -200,6 +212,58 @@ public final class AppData {
         );
     }
 
+    private static void addTrainingCourses() {
+        trainingCourses.addAll(
+                new TrainingCourse("KH001", "Kỹ năng làm việc nhóm", "Đào tạo kỹ năng làm việc nhóm cho TNV", "01/06/2026", "05/06/2026", 20, "Nguyễn Văn A", "CD001", 30, 15, "Đang mở"),
+                new TrainingCourse("KH002", "Kỹ năng sơ cứu cơ bản", "Hướng dẫn sơ cứu ban đầu cho TNV", "10/06/2026", "12/06/2026", 12, "Trần Thị B", "CD003", 30, 20, "Đang mở"),
+                new TrainingCourse("KH003", "Truyền thông xã hội cho TNV", "Kỹ năng viết bài và đăng tin", "15/07/2026", "16/07/2026", 8, "Lê Văn C", "CD001", 25, 10, "Đã kết thúc")
+        );
+    }
+
+    private static void addInventoryItems() {
+        inventoryItems.addAll(
+                new InventoryItem("VT001", "Áo ấm trẻ em", "Quần áo", "Cái", 500, 50, 120000, "CD001", "01/12/2026"),
+                new InventoryItem("VT002", "Sách giáo khoa", "Sách vở", "Quyển", 300, 30, 50000, "CD001", "01/12/2026"),
+                new InventoryItem("VT003", "Khẩu trang y tế", "Y tế", "Hộp", 200, 100, 35000, "CD003", "20/05/2026"),
+                new InventoryItem("VT004", "Thuốc cảm cúm", "Y tế", "Hộp", 50, 20, 85000, "CD003", "20/05/2026"),
+                new InventoryItem("VT005", "Bút bi", "Văn phòng phẩm", "Cây", 1000, 100, 3000, "CD002", "05/09/2026")
+        );
+    }
+
+    private static void addExpenses() {
+        expenses.addAll(
+                new Expense("PC001", "CD001", "Mua áo ấm cho trẻ em vùng cao", 20000000, "Vật phẩm", "ADMIN001", "ADMIN002", "Đã duyệt", "01/12/2026", "02/12/2026", ""),
+                new Expense("PC002", "CD001", "Thuê xe vận chuyển hàng", 5000000, "Vận chuyển", "ADMIN001", "ADMIN002", "Đã duyệt", "03/12/2026", "04/12/2026", ""),
+                new Expense("PC003", "CD003", "Mua thuốc khám bệnh", 15000000, "Y tế", "ADMIN003", "", "Chờ duyệt", "15/05/2026", "", "")
+        );
+    }
+
+    private static void addAlerts() {
+        alerts.addAll(
+                new Alert("AL001", "Tồn kho thấp", "Thuốc cảm cúm chỉ còn 50 hộp", "Trung bình", "Tồn kho", "VT004", "21/05/2026", "", "Chưa xử lý", "ADMIN001"),
+                new Alert("AL002", "Hồ sơ chờ xét duyệt", "Có 3 hồ sơ TNV mới cần xét duyệt", "Cao", "Nhân sự", "", "21/05/2026", "", "Chưa xử lý", "ADMIN001")
+        );
+    }
+
+    private static void addMaterialNorms() {
+        materialNorms.addAll(
+                new MaterialNorm("DM001", "1 suất quà Đông ấm", "VT001", 2.0, "Cái", "CD001"),
+                new MaterialNorm("DM002", "1 suất quà Đông ấm", "VT005", 5.0, "Cây", "CD001"),
+                new MaterialNorm("DM003", "1 túi thuốc khám bệnh", "VT003", 2.0, "Hộp", "CD003"),
+                new MaterialNorm("DM004", "1 túi thuốc khám bệnh", "VT004", 1.0, "Hộp", "CD003")
+        );
+    }
+
+    private static void addTrainingEnrollments() {
+        trainingEnrollments.addAll(
+                new TrainingEnrollment("GH001", "KH001", "TNV001", "Nguyễn Văn An", "01/06/2026", "Đang học", ""),
+                new TrainingEnrollment("GH002", "KH001", "TNV002", "Trần Thị Bình", "01/06/2026", "Hoàn thành", ""),
+                new TrainingEnrollment("GH003", "KH002", "TNV003", "Lê Minh Châu", "10/06/2026", "Đang học", ""),
+                new TrainingEnrollment("GH004", "KH003", "TNV004", "Phạm Tuấn Dũng", "15/07/2026", "Hoàn thành", ""),
+                new TrainingEnrollment("GH005", "KH003", "TNV005", "Võ Ngọc Hà", "15/07/2026", "Đang học", "")
+        );
+    }
+
     public static UserAccount authenticate(String username, String password) {
         return accounts.stream()
                 .filter(account -> account.getUsername().equalsIgnoreCase(username)
@@ -236,6 +300,30 @@ public final class AppData {
         return contents;
     }
 
+    public static ObservableList<TrainingCourse> getTrainingCourses() {
+        return trainingCourses;
+    }
+
+    public static ObservableList<InventoryItem> getInventoryItems() {
+        return inventoryItems;
+    }
+
+    public static ObservableList<Expense> getExpenses() {
+        return expenses;
+    }
+
+    public static ObservableList<Alert> getAlerts() {
+        return alerts;
+    }
+
+    public static ObservableList<MaterialNorm> getMaterialNorms() {
+        return materialNorms;
+    }
+
+    public static ObservableList<TrainingEnrollment> getTrainingEnrollments() {
+        return trainingEnrollments;
+    }
+
     public static double getTotalSponsorAmount() {
         return sponsors.stream()
                 .mapToDouble(SponsorModel::getGiaTriTaiTro)
@@ -245,6 +333,21 @@ public final class AppData {
     public static double getTotalDonationAmount() {
         return donations.stream()
                 .mapToDouble(DonationModel::getSoTien)
+                .sum();
+    }
+
+    public static double getTotalExpenseAmount() {
+        return expenses.stream()
+                .filter(e -> "Đã duyệt".equals(e.getTrangThai()))
+                .mapToDouble(Expense::getSoTien)
+                .sum();
+    }
+
+    public static double getCampaignExpenseTotal(String campaignId) {
+        return expenses.stream()
+                .filter(e -> e.getMaChienDich().equalsIgnoreCase(campaignId)
+                        && "Đã duyệt".equals(e.getTrangThai()))
+                .mapToDouble(Expense::getSoTien)
                 .sum();
     }
 
@@ -336,6 +439,60 @@ public final class AppData {
         return id;
     }
 
+    public static String nextTrainingCourseId() {
+        int index = trainingCourses.size() + 1;
+        String id;
+        do {
+            id = "KH" + String.format("%03d", index++);
+        } while (trainingCourseIdExists(id));
+        return id;
+    }
+
+    public static String nextInventoryItemId() {
+        int index = inventoryItems.size() + 1;
+        String id;
+        do {
+            id = "VT" + String.format("%03d", index++);
+        } while (inventoryItemIdExists(id));
+        return id;
+    }
+
+    public static String nextExpenseId() {
+        int index = expenses.size() + 1;
+        String id;
+        do {
+            id = "PC" + String.format("%03d", index++);
+        } while (expenseIdExists(id));
+        return id;
+    }
+
+    public static String nextAlertId() {
+        int index = alerts.size() + 1;
+        String id;
+        do {
+            id = "AL" + String.format("%03d", index++);
+        } while (alertIdExists(id));
+        return id;
+    }
+
+    public static String nextMaterialNormId() {
+        int index = materialNorms.size() + 1;
+        String id;
+        do {
+            id = "DM" + String.format("%03d", index++);
+        } while (materialNormIdExists(id));
+        return id;
+    }
+
+    public static String nextEnrollmentId() {
+        int index = trainingEnrollments.size() + 1;
+        String id;
+        do {
+            id = "GH" + String.format("%03d", index++);
+        } while (enrollmentIdExists(id));
+        return id;
+    }
+
     public static String nextContentId(String prefix) {
         int index = contents.size() + 1;
         String id;
@@ -384,6 +541,60 @@ public final class AppData {
     private static boolean operationIdExists(String id) {
         for (SystemRecord item : operations) {
             if (item.getMaChinh().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean trainingCourseIdExists(String id) {
+        for (TrainingCourse item : trainingCourses) {
+            if (item.getMaKhoaHoc().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean inventoryItemIdExists(String id) {
+        for (InventoryItem item : inventoryItems) {
+            if (item.getMaVatTu().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean expenseIdExists(String id) {
+        for (Expense item : expenses) {
+            if (item.getMaChiPhi().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean alertIdExists(String id) {
+        for (Alert item : alerts) {
+            if (item.getMaCanhBao().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean materialNormIdExists(String id) {
+        for (MaterialNorm item : materialNorms) {
+            if (item.getMaDinhMuc().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean enrollmentIdExists(String id) {
+        for (TrainingEnrollment item : trainingEnrollments) {
+            if (item.getMaGhiDanh().equalsIgnoreCase(id)) {
                 return true;
             }
         }

@@ -130,8 +130,8 @@ public class SponsorPortalController {
     }
 
     @FXML
-    private void handleCampaigns() throws IOException {
-        App.setRoot("activities");
+    private void handleCampaigns() {
+        refreshView();
     }
 
     @FXML

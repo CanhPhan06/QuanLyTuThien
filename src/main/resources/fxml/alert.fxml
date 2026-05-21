@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.AlertController"
+            prefWidth="1180" prefHeight="700"
+            stylesheets="@/com/mycompany/charitymanagement/style.css">
+
+    <left><VBox spacing="8" styleClass="sidebar">
+        <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
+        <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
+        <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
+        <Button text="♟  Tuyển dụng" onAction="#handleScreening" styleClass="menu-button"/>
+        <Button text="♟  TNV" onAction="#handleParticipants" styleClass="menu-button"/>
+        <Button text="◪  Đào tạo" onAction="#handleTraining" styleClass="menu-button"/>
+        <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
+        <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
+        <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
+        <Button text="▣  Kho" onAction="#handleInventory" styleClass="menu-button"/>
+        <Button text="⟐  Chi phí" onAction="#handleExpense" styleClass="menu-button"/>
+        <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
+        <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
+        <Button text="⚠  Cảnh báo" onAction="#handleAlerts" styleClass="menu-button-active"/>
+        <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+    </VBox></left>
+
+    <center><VBox spacing="14" styleClass="main-content">
+        <Label text="QUẢN LÝ CẢNH BÁO" styleClass="page-title"/>
+        <HBox spacing="12">
+            <VBox styleClass="stat-card">
+                <Label fx:id="lblTotalAlerts" text="0" styleClass="stat-number"/>
+                <Label text="Tổng cảnh báo" styleClass="stat-label"/>
+            </VBox>
+            <VBox styleClass="stat-card">
+                <Label fx:id="lblUrgentAlerts" text="0" styleClass="stat-number"/>
+                <Label text="Mức độ Cao" styleClass="stat-label"/>
+            </VBox>
+            <VBox styleClass="stat-card">
+                <Label fx:id="lblUnresolvedAlerts" text="0" styleClass="stat-number"/>
+                <Label text="Chưa xử lý" styleClass="stat-label"/>
+            </VBox>
+            <VBox styleClass="stat-card">
+                <Label fx:id="lblOverdueAlerts" text="0" styleClass="stat-number"/>
+                <Label text="Quá hạn" styleClass="stat-label"/>
+            </VBox>
+        </HBox>
+
+        <HBox spacing="10">
+            <ComboBox fx:id="cboLevelFilter" prefWidth="140"/>
+            <ComboBox fx:id="cboTypeFilter" prefWidth="140"/>
+            <ComboBox fx:id="cboStatusFilter" prefWidth="150"/>
+            <TextField fx:id="txtSearch" promptText="Tìm kiếm..." HBox.hgrow="ALWAYS"/>
+            <Button text="Xóa lọc" onAction="#handleClearFilters"/>
+        </HBox>
+
+        <TableView fx:id="tableAlerts" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colMaCanhBao" text="Mã"/>
+                <TableColumn fx:id="colTieuDe" text="Tiêu đề" prefWidth="150"/>
+                <TableColumn fx:id="colNoiDung" text="Nội dung" prefWidth="250"/>
+                <TableColumn fx:id="colMucDo" text="Mức độ" prefWidth="80"/>
+                <TableColumn fx:id="colLoai" text="Loại" prefWidth="100"/>
+                <TableColumn fx:id="colNgayTao" text="Ngày tạo" prefWidth="100"/>
+                <TableColumn fx:id="colHanXuLy" text="Hạn xử lý" prefWidth="100"/>
+                <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="100"/>
+                <TableColumn fx:id="colNguoiPhuTrach" text="Phụ trách" prefWidth="100"/>
+            </columns>
+        </TableView>
+
+        <HBox spacing="10">
+            <Button text="Đánh dấu đã xử lý" onAction="#handleMarkResolved"/>
+            <Button text="Xóa" onAction="#handleDeleteAlert"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Xuất CSV/PDF" onAction="#handleExport"/>
+        </HBox>
+    </VBox></center>
+</BorderPane>

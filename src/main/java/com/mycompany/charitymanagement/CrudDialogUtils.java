@@ -67,8 +67,8 @@ public final class CrudDialogUtils {
 
         VBox card = new VBox(16, titleLabel, scrollPane, actions);
         card.getStyleClass().add("detail-card");
-        card.setMaxWidth(720);
-        card.setMaxHeight(620);
+        card.setMaxWidth(600);
+        card.setMaxHeight(580);
 
         StackPane overlay = DetailDialogUtils.showCard(scene, card);
         if (overlay == null) {

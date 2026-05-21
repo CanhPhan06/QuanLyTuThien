@@ -214,6 +214,28 @@ public class ContentController {
     }
 
     @FXML
+    private void handleScreening() throws IOException {
+        App.setRoot("screening");
+    }
+
+    @FXML
+    private void handleTraining() throws IOException {
+        App.setRoot("training");
+    }
+
+    @FXML
+    private void handleInventory() throws IOException {
+        App.setRoot("inventory");
+    }
+
+    @FXML
+    private void handleExpense() throws IOException {
+        App.setRoot("expense");
+    }
+
+    @FXML private void handleAlerts() throws IOException { App.setRoot("alert"); }
+
+    @FXML
     private void handleLogout() throws IOException {
         App.setRoot("primary");
     }

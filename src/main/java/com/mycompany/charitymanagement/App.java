@@ -75,6 +75,11 @@ public class App extends Application {
             case "operations":
             case "content":
             case "reports":
+            case "training":
+            case "inventory":
+            case "expense":
+            case "screening":
+            case "alert":
             case "volunteer":
             case "sponsorportal":
                 path = "/fxml/" + fxml + ".fxml";

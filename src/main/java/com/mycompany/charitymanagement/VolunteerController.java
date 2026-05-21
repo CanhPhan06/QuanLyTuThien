@@ -19,7 +19,7 @@ public class VolunteerController {
     @FXML
     private Label lblWelcome;
     @FXML
-    private Label lblCampaign;
+    private Label lblCampaignCount;
     @FXML
     private Label lblStatus;
     @FXML
@@ -63,6 +63,15 @@ public class VolunteerController {
     private TableColumn<ActivityModel, String> colTrangThai;
 
     @FXML
+    private TableView<ParticipantModel> tableMyCampaigns;
+    @FXML
+    private TableColumn<ParticipantModel, String> colMyCampaign;
+    @FXML
+    private TableColumn<ParticipantModel, String> colMyCampaignStatus;
+    @FXML
+    private TableColumn<ParticipantModel, String> colMyCampaignScore;
+
+    @FXML
     private TableView<SystemRecord> tableTasks;
     @FXML
     private TableColumn<SystemRecord, String> colTaskType;
@@ -82,6 +91,7 @@ public class VolunteerController {
     @FXML
     private TableColumn<SystemRecord, String> colNoticeStatus;
 
+    private final ObservableList<ParticipantModel> myCampaigns = FXCollections.observableArrayList();
     private final ObservableList<SystemRecord> volunteerTasks = FXCollections.observableArrayList();
     private final ObservableList<SystemRecord> volunteerNotifications = FXCollections.observableArrayList();
     private UserAccount currentUser;
@@ -100,6 +110,10 @@ public class VolunteerController {
         colNgayKetThuc.setCellValueFactory(new PropertyValueFactory<>("ngayKetThuc"));
         colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
 
+        colMyCampaign.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
+        colMyCampaignStatus.setCellValueFactory(new PropertyValueFactory<>("trangThaiDuyet"));
+        colMyCampaignScore.setCellValueFactory(new PropertyValueFactory<>("diemDanhGia"));
+
         colTaskType.setCellValueFactory(new PropertyValueFactory<>("nhomBang"));
         colTaskTitle.setCellValueFactory(new PropertyValueFactory<>("tieuDe"));
         colTaskDate.setCellValueFactory(new PropertyValueFactory<>("ngayTao"));
@@ -110,9 +124,11 @@ public class VolunteerController {
         colNoticeStatus.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
 
         tableCampaigns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableMyCampaigns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableTasks.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableNotifications.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableCampaigns.setItems(AppData.getActivities());
+        tableMyCampaigns.setItems(myCampaigns);
         tableTasks.setItems(volunteerTasks);
         tableNotifications.setItems(volunteerNotifications);
 
@@ -256,14 +272,15 @@ public class VolunteerController {
 
     private void refreshView() {
         lblWelcome.setText("Xin chào, " + currentUser.getDisplayName());
-        ParticipantModel profile = findParticipant();
-        String campaignId = profile == null ? "" : profile.getMaChienDich();
-        ActivityModel campaign = AppData.findCampaign(campaignId);
+        ObservableList<ParticipantModel> profiles = findMyParticipants();
+        myCampaigns.setAll(profiles);
+        lblCampaignCount.setText(String.valueOf(profiles.size()));
 
-        lblCampaign.setText(campaign == null ? "Chưa tham gia" : campaign.getTenChienDich());
-        lblStatus.setText(profile == null ? "Chưa đăng ký" : profile.getTrangThaiDuyet());
-        lblScore.setText(profile == null || profile.getDiemDanhGia().isEmpty() ? "Chưa có" : profile.getDiemDanhGia());
+        ParticipantModel latestProfile = profiles.isEmpty() ? null : profiles.get(0);
+        lblStatus.setText(latestProfile == null ? "Chưa đăng ký" : latestProfile.getTrangThaiDuyet());
+        lblScore.setText(latestProfile == null || latestProfile.getDiemDanhGia().isEmpty() ? "Chưa có" : latestProfile.getDiemDanhGia());
 
+        String campaignId = latestProfile == null ? "" : latestProfile.getMaChienDich();
         volunteerTasks.setAll(AppData.getOperations().filtered(record ->
                 record.getMaLienKet().equalsIgnoreCase(currentUser.getUsername())
                 || (!campaignId.isEmpty() && record.getMaChienDich().equalsIgnoreCase(campaignId))
@@ -328,10 +345,13 @@ public class VolunteerController {
         });
     }
 
+    private ObservableList<ParticipantModel> findMyParticipants() {
+        return AppData.getParticipants().filtered(item ->
+                item.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername()));
+    }
+
     private ParticipantModel findParticipant() {
-        return AppData.getParticipants().stream()
-                .filter(item -> item.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername()))
-                .findFirst()
-                .orElse(null);
+        ObservableList<ParticipantModel> list = findMyParticipants();
+        return list.isEmpty() ? null : list.get(0);
     }
 }

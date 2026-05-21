@@ -12,6 +12,11 @@ public class ParticipantModel {
     private String maChienDich;
     private String trangThaiDuyet;
     private String diemDanhGia;
+    private String ketQuaVangGia;
+    private String ngayVangGia;
+    private String ngayPhongVan;
+    private String ketQuaPhongVan;
+    private String screeningNote;
 
     public ParticipantModel(String maNguoiThamGia, String hoTen, String soDienThoai, String email, String hoatDong) {
         this(maNguoiThamGia, "HS" + maNguoiThamGia, hoTen, email, soDienThoai, "", "", hoatDong, "Chờ duyệt", "");
@@ -29,6 +34,11 @@ public class ParticipantModel {
         this.maChienDich = maChienDich;
         this.trangThaiDuyet = trangThaiDuyet;
         this.diemDanhGia = diemDanhGia;
+        this.ketQuaVangGia = "";
+        this.ngayVangGia = "";
+        this.ngayPhongVan = "";
+        this.ketQuaPhongVan = "";
+        this.screeningNote = "";
     }
 
     public String getMaTaiKhoan() {
@@ -109,6 +119,46 @@ public class ParticipantModel {
 
     public void setDiemDanhGia(String diemDanhGia) {
         this.diemDanhGia = diemDanhGia;
+    }
+
+    public String getKetQuaVangGia() {
+        return ketQuaVangGia;
+    }
+
+    public void setKetQuaVangGia(String ketQuaVangGia) {
+        this.ketQuaVangGia = ketQuaVangGia;
+    }
+
+    public String getNgayVangGia() {
+        return ngayVangGia;
+    }
+
+    public void setNgayVangGia(String ngayVangGia) {
+        this.ngayVangGia = ngayVangGia;
+    }
+
+    public String getNgayPhongVan() {
+        return ngayPhongVan;
+    }
+
+    public void setNgayPhongVan(String ngayPhongVan) {
+        this.ngayPhongVan = ngayPhongVan;
+    }
+
+    public String getKetQuaPhongVan() {
+        return ketQuaPhongVan;
+    }
+
+    public void setKetQuaPhongVan(String ketQuaPhongVan) {
+        this.ketQuaPhongVan = ketQuaPhongVan;
+    }
+
+    public String getScreeningNote() {
+        return screeningNote;
+    }
+
+    public void setScreeningNote(String screeningNote) {
+        this.screeningNote = screeningNote;
     }
 
     public String getMaNguoiThamGia() {

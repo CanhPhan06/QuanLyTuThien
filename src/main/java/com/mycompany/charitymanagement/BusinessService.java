@@ -259,6 +259,28 @@ public final class BusinessService {
                 .orElse(null);
     }
 
+    public static void createAlert(String title, String content, String level, String type,
+            String relatedObject, String deadline, String assignee) {
+        AppData.getAlerts().add(new Alert(AppData.nextAlertId(), title, content, level, type,
+                relatedObject, AppData.todayText(), deadline, "Chưa xử lý", assignee));
+    }
+
+    public static void checkLowStockAlerts() {
+        for (InventoryItem item : AppData.getInventoryItems()) {
+            if (item.isLowStock()) {
+                boolean hasAlert = AppData.getAlerts().stream()
+                        .anyMatch(a -> "Tồn kho".equals(a.getLoai())
+                        && item.getMaVatTu().equals(a.getDoiTuongLienQuan())
+                        && "Chưa xử lý".equals(a.getTrangThai()));
+                if (!hasAlert) {
+                    createAlert("Tồn kho thấp", item.getTenVatTu() + " chỉ còn " + item.getSoLuongTon()
+                            + " " + item.getDonViTinh(), "Trung bình", "Tồn kho",
+                            item.getMaVatTu(), "", "ADMIN001");
+                }
+            }
+        }
+    }
+
     private static SystemRecord findRegistrationOperation(String accountId, String campaignId) {
         return AppData.getOperations().stream()
                 .filter(record -> "Đăng ký TNV".equals(record.getNhomBang())

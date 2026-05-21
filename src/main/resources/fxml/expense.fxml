@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.ExpenseController"
+            prefWidth="1180" prefHeight="700"
+            stylesheets="@../com/mycompany/charitymanagement/style.css">
+    <left><VBox spacing="8" styleClass="sidebar">
+        <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
+        <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
+        <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
+        <Button text="♟  Tuyển dụng" onAction="#handleScreening" styleClass="menu-button"/>
+        <Button text="♟  TNV" onAction="#handleParticipants" styleClass="menu-button"/>
+        <Button text="◪  Đào tạo" onAction="#handleTraining" styleClass="menu-button"/>
+        <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
+        <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
+        <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
+        <Button text="▣  Kho" onAction="#handleInventory" styleClass="menu-button"/>
+        <Button text="⟐  Chi phí" onAction="#handleExpense" styleClass="menu-button-active"/>
+        <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
+        <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
+        <Button text="⚠  Cảnh báo" onAction="#handleAlerts" styleClass="menu-button"/>
+        <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+    </VBox></left>
+    <center><VBox spacing="14" styleClass="main-content">
+        <Label text="QUẢN LÝ THU CHI" styleClass="page-title"/>
+        <HBox spacing="12">
+            <VBox styleClass="stat-card"><Label text="Tổng chi đã duyệt" styleClass="muted-text"/><Label fx:id="lblTotalExpense" text="0 VNĐ" styleClass="stat-number"/></VBox>
+            <VBox styleClass="stat-card"><Label text="Chờ duyệt" styleClass="muted-text"/><Label fx:id="lblPendingExpense" text="0" styleClass="stat-number orange"/></VBox>
+            <VBox styleClass="stat-card"><Label text="Đã duyệt" styleClass="muted-text"/><Label fx:id="lblApprovedExpense" text="0" styleClass="stat-number green"/></VBox>
+            <VBox styleClass="stat-card"><Label text="Tổng phiếu chi" styleClass="muted-text"/><Label fx:id="lblExpenseCount" text="0" styleClass="stat-number"/></VBox>
+        </HBox>
+        <HBox spacing="12" styleClass="filter-card">
+            <ComboBox fx:id="cboStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="cboCategoryFilter" promptText="Lọc danh mục" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="cboCampaignFilter" promptText="Lọc chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtSearch" promptText="Tìm mô tả, người đề xuất..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+            <Button text="Bỏ lọc" onAction="#handleClearFilters" styleClass="quick-button"/>
+        </HBox>
+        <HBox spacing="10" styleClass="action-bar">
+            <Button text="+  Đề xuất chi" onAction="#handleAddExpense" styleClass="primary-button"/>
+            <Button text="✓  Phê duyệt" onAction="#handleApproveExpense" styleClass="quick-button"/>
+            <Button text="✗  Từ chối" onAction="#handleRejectExpense" styleClass="danger-button"/>
+            <Button text="✎  Sửa" onAction="#handleUpdateExpense" styleClass="quick-button"/>
+            <Button text="⌫  Xóa" onAction="#handleDeleteExpense" styleClass="danger-button"/>
+            <Button text="⇩  Xuất file" onAction="#handleExport" styleClass="quick-button"/>
+        </HBox>
+        <TableView fx:id="tableExpenses" styleClass="activity-table" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colMaChiPhi" text="Mã" prefWidth="70"/>
+                <TableColumn fx:id="colMoTa" text="Mô tả" prefWidth="200"/>
+                <TableColumn fx:id="colSoTien" text="Số tiền" prefWidth="130"/>
+                <TableColumn fx:id="colDanhMuc" text="Danh mục" prefWidth="120"/>
+                <TableColumn fx:id="colChienDich" text="Chiến dịch" prefWidth="150"/>
+                <TableColumn fx:id="colNguoiDeXuat" text="Đề xuất" prefWidth="100"/>
+                <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="100"/>
+                <TableColumn fx:id="colNgayDeXuat" text="Ngày ĐX" prefWidth="100"/>
+                <TableColumn fx:id="colNgayDuyet" text="Ngày duyệt" prefWidth="100"/>
+            </columns>
+        </TableView>
+    </VBox></center>
+</BorderPane>

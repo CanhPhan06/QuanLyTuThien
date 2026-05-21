@@ -13,6 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
 
 public class ParticipantsController {
 
@@ -51,8 +52,11 @@ public class ParticipantsController {
     private ComboBox<String> cboParticipantStatusFilter;
     @FXML
     private TextField txtParticipantSearch;
+    @FXML
+    private HBox paginationBar;
 
     private FilteredList<ParticipantModel> filteredParticipants;
+    private PaginationSupport<ParticipantModel> pagination;
 
     @FXML
     private void initialize() {
@@ -72,8 +76,8 @@ public class ParticipantsController {
 
         tableParticipants.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         filteredParticipants = new FilteredList<>(AppData.getParticipants(), item -> true);
-        tableParticipants.setItems(filteredParticipants);
         setupParticipantFilters();
+        pagination = new PaginationSupport<>(tableParticipants, filteredParticipants, paginationBar);
         tableParticipants.setRowFactory(table -> {
             TableRow<ParticipantModel> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -158,7 +162,13 @@ public class ParticipantsController {
             DialogUtils.warning(deleteError);
             return;
         }
-        if (!DialogUtils.confirm("Bạn có chắc muốn xóa sinh viên/TNV " + selected.getMaTaiKhoan() + "?")) {
+        long relCount = AppData.getOperations().stream()
+                .filter(item -> item.getMaLienKet().equalsIgnoreCase(selected.getMaTaiKhoan())
+                && item.getMaChienDich().equalsIgnoreCase(selected.getMaChienDich()))
+                .count();
+        String detail = relCount > 0 ? "\nCó " + relCount + " bản ghi vận hành liên quan." : "\nKhông có bản ghi vận hành liên quan.";
+        if (!DialogUtils.confirmWithDetails(detail,
+                "Bạn có chắc muốn xóa TNV " + selected.getHoTen() + " (" + selected.getMaTaiKhoan() + ")?")) {
             return;
         }
 
@@ -221,6 +231,28 @@ public class ParticipantsController {
     private void handleReports() throws IOException {
         App.setRoot("reports");
     }
+
+    @FXML
+    private void handleScreening() throws IOException {
+        App.setRoot("screening");
+    }
+
+    @FXML
+    private void handleTraining() throws IOException {
+        App.setRoot("training");
+    }
+
+    @FXML
+    private void handleInventory() throws IOException {
+        App.setRoot("inventory");
+    }
+
+    @FXML
+    private void handleExpense() throws IOException {
+        App.setRoot("expense");
+    }
+
+    @FXML private void handleAlerts() throws IOException { App.setRoot("alert"); }
 
     @FXML
     private void handleLogout() throws IOException {

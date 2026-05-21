@@ -24,6 +24,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -72,9 +73,12 @@ public class ActivitiesController {
     private TableColumn<ActivityModel, String> colDiaDiem;
     @FXML
     private TableColumn<ActivityModel, String> colTrangThai;
+    @FXML
+    private HBox paginationBar;
 
     private UserAccount currentUser;
     private FilteredList<ActivityModel> filteredActivities;
+    private PaginationSupport<ActivityModel> pagination;
 
     @FXML
     private void initialize() {
@@ -94,8 +98,8 @@ public class ActivitiesController {
 
         tableActivities.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         filteredActivities = new FilteredList<>(AppData.getActivities(), item -> true);
-        tableActivities.setItems(filteredActivities);
         setupActivityFilters();
+        pagination = new PaginationSupport<>(tableActivities, filteredActivities, paginationBar);
         tableActivities.setRowFactory(table -> {
             TableRow<ActivityModel> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -184,7 +188,23 @@ public class ActivitiesController {
             DialogUtils.warning(deleteError);
             return;
         }
-        if (!DialogUtils.confirm("Bạn có chắc muốn xóa chiến dịch " + selected.getMaChienDich() + "?")) {
+        String campaignId = selected.getMaChienDich();
+        long pCount = AppData.getParticipants().stream()
+                .filter(item -> item.getMaChienDich().equalsIgnoreCase(campaignId)).count();
+        long dCount = AppData.getDonations().stream()
+                .filter(item -> item.getHoatDong().equalsIgnoreCase(campaignId)).count();
+        long sCount = AppData.getSponsors().stream()
+                .filter(item -> item.getMaChienDich().equalsIgnoreCase(campaignId)).count();
+        long oCount = AppData.getOperations().stream()
+                .filter(item -> item.getMaChienDich().equalsIgnoreCase(campaignId)).count();
+        StringBuilder details = new StringBuilder();
+        if (pCount > 0) details.append("\n  • ").append(pCount).append(" TNV tham gia");
+        if (sCount > 0) details.append("\n  • ").append(sCount).append(" nhà tài trợ");
+        if (dCount > 0) details.append("\n  • ").append(dCount).append(" khoản quyên góp");
+        if (oCount > 0) details.append("\n  • ").append(oCount).append(" bản ghi vận hành");
+        if (!DialogUtils.confirmWithDetails(
+                "Các mục liên quan sẽ bị xóa:" + details.toString(),
+                "Bạn có chắc muốn xóa chiến dịch " + selected.getMaChienDich() + "?")) {
             return;
         }
 
@@ -393,6 +413,28 @@ public class ActivitiesController {
     private void handleReports() throws IOException {
         App.setRoot("reports");
     }
+
+    @FXML
+    private void handleScreening() throws IOException {
+        App.setRoot("screening");
+    }
+
+    @FXML
+    private void handleTraining() throws IOException {
+        App.setRoot("training");
+    }
+
+    @FXML
+    private void handleInventory() throws IOException {
+        App.setRoot("inventory");
+    }
+
+    @FXML
+    private void handleExpense() throws IOException {
+        App.setRoot("expense");
+    }
+
+    @FXML private void handleAlerts() throws IOException { App.setRoot("alert"); }
 
     @FXML
     private void handleLogout() throws IOException {

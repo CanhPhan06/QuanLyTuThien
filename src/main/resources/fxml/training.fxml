@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.TrainingController"
+            prefWidth="1180" prefHeight="700"
+            stylesheets="@../com/mycompany/charitymanagement/style.css">
+    <left><VBox spacing="8" styleClass="sidebar">
+        <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
+        <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
+        <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
+        <Button text="♟  Tuyển dụng" onAction="#handleScreening" styleClass="menu-button"/>
+        <Button text="♟  TNV" onAction="#handleParticipants" styleClass="menu-button"/>
+        <Button text="◪  Đào tạo" onAction="#handleTraining" styleClass="menu-button-active"/>
+        <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
+        <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
+        <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
+        <Button text="▣  Kho" onAction="#handleInventory" styleClass="menu-button"/>
+        <Button text="⟐  Chi phí" onAction="#handleExpense" styleClass="menu-button"/>
+        <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
+        <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
+        <Button text="⚠  Cảnh báo" onAction="#handleAlerts" styleClass="menu-button"/>
+        <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+    </VBox></left>
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <Tab text="Khóa học">
+                <VBox spacing="14" styleClass="main-content">
+                    <Label text="ĐÀO TẠO - KHÓA HỌC" styleClass="page-title"/>
+                    <HBox spacing="12">
+                        <VBox styleClass="stat-card"><Label text="Tổng khóa học" styleClass="muted-text"/><Label fx:id="lblTotalCourses" text="0" styleClass="stat-number"/></VBox>
+                        <VBox styleClass="stat-card"><Label text="Đang mở" styleClass="muted-text"/><Label fx:id="lblActiveCourses" text="0" styleClass="stat-number green"/></VBox>
+                        <VBox styleClass="stat-card"><Label text="Học viên" styleClass="muted-text"/><Label fx:id="lblTotalStudents" text="0" styleClass="stat-number"/></VBox>
+                        <VBox styleClass="stat-card"><Label text="Tổng số giờ" styleClass="muted-text"/><Label fx:id="lblCourseHours" text="0" styleClass="stat-number purple"/></VBox>
+                    </HBox>
+                    <HBox spacing="12" styleClass="filter-card">
+                        <ComboBox fx:id="cboCourseStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                        <ComboBox fx:id="cboCourseCampaignFilter" promptText="Lọc chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtCourseSearch" promptText="Tìm tên khóa học, giảng viên..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+                        <Button text="Bỏ lọc" onAction="#handleClearFilters" styleClass="quick-button"/>
+                    </HBox>
+                    <HBox spacing="10" styleClass="action-bar">
+                        <Button text="+  Thêm khóa học" onAction="#handleAddCourse" styleClass="primary-button"/>
+                        <Button text="✎  Cập nhật" onAction="#handleUpdateCourse" styleClass="quick-button"/>
+                        <Button text="⌫  Xóa" onAction="#handleDeleteCourse" styleClass="danger-button"/>
+                        <Button text="⇩  Xuất file" onAction="#handleExport" styleClass="quick-button"/>
+                    </HBox>
+                    <TableView fx:id="tableCourses" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colMaKhoaHoc" text="Mã" prefWidth="80"/>
+                            <TableColumn fx:id="colTenKhoaHoc" text="Tên khóa học" prefWidth="200"/>
+                            <TableColumn fx:id="colNgayBatDau" text="Bắt đầu" prefWidth="100"/>
+                            <TableColumn fx:id="colNgayKetThuc" text="Kết thúc" prefWidth="100"/>
+                            <TableColumn fx:id="colSoGio" text="Số giờ" prefWidth="70"/>
+                            <TableColumn fx:id="colGiangVien" text="Giảng viên" prefWidth="150"/>
+                            <TableColumn fx:id="colChienDich" text="Chiến dịch" prefWidth="160"/>
+                            <TableColumn fx:id="colTienDo" text="Sĩ số" prefWidth="80"/>
+                            <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="120"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+            <Tab text="Học viên">
+                <VBox spacing="14" styleClass="main-content">
+                    <Label text="QUẢN LÝ HỌC VIÊN" styleClass="page-title"/>
+                    <HBox spacing="12">
+                        <VBox styleClass="stat-card"><Label text="Tổng ghi danh" styleClass="muted-text"/><Label fx:id="lblTotalEnrollments" text="0" styleClass="stat-number"/></VBox>
+                        <VBox styleClass="stat-card"><Label text="Đang học" styleClass="muted-text"/><Label fx:id="lblActiveEnrollments" text="0" styleClass="stat-number green"/></VBox>
+                        <VBox styleClass="stat-card"><Label text="Hoàn thành" styleClass="muted-text"/><Label fx:id="lblCompletedEnrollments" text="0" styleClass="stat-number"/></VBox>
+                    </HBox>
+                    <HBox spacing="12" styleClass="filter-card">
+                        <ComboBox fx:id="cboEnrollStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                        <ComboBox fx:id="cboEnrollCourseFilter" promptText="Lọc khóa học" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="txtEnrollSearch" promptText="Tìm học viên..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+                        <Button text="Bỏ lọc" onAction="#handleClearEnrollFilters" styleClass="quick-button"/>
+                    </HBox>
+                    <HBox spacing="10" styleClass="action-bar">
+                        <Button text="+  Ghi danh" onAction="#handleAddEnrollment" styleClass="primary-button"/>
+                        <Button text="Cập nhật tiến độ" onAction="#handleUpdateEnrollment" styleClass="quick-button"/>
+                        <Button text="⌫  Hủy ghi danh" onAction="#handleDeleteEnrollment" styleClass="danger-button"/>
+                    </HBox>
+                    <TableView fx:id="tableEnrollments" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colEnrollMa" text="Mã" prefWidth="80"/>
+                            <TableColumn fx:id="colEnrollHocVien" text="Học viên" prefWidth="170"/>
+                            <TableColumn fx:id="colEnrollKhoaHoc" text="Khóa học" prefWidth="200"/>
+                            <TableColumn fx:id="colEnrollNgayThamGia" text="Ngày tham gia" prefWidth="120"/>
+                            <TableColumn fx:id="colEnrollTrangThai" text="Tiến độ" prefWidth="120"/>
+                            <TableColumn fx:id="colEnrollGhiChu" text="Ghi chú" prefWidth="150"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>

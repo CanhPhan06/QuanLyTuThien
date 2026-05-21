@@ -24,6 +24,7 @@ public class OperationsController {
     private static final String TYPE_VOLUNTEER_PROOF = "Minh chứng TNV";
     private static final String TYPE_ITEM_EXPORT = "Xuất vật phẩm";
     private static final String TYPE_DONATION = "Quyên góp";
+    private static final String TYPE_REVIEW = "Xét duyệt";
 
     @FXML
     private VBox formSection;
@@ -123,7 +124,8 @@ public class OperationsController {
                 TYPE_EXPENSE,
                 TYPE_VOLUNTEER_PROOF,
                 TYPE_ITEM_EXPORT,
-                TYPE_DONATION
+                TYPE_DONATION,
+                TYPE_REVIEW
         ));
         cboNguoiXuLy.setItems(buildUserOptions());
         cboChienDich.setItems(buildCampaignOptions());
@@ -298,6 +300,28 @@ public class OperationsController {
     }
 
     @FXML
+    private void handleScreening() throws IOException {
+        App.setRoot("screening");
+    }
+
+    @FXML
+    private void handleTraining() throws IOException {
+        App.setRoot("training");
+    }
+
+    @FXML
+    private void handleInventory() throws IOException {
+        App.setRoot("inventory");
+    }
+
+    @FXML
+    private void handleExpense() throws IOException {
+        App.setRoot("expense");
+    }
+
+    @FXML private void handleAlerts() throws IOException { App.setRoot("alert"); }
+
+    @FXML
     private void handleLogout() throws IOException {
         UserSession.clear();
         App.setRoot("primary");
@@ -444,7 +468,8 @@ public class OperationsController {
                 TYPE_EXPENSE,
                 TYPE_VOLUNTEER_PROOF,
                 TYPE_ITEM_EXPORT,
-                TYPE_DONATION
+                TYPE_DONATION,
+                TYPE_REVIEW
         ));
         cboOperationCampaignFilter.setItems(buildCampaignFilterOptions());
         cboOperationStatusFilter.setItems(FXCollections.observableArrayList(
@@ -549,6 +574,9 @@ public class OperationsController {
         }
         if (sameType(type, TYPE_DONATION)) {
             return FXCollections.observableArrayList("Chờ xác nhận", "Đã xác nhận", "Từ chối");
+        }
+        if (sameType(type, TYPE_REVIEW)) {
+            return FXCollections.observableArrayList("Chờ xét", "Đã xét", "Từ chối");
         }
         return FXCollections.observableArrayList("Chờ duyệt", "Đã duyệt");
     }

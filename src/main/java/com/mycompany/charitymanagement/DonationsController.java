@@ -161,7 +161,12 @@ public class DonationsController {
             DialogUtils.warning(deleteError);
             return;
         }
-        if (!DialogUtils.confirm("Bạn có chắc muốn xóa khoản quyên góp " + selected.getMaQuyenGop() + "?")) {
+        long relCount = AppData.getOperations().stream()
+                .filter(item -> item.getMaLienKet().equalsIgnoreCase(selected.getMaQuyenGop()))
+                .count();
+        String detail = relCount > 0 ? "\nCó " + relCount + " bản ghi vận hành liên quan." : "\nKhông có bản ghi vận hành liên quan.";
+        if (!DialogUtils.confirmWithDetails(detail,
+                "Bạn có chắc muốn xóa khoản quyên góp " + selected.getMaQuyenGop() + "?")) {
             return;
         }
 
@@ -223,6 +228,28 @@ public class DonationsController {
     private void handleReports() throws IOException {
         App.setRoot("reports");
     }
+
+    @FXML
+    private void handleScreening() throws IOException {
+        App.setRoot("screening");
+    }
+
+    @FXML
+    private void handleTraining() throws IOException {
+        App.setRoot("training");
+    }
+
+    @FXML
+    private void handleInventory() throws IOException {
+        App.setRoot("inventory");
+    }
+
+    @FXML
+    private void handleExpense() throws IOException {
+        App.setRoot("expense");
+    }
+
+    @FXML private void handleAlerts() throws IOException { App.setRoot("alert"); }
 
     @FXML
     private void handleLogout() throws IOException {

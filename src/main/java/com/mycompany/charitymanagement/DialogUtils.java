@@ -23,6 +23,10 @@ public final class DialogUtils {
     }
 
     public static boolean confirm(String message) {
+        return confirmWithDetails(null, message);
+    }
+
+    public static boolean confirmWithDetails(String details, String message) {
         Scene scene = App.getScene();
         if (scene == null || !Platform.isFxApplicationThread()) {
             return false;
@@ -37,6 +41,13 @@ public final class DialogUtils {
         messageLabel.setWrapText(true);
         messageLabel.setMaxWidth(520);
 
+        VBox contentBox = new VBox(8, messageLabel);
+        if (details != null && !details.isEmpty()) {
+            Label detailLabel = new Label(details);
+            detailLabel.getStyleClass().add("delete-detail-text");
+            contentBox.getChildren().add(detailLabel);
+        }
+
         Button cancelButton = new Button("Hủy");
         cancelButton.getStyleClass().add("quick-button");
         Button okButton = new Button("Đồng ý");
@@ -45,9 +56,8 @@ public final class DialogUtils {
         HBox actions = new HBox(12, cancelButton, okButton);
         actions.setAlignment(Pos.CENTER_RIGHT);
 
-        VBox card = new VBox(16, titleLabel, messageLabel, actions);
+        VBox card = new VBox(16, titleLabel, contentBox, actions);
         card.getStyleClass().add("detail-card");
-        card.setMaxWidth(600);
 
         StackPane overlay = DetailDialogUtils.showCard(scene, card);
         if (overlay == null) {
@@ -89,7 +99,6 @@ public final class DialogUtils {
 
         VBox card = new VBox(16, titleLabel, messageLabel, actions);
         card.getStyleClass().add("detail-card");
-        card.setMaxWidth(600);
 
         StackPane overlay = DetailDialogUtils.showCard(scene, card);
         if (overlay == null) {

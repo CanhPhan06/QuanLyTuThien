@@ -276,7 +276,12 @@ public final class ExportUtils {
             String[] candidates = {
                 "C:\\Windows\\Fonts\\arial.ttf",
                 "C:\\Windows\\Fonts\\segoeui.ttf",
-                "C:\\Windows\\Fonts\\tahoma.ttf"
+                "C:\\Windows\\Fonts\\tahoma.ttf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+                "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
+                "/usr/share/fonts/TTF/DejaVuSans.ttf",
+                "/System/Library/Fonts/Helvetica.ttc"
             };
             for (String candidate : candidates) {
                 File fontFile = new File(candidate);
@@ -284,7 +289,12 @@ public final class ExportUtils {
                     return PDType0Font.load(document, fontFile);
                 }
             }
-            throw new IOException("Không tìm thấy font Unicode để xuất PDF.");
+            try {
+                return PDType0Font.load(document, ExportUtils.class.getResourceAsStream("/com/mycompany/charitymanagement/DejaVuSans.ttf"));
+            } catch (Exception e) {
+                // fallback
+            }
+            throw new IOException("Không tìm thấy font Unicode để xuất PDF. Vui lòng cài đặt DejaVu Sans hoặc Liberation Sans.");
         }
 
         private static String safePdfText(String value) {

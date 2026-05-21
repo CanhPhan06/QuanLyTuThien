@@ -13,13 +13,18 @@
             <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
             <Button text="⌂  Trang chủ" onAction="#handleHome" styleClass="menu-button-active"/>
             <Button text="▣  Chiến dịch" onAction="#handleActivityManagement" styleClass="menu-button"/>
-            <Button text="♟  Tình nguyện viên" onAction="#handleParticipants" styleClass="menu-button"/>
+            <Button text="♟  Tuyển dụng" onAction="#handleScreening" styleClass="menu-button"/>
+            <Button text="♟  TNV" onAction="#handleParticipants" styleClass="menu-button"/>
+            <Button text="◪  Đào tạo" onAction="#handleTraining" styleClass="menu-button"/>
             <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
             <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
             <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
+            <Button text="▣  Kho" onAction="#handleInventory" styleClass="menu-button"/>
+            <Button text="⟐  Chi phí" onAction="#handleExpense" styleClass="menu-button"/>
             <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
             <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
-            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+            <Button text="⚠  Cảnh báo" onAction="#handleAlerts" styleClass="menu-button"/>
+        <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
         </VBox>
     </left>
 

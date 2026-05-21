@@ -146,7 +146,7 @@ public final class DetailDialogUtils {
         card.requestFocus();
     }
 
-    private static StackPane detailHost(Scene scene) {
+    static StackPane detailHost(Scene scene) {
         Parent currentRoot = scene.getRoot();
         if (currentRoot instanceof StackPane
                 && Boolean.TRUE.equals(currentRoot.getProperties().get(DETAIL_HOST_KEY))) {

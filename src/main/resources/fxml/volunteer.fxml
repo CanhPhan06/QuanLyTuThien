@@ -28,8 +28,8 @@
 
                 <HBox spacing="14">
                     <VBox styleClass="stat-card wide-stat-card">
-                        <Label text="Chiến dịch hiện tại" styleClass="muted-text"/>
-                        <Label fx:id="lblCampaign" text="Chưa tham gia" styleClass="activity-title"/>
+                        <Label text="Số chiến dịch tham gia" styleClass="muted-text"/>
+                        <Label fx:id="lblCampaignCount" text="0" styleClass="stat-number"/>
                     </VBox>
                     <VBox styleClass="stat-card">
                         <Label text="Trạng thái duyệt" styleClass="muted-text"/>
@@ -44,6 +44,14 @@
                         <Label fx:id="lblNotificationCount" text="0" styleClass="stat-number purple"/>
                     </VBox>
                 </HBox>
+
+                <TableView fx:id="tableMyCampaigns" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colMyCampaign" text="Chiến dịch" prefWidth="360"/>
+                        <TableColumn fx:id="colMyCampaignStatus" text="Trạng thái" prefWidth="120"/>
+                        <TableColumn fx:id="colMyCampaignScore" text="Điểm" prefWidth="80"/>
+                    </columns>
+                </TableView>
 
                 <HBox spacing="12" styleClass="action-bar">
                     <Button text="Xem chiến dịch" onAction="#handleShowCampaigns" styleClass="primary-button"/>

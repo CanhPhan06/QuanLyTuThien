@@ -245,6 +245,59 @@ public final class BusinessRules {
         return null;
     }
 
+    public static String validateTrainingCourse(TrainingCourse course) {
+        if (course == null) {
+            return "Khóa học không hợp lệ.";
+        }
+        if (isBlank(course.getMaKhoaHoc()) || isBlank(course.getTenKhoaHoc())) {
+            return "Khóa học phải có mã và tên.";
+        }
+        if (parseDate(course.getNgayBatDau()) == null) {
+            return "Ngày bắt đầu phải có dạng dd/MM/yyyy.";
+        }
+        if (parseDate(course.getNgayKetThuc()) == null) {
+            return "Ngày kết thúc phải có dạng dd/MM/yyyy.";
+        }
+        if (parseDate(course.getNgayKetThuc()).isBefore(parseDate(course.getNgayBatDau()))) {
+            return "Ngày kết thúc không được trước ngày bắt đầu.";
+        }
+        if (course.getSoGio() <= 0) {
+            return "Số giờ đào tạo phải lớn hơn 0.";
+        }
+        if (isBlank(course.getGiangVien())) {
+            return "Khóa học phải có giảng viên.";
+        }
+        if (AppData.findCampaign(course.getMaChienDich()) == null) {
+            return "Chiến dịch liên kết không tồn tại.";
+        }
+        return null;
+    }
+
+    public static String validateExpense(Expense expense) {
+        if (expense == null) {
+            return "Phiếu chi không hợp lệ.";
+        }
+        if (isBlank(expense.getMaChiPhi()) || isBlank(expense.getMoTa())) {
+            return "Phiếu chi phải có mã và mô tả.";
+        }
+        if (expense.getSoTien() <= 0) {
+            return "Số tiền chi phải lớn hơn 0.";
+        }
+        if (isBlank(expense.getDanhMuc())) {
+            return "Vui lòng chọn danh mục chi.";
+        }
+        if (parseDate(expense.getNgayDeXuat()) == null) {
+            return "Ngày đề xuất phải có dạng dd/MM/yyyy.";
+        }
+        if (!isBlank(expense.getNgayDuyet()) && parseDate(expense.getNgayDuyet()) == null) {
+            return "Ngày duyệt phải có dạng dd/MM/yyyy.";
+        }
+        if (AppData.findCampaign(expense.getMaChienDich()) == null) {
+            return "Chiến dịch liên kết không tồn tại.";
+        }
+        return null;
+    }
+
     public static String canDeleteCampaign(ActivityModel campaign) {
         if (campaign == null) {
             return "Chiến dịch không tồn tại.";
