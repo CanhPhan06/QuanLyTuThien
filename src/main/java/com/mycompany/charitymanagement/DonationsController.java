@@ -11,7 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 
 public class DonationsController {
@@ -59,18 +59,19 @@ public class DonationsController {
 
     @FXML
     private void initialize() {
-        colMaQuyenGop.setCellValueFactory(new PropertyValueFactory<>("maQuyenGop"));
+        colMaQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaQuyenGop()));
         colMaQuyenGop.setVisible(false);
-        colNguoiQuyenGop.setCellValueFactory(new PropertyValueFactory<>("nguoiQuyenGop"));
+        colNguoiQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNguoiQuyenGop()));
         colHoatDong.setText("Chiến dịch");
-        colHoatDong.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
-        colNgayQuyenGop.setCellValueFactory(new PropertyValueFactory<>("ngayQuyenGop"));
-        colHinhThuc.setCellValueFactory(new PropertyValueFactory<>("hinhThuc"));
-        colNoiDungQuyenGop.setCellValueFactory(new PropertyValueFactory<>("noiDungQuyenGop"));
-        colSoTien.setCellValueFactory(new PropertyValueFactory<>("soTienText"));
-        colTrangThaiXuLy.setCellValueFactory(new PropertyValueFactory<>("trangThaiXuLy"));
+        colHoatDong.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colNgayQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayQuyenGop()));
+        colHinhThuc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getHinhThuc()));
+        colNoiDungQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNoiDungQuyenGop()));
+        colSoTien.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSoTienText()));
+        colTrangThaiXuLy.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThaiXuLy()));
 
         tableDonations.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableDonations.setFixedCellSize(32.0);
         filteredDonations = new FilteredList<>(AppData.getDonations(), item -> true);
         tableDonations.setItems(filteredDonations);
         cboCampaignFilter.setItems(buildCampaignFilterChoices());
@@ -186,47 +187,47 @@ public class DonationsController {
 
     @FXML
     private void handleBackHome() throws IOException {
-        App.setRoot("secondary");
+        NavigationService.navigateTo(NavigationService.VIEW_DASHBOARD);
     }
 
     @FXML
     private void handleActivities() throws IOException {
-        App.setRoot("activities");
+        NavigationService.navigateTo(NavigationService.VIEW_ACTIVITIES);
     }
 
     @FXML
     private void handleParticipants() throws IOException {
-        App.setRoot("participants");
+        NavigationService.navigateTo(NavigationService.VIEW_PARTICIPANTS);
     }
 
     @FXML
     private void handleSponsors() throws IOException {
-        App.setRoot("sponsors");
+        NavigationService.navigateTo(NavigationService.VIEW_SPONSORS);
     }
 
     @FXML
     private void handleDonations() throws IOException {
-        App.setRoot("donations");
+        NavigationService.navigateTo(NavigationService.VIEW_DONATIONS);
     }
 
     @FXML
     private void handleOperations() throws IOException {
-        App.setRoot("operations");
+        NavigationService.navigateTo(NavigationService.VIEW_OPERATIONS);
     }
 
     @FXML
     private void handleContent() throws IOException {
-        App.setRoot("content");
+        NavigationService.navigateTo(NavigationService.VIEW_CONTENT);
     }
 
     @FXML
     private void handleReports() throws IOException {
-        App.setRoot("reports");
+        NavigationService.navigateTo(NavigationService.VIEW_REPORTS);
     }
 
     @FXML
     private void handleLogout() throws IOException {
-        App.setRoot("primary");
+        NavigationService.navigateTo(NavigationService.VIEW_LOGIN);
     }
 
     private DonationModel showDonationDialog(String title, DonationModel current) {

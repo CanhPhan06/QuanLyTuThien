@@ -3,59 +3,39 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.mycompany.charitymanagement.ParticipantsController"
-            prefWidth="1180" prefHeight="700"
-            stylesheets="@../com/mycompany/charitymanagement/style.css">
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.mycompany.charitymanagement.ParticipantsController"
+      spacing="16" styleClass="main-content">
 
-    <left>
-        <VBox spacing="8" styleClass="sidebar">
-            <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
-            <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
-            <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
-            <Button text="♟  Tình nguyện viên" onAction="#handleParticipants" styleClass="menu-button-active"/>
-            <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
-            <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
-            <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
-            <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
-            <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
-            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
-        </VBox>
-    </left>
+    <Label text="SINH VIÊN / TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
 
-    <center>
-        <VBox spacing="16" styleClass="main-content">
-            <Label text="SINH VIÊN / TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
+    <HBox spacing="12" styleClass="filter-card">
+        <ComboBox fx:id="cboParticipantCampaignFilter" promptText="Lọc chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="cboParticipantSchoolFilter" promptText="Lọc trường" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="cboParticipantStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtParticipantSearch" promptText="Tìm họ tên, MSSV, SĐT, khoa..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+        <Button text="Bỏ lọc" onAction="#handleClearParticipantFilters" styleClass="quick-button"/>
+    </HBox>
 
-            <HBox spacing="12" styleClass="filter-card">
-                <ComboBox fx:id="cboParticipantCampaignFilter" promptText="Lọc chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <ComboBox fx:id="cboParticipantSchoolFilter" promptText="Lọc trường" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <ComboBox fx:id="cboParticipantStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="txtParticipantSearch" promptText="Tìm họ tên, MSSV, SĐT, khoa..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
-                <Button text="Bỏ lọc" onAction="#handleClearParticipantFilters" styleClass="quick-button"/>
-            </HBox>
+    <HBox spacing="12" styleClass="action-bar">
+        <Button text="+  Thêm" onAction="#handleAddParticipant" styleClass="primary-button"/>
+        <Button text="✎  Cập nhật" onAction="#handleUpdateParticipant" styleClass="quick-button"/>
+        <Button text="⌫  Xóa" onAction="#handleDeleteParticipant" styleClass="danger-button"/>
+        <Button text="⇩  Xuất file" onAction="#handleExportParticipants" styleClass="quick-button"/>
+    </HBox>
 
-            <HBox spacing="12" styleClass="action-bar">
-                <Button text="+  Thêm" onAction="#handleAddParticipant" styleClass="primary-button"/>
-                <Button text="✎  Cập nhật" onAction="#handleUpdateParticipant" styleClass="quick-button"/>
-                <Button text="⌫  Xóa" onAction="#handleDeleteParticipant" styleClass="danger-button"/>
-                <Button text="⇩  Xuất file" onAction="#handleExportParticipants" styleClass="quick-button"/>
-            </HBox>
-
-            <TableView fx:id="tableParticipants" styleClass="activity-table" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colMaTaiKhoan" text="Tài khoản" prefWidth="80"/>
-                    <TableColumn fx:id="colMaHoSo" text="Hồ sơ" prefWidth="75"/>
-                    <TableColumn fx:id="colHoTen" text="Họ tên" prefWidth="150"/>
-                    <TableColumn fx:id="colMssv" text="MSSV" prefWidth="95"/>
-                    <TableColumn fx:id="colSoDienThoai" text="SĐT" prefWidth="105"/>
-                    <TableColumn fx:id="colKhoa" text="Khoa" prefWidth="155"/>
-                    <TableColumn fx:id="colTruong" text="Trường" prefWidth="95"/>
-                    <TableColumn fx:id="colMaChienDich" text="Chiến dịch" prefWidth="180"/>
-                    <TableColumn fx:id="colTrangThaiDuyet" text="Trạng thái" prefWidth="105"/>
-                    <TableColumn fx:id="colDiemDanhGia" text="Điểm" prefWidth="65"/>
-                </columns>
-            </TableView>
-        </VBox>
-    </center>
-</BorderPane>
+    <TableView fx:id="tableParticipants" styleClass="activity-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colMaTaiKhoan" text="Tài khoản" prefWidth="80"/>
+            <TableColumn fx:id="colMaHoSo" text="Hồ sơ" prefWidth="75"/>
+            <TableColumn fx:id="colHoTen" text="Họ tên" prefWidth="150"/>
+            <TableColumn fx:id="colMssv" text="MSSV" prefWidth="95"/>
+            <TableColumn fx:id="colSoDienThoai" text="SĐT" prefWidth="105"/>
+            <TableColumn fx:id="colKhoa" text="Khoa" prefWidth="155"/>
+            <TableColumn fx:id="colTruong" text="Trường" prefWidth="95"/>
+            <TableColumn fx:id="colMaChienDich" text="Chiến dịch" prefWidth="180"/>
+            <TableColumn fx:id="colTrangThaiDuyet" text="Trạng thái" prefWidth="105"/>
+            <TableColumn fx:id="colDiemDanhGia" text="Điểm" prefWidth="65"/>
+        </columns>
+    </TableView>
+</VBox>

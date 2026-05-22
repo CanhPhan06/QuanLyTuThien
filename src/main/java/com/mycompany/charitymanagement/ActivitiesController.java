@@ -19,7 +19,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -33,19 +33,6 @@ public class ActivitiesController {
         "Tên chiến dịch", "Mô tả", "Địa điểm",
         "Ngày bắt đầu", "Ngày kết thúc", "Mục tiêu tiền", "Trạng thái chiến dịch"
     };
-
-    @FXML
-    private Button btnParticipantsMenu;
-    @FXML
-    private Button btnSponsorsMenu;
-    @FXML
-    private Button btnDonationsMenu;
-    @FXML
-    private Button btnOperationsMenu;
-    @FXML
-    private Button btnContentMenu;
-    @FXML
-    private Button btnReportsMenu;
 
     @FXML
     private HBox adminActionBar;
@@ -83,16 +70,17 @@ public class ActivitiesController {
             currentUser = new UserAccount("ADMIN", "123", UserAccount.ROLE_ADMIN, "Người quản lý hệ thống", "TK001");
         }
 
-        colMaChienDich.setCellValueFactory(new PropertyValueFactory<>("maChienDich"));
+        colMaChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaChienDich()));
         colMaChienDich.setVisible(false);
-        colTenChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
-        colNgayBatDau.setCellValueFactory(new PropertyValueFactory<>("ngayBatDau"));
-        colNgayKetThuc.setCellValueFactory(new PropertyValueFactory<>("ngayKetThuc"));
-        colMucTieuTien.setCellValueFactory(new PropertyValueFactory<>("mucTieuTienText"));
-        colDiaDiem.setCellValueFactory(new PropertyValueFactory<>("diaDiem"));
-        colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
+        colTenChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colNgayBatDau.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayBatDau()));
+        colNgayKetThuc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayKetThuc()));
+        colMucTieuTien.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMucTieuTienText()));
+        colDiaDiem.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDiaDiem()));
+        colTrangThai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
 
         tableActivities.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableActivities.setFixedCellSize(32.0);
         filteredActivities = new FilteredList<>(AppData.getActivities(), item -> true);
         tableActivities.setItems(filteredActivities);
         setupActivityFilters();
@@ -254,7 +242,7 @@ public class ActivitiesController {
     @FXML
     private void handleViewMyTasks() throws IOException {
         closeCampaignDetailWindow();
-        App.setRoot("volunteer");
+        NavigationService.navigateTo(NavigationService.VIEW_VOLUNTEER);
     }
 
     @FXML
@@ -300,7 +288,7 @@ public class ActivitiesController {
     @FXML
     private void handleDonateMoney() throws IOException {
         closeCampaignDetailWindow();
-        App.setRoot("sponsorportal");
+        NavigationService.navigateTo(NavigationService.VIEW_SPONSORPORTAL);
     }
 
     @FXML
@@ -324,95 +312,85 @@ public class ActivitiesController {
     @FXML
     private void handleViewSponsorHistory() throws IOException {
         closeCampaignDetailWindow();
-        App.setRoot("sponsorportal");
+        NavigationService.navigateTo(NavigationService.VIEW_SPONSORPORTAL);
     }
 
     @FXML
     private void handleAssignWork() throws IOException {
-        App.setRoot("operations");
+        NavigationService.navigateTo(NavigationService.VIEW_OPERATIONS);
     }
 
     @FXML
     private void handleViewParticipants() throws IOException {
-        App.setRoot("participants");
+        NavigationService.navigateTo(NavigationService.VIEW_PARTICIPANTS);
     }
 
     @FXML
     private void handleViewDonations() throws IOException {
-        App.setRoot("donations");
+        NavigationService.navigateTo(NavigationService.VIEW_DONATIONS);
     }
 
     @FXML
     private void handleViewExpenses() throws IOException {
-        App.setRoot("operations");
+        NavigationService.navigateTo(NavigationService.VIEW_OPERATIONS);
     }
 
     @FXML
     private void handleBackHome() throws IOException {
         closeCampaignDetailWindow();
         if (currentUser.isVolunteer()) {
-            App.setRoot("volunteer");
+            NavigationService.navigateTo(NavigationService.VIEW_VOLUNTEER);
         } else if (currentUser.isSponsor()) {
-            App.setRoot("sponsorportal");
+            NavigationService.navigateTo(NavigationService.VIEW_SPONSORPORTAL);
         } else {
-            App.setRoot("secondary");
+            NavigationService.navigateTo(NavigationService.VIEW_DASHBOARD);
         }
     }
 
     @FXML
     private void handleActivities() throws IOException {
-        App.setRoot("activities");
+        NavigationService.navigateTo(NavigationService.VIEW_ACTIVITIES);
     }
 
     @FXML
     private void handleParticipants() throws IOException {
-        App.setRoot("participants");
+        NavigationService.navigateTo(NavigationService.VIEW_PARTICIPANTS);
     }
 
     @FXML
     private void handleSponsors() throws IOException {
-        App.setRoot("sponsors");
+        NavigationService.navigateTo(NavigationService.VIEW_SPONSORS);
     }
 
     @FXML
     private void handleDonations() throws IOException {
-        App.setRoot("donations");
+        NavigationService.navigateTo(NavigationService.VIEW_DONATIONS);
     }
 
     @FXML
     private void handleOperations() throws IOException {
-        App.setRoot("operations");
+        NavigationService.navigateTo(NavigationService.VIEW_OPERATIONS);
     }
 
     @FXML
     private void handleContent() throws IOException {
-        App.setRoot("content");
+        NavigationService.navigateTo(NavigationService.VIEW_CONTENT);
     }
 
     @FXML
     private void handleReports() throws IOException {
-        App.setRoot("reports");
+        NavigationService.navigateTo(NavigationService.VIEW_REPORTS);
     }
 
     @FXML
     private void handleLogout() throws IOException {
         closeCampaignDetailWindow();
-        UserSession.clear();
-        App.setRoot("primary");
+        NavigationService.navigateTo(NavigationService.VIEW_LOGIN);
     }
 
     private void configureRole() {
         boolean isAdmin = currentUser.isAdmin();
-
         setVisibleManaged(adminActionBar, isAdmin);
-
-        setVisibleManaged(btnParticipantsMenu, isAdmin);
-        setVisibleManaged(btnSponsorsMenu, isAdmin);
-        setVisibleManaged(btnDonationsMenu, isAdmin);
-        setVisibleManaged(btnOperationsMenu, isAdmin);
-        setVisibleManaged(btnContentMenu, isAdmin);
-        setVisibleManaged(btnReportsMenu, isAdmin);
-
     }
 
     private void setupActivityFilters() {

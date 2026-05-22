@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.mycompany.charitymanagement.SecondaryController"
+      spacing="28" styleClass="dashboard-content">
+
+    <Label text="HỆ THỐNG QUẢN LÝ HOẠT ĐỘNG TỪ THIỆN" styleClass="dashboard-page-title"/>
+
+    <HBox spacing="22">
+        <VBox styleClass="dashboard-stat-card" HBox.hgrow="ALWAYS">
+            <Label fx:id="lblActivityCount" text="18" styleClass="dashboard-stat-number"/>
+            <Label text="Hoạt động" styleClass="dashboard-main-text"/>
+            <Label text="Tổng số hoạt động" styleClass="dashboard-muted-text"/>
+        </VBox>
+
+        <VBox styleClass="dashboard-stat-card" HBox.hgrow="ALWAYS">
+            <Label fx:id="lblParticipantCount" text="420" styleClass="dashboard-small-number"/>
+            <Label text="Người tham gia" styleClass="dashboard-main-text"/>
+            <Label text="Tổng số người tham gia" styleClass="dashboard-muted-text"/>
+        </VBox>
+
+        <VBox styleClass="dashboard-stat-card" HBox.hgrow="ALWAYS">
+            <Label fx:id="lblSponsorCount" text="45" styleClass="dashboard-small-number"/>
+            <Label text="Nhà tài trợ" styleClass="dashboard-main-text"/>
+            <Label text="Tổng số nhà tài trợ" styleClass="dashboard-muted-text"/>
+        </VBox>
+
+        <VBox styleClass="dashboard-stat-card" HBox.hgrow="ALWAYS">
+            <Label fx:id="lblDonationTotal" text="320.750.000" styleClass="dashboard-small-number"/>
+            <Label text="Tổng quyên góp (VNĐ)" styleClass="dashboard-main-text"/>
+            <Label text="Tổng số tiền đã quyên góp" styleClass="dashboard-muted-text"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="24" VBox.vgrow="ALWAYS">
+        <VBox spacing="18" styleClass="dashboard-large-card" HBox.hgrow="ALWAYS">
+            <Label text="HOẠT ĐỘNG NỔI BẬT" styleClass="dashboard-section-title"/>
+            <Label fx:id="lblFeaturedTitle" text="Chương trình &quot;Đông ấm cho em 2026&quot;" styleClass="dashboard-activity-title"/>
+            <Label fx:id="lblFeaturedStartDate" text="Ngày bắt đầu: 01/12/2026" styleClass="dashboard-main-text"/>
+            <Label fx:id="lblFeaturedLocation" text="Địa điểm: Hà Giang" styleClass="dashboard-main-text"/>
+            <Label fx:id="lblFeaturedParticipants" text="Người tham gia: 120 người" styleClass="dashboard-main-text"/>
+            <Label fx:id="lblFeaturedDonations" text="Đã quyên góp: 85.350.000 VNĐ" styleClass="dashboard-main-text"/>
+            <Button text="Xem chi tiết" onAction="#handleViewDetail" styleClass="dashboard-primary-button"/>
+        </VBox>
+
+        <VBox spacing="20" styleClass="dashboard-large-card" HBox.hgrow="ALWAYS">
+            <Label text="THÔNG BÁO" styleClass="dashboard-section-title"/>
+            <Label fx:id="lblNotice1" text="• Cập nhật chương trình mới &quot;Khám bệnh thiện nguyện 2026&quot;" styleClass="dashboard-main-text"/>
+            <Label fx:id="lblNotice2" text="• Cảm ơn các nhà tài trợ đã đồng hành cùng chúng tôi" styleClass="dashboard-main-text"/>
+            <Label fx:id="lblNotice3" text="• Báo cáo tháng 04/2026 đã được cập nhật" styleClass="dashboard-main-text"/>
+            <Label fx:id="lblNotice4" text="• Chương trình Xuân yêu thương 2026 đã hoàn thành" styleClass="dashboard-main-text"/>
+        </VBox>
+    </HBox>
+
+    <VBox spacing="18" styleClass="dashboard-action-card">
+        <Label text="THAO TÁC NHANH" styleClass="dashboard-section-title"/>
+        <HBox spacing="18">
+            <Button text="Tạo hoạt động mới" onAction="#handleCreateActivity" styleClass="dashboard-quick-button"/>
+            <Button text="Thêm người tham gia" onAction="#handleAddParticipant" styleClass="dashboard-quick-button"/>
+            <Button text="Thêm nhà tài trợ" onAction="#handleAddSponsor" styleClass="dashboard-quick-button"/>
+            <Button text="Ghi nhận quyên góp" onAction="#handleRecordDonation" styleClass="dashboard-quick-button"/>
+            <Button text="Xem báo cáo" onAction="#handleViewReport" styleClass="dashboard-quick-button"/>
+        </HBox>
+    </VBox>
+</VBox>

@@ -33,6 +33,24 @@ public class App extends Application {
         updateStageSize(fxml);
     }
 
+    static void setRootToMainLayout(String initialContent) throws IOException {
+        Parent mainLayout = loadFXML("layout/MainLayout");
+        scene.setRoot(mainLayout);
+        updateStageSize("secondary");
+        
+        MainLayoutController controller = NavigationService.getMainLayoutController();
+        if (controller != null) {
+            NavigationService.loadContentInLayout(getContentNameForMain(initialContent));
+        }
+    }
+
+    private static String getContentNameForMain(String viewName) {
+        if ("secondary".equals(viewName)) {
+            return NavigationService.VIEW_DASHBOARD;
+        }
+        return viewName;
+    }
+
     static Scene getScene() {
         return scene;
     }
@@ -68,6 +86,13 @@ public class App extends Application {
     private static Parent loadFXML(String fxml) throws IOException {
         String path;
         switch (fxml) {
+            case "volunteer":
+            case "sponsorportal":
+                path = "/fxml/" + fxml + ".fxml";
+                break;
+            case "layout/MainLayout":
+                path = "/fxml/layout/MainLayout.fxml";
+                break;
             case "activities":
             case "participants":
             case "sponsors":
@@ -75,8 +100,6 @@ public class App extends Application {
             case "operations":
             case "content":
             case "reports":
-            case "volunteer":
-            case "sponsorportal":
                 path = "/fxml/" + fxml + ".fxml";
                 break;
             default:

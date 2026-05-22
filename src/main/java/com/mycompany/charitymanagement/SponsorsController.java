@@ -11,7 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 
 public class SponsorsController {
@@ -59,19 +59,20 @@ public class SponsorsController {
 
     @FXML
     private void initialize() {
-        colMaDoiTac.setCellValueFactory(new PropertyValueFactory<>("maDoiTac"));
+        colMaDoiTac.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaDoiTac()));
         colMaDoiTac.setVisible(false);
-        colTenDoiTac.setCellValueFactory(new PropertyValueFactory<>("tenDoiTac"));
-        colLinhVuc.setCellValueFactory(new PropertyValueFactory<>("linhVuc"));
-        colSoDienThoai.setCellValueFactory(new PropertyValueFactory<>("soDienThoai"));
-        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colDiaChi.setCellValueFactory(new PropertyValueFactory<>("diaChi"));
+        colTenDoiTac.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenDoiTac()));
+        colLinhVuc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getLinhVuc()));
+        colSoDienThoai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSoDienThoai()));
+        colEmail.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getEmail()));
+        colDiaChi.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDiaChi()));
         colMaChienDich.setText("Chiến dịch");
-        colMaChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
-        colGiaTriTaiTro.setCellValueFactory(new PropertyValueFactory<>("giaTriTaiTroText"));
-        colNgayKyKet.setCellValueFactory(new PropertyValueFactory<>("ngayKyKet"));
+        colMaChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colGiaTriTaiTro.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGiaTriTaiTroText()));
+        colNgayKyKet.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayKyKet()));
 
         tableSponsors.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableSponsors.setFixedCellSize(32.0);
         filteredSponsors = new FilteredList<>(AppData.getSponsors(), item -> true);
         tableSponsors.setItems(filteredSponsors);
         setupSponsorFilters();
@@ -169,47 +170,47 @@ public class SponsorsController {
 
     @FXML
     private void handleBackHome() throws IOException {
-        App.setRoot("secondary");
+        NavigationService.navigateTo(NavigationService.VIEW_DASHBOARD);
     }
 
     @FXML
     private void handleActivities() throws IOException {
-        App.setRoot("activities");
+        NavigationService.navigateTo(NavigationService.VIEW_ACTIVITIES);
     }
 
     @FXML
     private void handleParticipants() throws IOException {
-        App.setRoot("participants");
+        NavigationService.navigateTo(NavigationService.VIEW_PARTICIPANTS);
     }
 
     @FXML
     private void handleSponsors() throws IOException {
-        App.setRoot("sponsors");
+        NavigationService.navigateTo(NavigationService.VIEW_SPONSORS);
     }
 
     @FXML
     private void handleDonations() throws IOException {
-        App.setRoot("donations");
+        NavigationService.navigateTo(NavigationService.VIEW_DONATIONS);
     }
 
     @FXML
     private void handleOperations() throws IOException {
-        App.setRoot("operations");
+        NavigationService.navigateTo(NavigationService.VIEW_OPERATIONS);
     }
 
     @FXML
     private void handleContent() throws IOException {
-        App.setRoot("content");
+        NavigationService.navigateTo(NavigationService.VIEW_CONTENT);
     }
 
     @FXML
     private void handleReports() throws IOException {
-        App.setRoot("reports");
+        NavigationService.navigateTo(NavigationService.VIEW_REPORTS);
     }
 
     @FXML
     private void handleLogout() throws IOException {
-        App.setRoot("primary");
+        NavigationService.navigateTo(NavigationService.VIEW_LOGIN);
     }
 
     private SponsorModel showSponsorDialog(String title, SponsorModel current) {

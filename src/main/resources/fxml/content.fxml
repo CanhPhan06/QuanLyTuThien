@@ -3,91 +3,71 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.mycompany.charitymanagement.ContentController"
-            prefWidth="1180" prefHeight="700"
-            stylesheets="@../com/mycompany/charitymanagement/style.css">
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.mycompany.charitymanagement.ContentController"
+      spacing="16" styleClass="main-content">
 
-    <left>
-        <VBox spacing="8" styleClass="sidebar">
-            <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
-            <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
-            <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
-            <Button text="♟  Tình nguyện viên" onAction="#handleParticipants" styleClass="menu-button"/>
-            <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
-            <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
-            <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
-            <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button-active"/>
-            <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
-            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
-        </VBox>
-    </left>
+    <Label text="TRUNG TÂM NỘI DUNG" styleClass="page-title"/>
 
-    <center>
-        <VBox spacing="16" styleClass="main-content">
-            <Label text="TRUNG TÂM NỘI DUNG" styleClass="page-title"/>
+    <HBox spacing="18">
+        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
+            <Label text="▤" styleClass="metric-icon blue-soft"/>
+            <VBox spacing="2">
+                <Label text="Tin tức" styleClass="metric-title"/>
+                <Label fx:id="lblNewsCount" text="0" styleClass="stat-number"/>
+                <Label text="Bài viết / bình luận" styleClass="muted-text"/>
+            </VBox>
+        </HBox>
+        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
+            <Label text="✉" styleClass="metric-icon green-soft"/>
+            <VBox spacing="2">
+                <Label text="Thông báo" styleClass="metric-title"/>
+                <Label fx:id="lblNoticeCount" text="0" styleClass="stat-number green"/>
+                <Label text="Gửi cho người dùng" styleClass="muted-text"/>
+            </VBox>
+        </HBox>
+        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
+            <Label text="◷" styleClass="metric-icon orange-soft"/>
+            <VBox spacing="2">
+                <Label text="Chờ xử lý" styleClass="metric-title"/>
+                <Label fx:id="lblPendingContent" text="0" styleClass="stat-number orange"/>
+                <Label text="Nháp / chờ duyệt" styleClass="muted-text"/>
+            </VBox>
+        </HBox>
+        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
+            <Label text="◉" styleClass="metric-icon purple-soft"/>
+            <VBox spacing="2">
+                <Label text="Đang hiển thị" styleClass="metric-title"/>
+                <Label fx:id="lblVisibleCount" text="0" styleClass="stat-number purple"/>
+                <Label text="Nội dung công khai" styleClass="muted-text"/>
+            </VBox>
+        </HBox>
+    </HBox>
 
-            <HBox spacing="18">
-                <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                    <Label text="▤" styleClass="metric-icon blue-soft"/>
-                    <VBox spacing="2">
-                        <Label text="Tin tức" styleClass="metric-title"/>
-                        <Label fx:id="lblNewsCount" text="0" styleClass="stat-number"/>
-                        <Label text="Bài viết / bình luận" styleClass="muted-text"/>
-                    </VBox>
-                </HBox>
-                <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                    <Label text="✉" styleClass="metric-icon green-soft"/>
-                    <VBox spacing="2">
-                        <Label text="Thông báo" styleClass="metric-title"/>
-                        <Label fx:id="lblNoticeCount" text="0" styleClass="stat-number green"/>
-                        <Label text="Gửi cho người dùng" styleClass="muted-text"/>
-                    </VBox>
-                </HBox>
-                <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                    <Label text="◷" styleClass="metric-icon orange-soft"/>
-                    <VBox spacing="2">
-                        <Label text="Chờ xử lý" styleClass="metric-title"/>
-                        <Label fx:id="lblPendingContent" text="0" styleClass="stat-number orange"/>
-                        <Label text="Nháp / chờ duyệt" styleClass="muted-text"/>
-                    </VBox>
-                </HBox>
-                <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                    <Label text="◉" styleClass="metric-icon purple-soft"/>
-                    <VBox spacing="2">
-                        <Label text="Đang hiển thị" styleClass="metric-title"/>
-                        <Label fx:id="lblVisibleCount" text="0" styleClass="stat-number purple"/>
-                        <Label text="Nội dung công khai" styleClass="muted-text"/>
-                    </VBox>
-                </HBox>
-            </HBox>
+    <HBox spacing="12" styleClass="filter-card">
+        <ComboBox fx:id="cboContentTypeFilter" promptText="Loại nội dung" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="cboContentStatusFilter" promptText="Trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtContentSearch" promptText="Tìm theo tiêu đề hoặc nội dung" styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+        <Button text="Bỏ lọc" onAction="#handleClearContentFilters" styleClass="quick-button"/>
+    </HBox>
 
-            <HBox spacing="12" styleClass="filter-card">
-                <ComboBox fx:id="cboContentTypeFilter" promptText="Loại nội dung" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <ComboBox fx:id="cboContentStatusFilter" promptText="Trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="txtContentSearch" promptText="Tìm theo tiêu đề hoặc nội dung" styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
-                <Button text="Bỏ lọc" onAction="#handleClearContentFilters" styleClass="quick-button"/>
-            </HBox>
+    <HBox spacing="12" styleClass="action-bar">
+        <Button text="+  Tạo nội dung" onAction="#handleAddRecord" styleClass="primary-button"/>
+        <Button text="✎  Chỉnh sửa" onAction="#handleUpdateRecord" styleClass="quick-button"/>
+        <Button text="⌫  Xóa" onAction="#handleDeleteRecord" styleClass="danger-button"/>
+        <Button text="⇩  Xuất danh sách" onAction="#handleExportContent" styleClass="quick-button"/>
+    </HBox>
 
-            <HBox spacing="12" styleClass="action-bar">
-                <Button text="+  Tạo nội dung" onAction="#handleAddRecord" styleClass="primary-button"/>
-                <Button text="✎  Chỉnh sửa" onAction="#handleUpdateRecord" styleClass="quick-button"/>
-                <Button text="⌫  Xóa" onAction="#handleDeleteRecord" styleClass="danger-button"/>
-                <Button text="⇩  Xuất danh sách" onAction="#handleExportContent" styleClass="quick-button"/>
-            </HBox>
-
-            <TableView fx:id="tableRecords" styleClass="activity-table content-table" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colNhomBang" text="Loại" prefWidth="120"/>
-                    <TableColumn fx:id="colMaChinh" text="Mã" prefWidth="75"/>
-                    <TableColumn fx:id="colMaLienKet" text="Liên quan đến" prefWidth="170"/>
-                    <TableColumn fx:id="colTieuDe" text="Tiêu đề" prefWidth="210"/>
-                    <TableColumn fx:id="colNoiDung" text="Nội dung tóm tắt" prefWidth="310"/>
-                    <TableColumn fx:id="colNgay" text="Ngày tạo" prefWidth="105"/>
-                    <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="115"/>
-                    <TableColumn fx:id="colGhiChu" text="Ghi chú" prefWidth="120"/>
-                </columns>
-            </TableView>
-        </VBox>
-    </center>
-</BorderPane>
+    <TableView fx:id="tableRecords" styleClass="activity-table content-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colNhomBang" text="Loại" prefWidth="120"/>
+            <TableColumn fx:id="colMaChinh" text="Mã" prefWidth="75"/>
+            <TableColumn fx:id="colMaLienKet" text="Liên quan đến" prefWidth="170"/>
+            <TableColumn fx:id="colTieuDe" text="Tiêu đề" prefWidth="210"/>
+            <TableColumn fx:id="colNoiDung" text="Nội dung tóm tắt" prefWidth="310"/>
+            <TableColumn fx:id="colNgay" text="Ngày tạo" prefWidth="105"/>
+            <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="115"/>
+            <TableColumn fx:id="colGhiChu" text="Ghi chú" prefWidth="120"/>
+        </columns>
+    </TableView>
+</VBox>

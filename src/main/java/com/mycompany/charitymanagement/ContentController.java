@@ -11,7 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 
 public class ContentController {
@@ -59,18 +59,19 @@ public class ContentController {
 
     @FXML
     private void initialize() {
-        colNhomBang.setCellValueFactory(new PropertyValueFactory<>("tenNhomBang"));
-        colMaChinh.setCellValueFactory(new PropertyValueFactory<>("maChinh"));
+        colNhomBang.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenNhomBang()));
+        colMaChinh.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaChinh()));
         colMaChinh.setVisible(false);
         colMaLienKet.setText("Đối tượng liên quan");
-        colMaLienKet.setCellValueFactory(new PropertyValueFactory<>("tenLienKet"));
-        colTieuDe.setCellValueFactory(new PropertyValueFactory<>("tieuDe"));
-        colNoiDung.setCellValueFactory(new PropertyValueFactory<>("noiDung"));
-        colNgay.setCellValueFactory(new PropertyValueFactory<>("ngay"));
-        colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
-        colGhiChu.setCellValueFactory(new PropertyValueFactory<>("ghiChu"));
+        colMaLienKet.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenLienKet()));
+        colTieuDe.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTieuDe()));
+        colNoiDung.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNoiDung()));
+        colNgay.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgay()));
+        colTrangThai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
+        colGhiChu.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGhiChu()));
 
         tableRecords.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableRecords.setFixedCellSize(32.0);
         filteredContents = new FilteredList<>(AppData.getContents(), item -> true);
         tableRecords.setItems(filteredContents);
         cboContentTypeFilter.setItems(FXCollections.observableArrayList(
@@ -175,47 +176,47 @@ public class ContentController {
 
     @FXML
     private void handleBackHome() throws IOException {
-        App.setRoot("secondary");
+        NavigationService.navigateTo(NavigationService.VIEW_DASHBOARD);
     }
 
     @FXML
     private void handleActivities() throws IOException {
-        App.setRoot("activities");
+        NavigationService.navigateTo(NavigationService.VIEW_ACTIVITIES);
     }
 
     @FXML
     private void handleParticipants() throws IOException {
-        App.setRoot("participants");
+        NavigationService.navigateTo(NavigationService.VIEW_PARTICIPANTS);
     }
 
     @FXML
     private void handleSponsors() throws IOException {
-        App.setRoot("sponsors");
+        NavigationService.navigateTo(NavigationService.VIEW_SPONSORS);
     }
 
     @FXML
     private void handleDonations() throws IOException {
-        App.setRoot("donations");
+        NavigationService.navigateTo(NavigationService.VIEW_DONATIONS);
     }
 
     @FXML
     private void handleOperations() throws IOException {
-        App.setRoot("operations");
+        NavigationService.navigateTo(NavigationService.VIEW_OPERATIONS);
     }
 
     @FXML
     private void handleContent() throws IOException {
-        App.setRoot("content");
+        NavigationService.navigateTo(NavigationService.VIEW_CONTENT);
     }
 
     @FXML
     private void handleReports() throws IOException {
-        App.setRoot("reports");
+        NavigationService.navigateTo(NavigationService.VIEW_REPORTS);
     }
 
     @FXML
     private void handleLogout() throws IOException {
-        App.setRoot("primary");
+        NavigationService.navigateTo(NavigationService.VIEW_LOGIN);
     }
 
     private SystemRecord showRecordDialog(String title, SystemRecord current) {
