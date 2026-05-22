@@ -93,6 +93,17 @@
     -fx-border-color: transparent;
 }
 
+.menu-button:focused,
+.logout-button:focused {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.menu-button-active:focused {
+    -fx-background-color: #2f80ed;
+    -fx-text-fill: white;
+}
+
 .menu-button:pressed,
 .logout-button:pressed,
 .menu-button-active:pressed {

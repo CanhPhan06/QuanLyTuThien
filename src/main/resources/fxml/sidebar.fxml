@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="8" styleClass="sidebar" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.mycompany.charitymanagement.SidebarController">
+    <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
+    <Button fx:id="btnHome" text="⌂  Trang chủ" onAction="#handleHome" styleClass="menu-button"/>
+    <Button fx:id="btnActivities" text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
+    <Button fx:id="btnScreening" text="♟  Tuyển dụng" onAction="#handleScreening" styleClass="menu-button"/>
+    <Button fx:id="btnParticipants" text="♟  TNV" onAction="#handleParticipants" styleClass="menu-button"/>
+    <Button fx:id="btnTraining" text="◪  Đào tạo" onAction="#handleTraining" styleClass="menu-button"/>
+    <Button fx:id="btnSponsors" text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
+    <Button fx:id="btnDonations" text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
+    <Button fx:id="btnOperations" text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
+    <Button fx:id="btnInventory" text="▣  Kho" onAction="#handleInventory" styleClass="menu-button"/>
+    <Button fx:id="btnExpense" text="⟐  Chi phí" onAction="#handleExpense" styleClass="menu-button"/>
+    <Button fx:id="btnContent" text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
+    <Button fx:id="btnReports" text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
+    <Button fx:id="btnAlerts" text="⚠  Cảnh báo" onAction="#handleAlerts" styleClass="menu-button"/>
+    <Button fx:id="btnLogout" text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
+</VBox>
