@@ -11,7 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 
 public class SponsorsController {
@@ -59,17 +59,17 @@ public class SponsorsController {
 
     @FXML
     private void initialize() {
-        colMaDoiTac.setCellValueFactory(new PropertyValueFactory<>("maDoiTac"));
+        colMaDoiTac.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaDoiTac()));
         colMaDoiTac.setVisible(false);
-        colTenDoiTac.setCellValueFactory(new PropertyValueFactory<>("tenDoiTac"));
-        colLinhVuc.setCellValueFactory(new PropertyValueFactory<>("linhVuc"));
-        colSoDienThoai.setCellValueFactory(new PropertyValueFactory<>("soDienThoai"));
-        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colDiaChi.setCellValueFactory(new PropertyValueFactory<>("diaChi"));
+        colTenDoiTac.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenDoiTac()));
+        colLinhVuc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getLinhVuc()));
+        colSoDienThoai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSoDienThoai()));
+        colEmail.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getEmail()));
+        colDiaChi.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDiaChi()));
         colMaChienDich.setText("Chiến dịch");
-        colMaChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
-        colGiaTriTaiTro.setCellValueFactory(new PropertyValueFactory<>("giaTriTaiTroText"));
-        colNgayKyKet.setCellValueFactory(new PropertyValueFactory<>("ngayKyKet"));
+        colMaChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colGiaTriTaiTro.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGiaTriTaiTroText()));
+        colNgayKyKet.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayKyKet()));
 
         tableSponsors.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableSponsors.setFixedCellSize(32.0);

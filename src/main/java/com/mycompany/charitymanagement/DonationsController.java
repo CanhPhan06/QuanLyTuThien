@@ -11,7 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 
 public class DonationsController {
@@ -59,16 +59,16 @@ public class DonationsController {
 
     @FXML
     private void initialize() {
-        colMaQuyenGop.setCellValueFactory(new PropertyValueFactory<>("maQuyenGop"));
+        colMaQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaQuyenGop()));
         colMaQuyenGop.setVisible(false);
-        colNguoiQuyenGop.setCellValueFactory(new PropertyValueFactory<>("nguoiQuyenGop"));
+        colNguoiQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNguoiQuyenGop()));
         colHoatDong.setText("Chiến dịch");
-        colHoatDong.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
-        colNgayQuyenGop.setCellValueFactory(new PropertyValueFactory<>("ngayQuyenGop"));
-        colHinhThuc.setCellValueFactory(new PropertyValueFactory<>("hinhThuc"));
-        colNoiDungQuyenGop.setCellValueFactory(new PropertyValueFactory<>("noiDungQuyenGop"));
-        colSoTien.setCellValueFactory(new PropertyValueFactory<>("soTienText"));
-        colTrangThaiXuLy.setCellValueFactory(new PropertyValueFactory<>("trangThaiXuLy"));
+        colHoatDong.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colNgayQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayQuyenGop()));
+        colHinhThuc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getHinhThuc()));
+        colNoiDungQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNoiDungQuyenGop()));
+        colSoTien.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSoTienText()));
+        colTrangThaiXuLy.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThaiXuLy()));
 
         tableDonations.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableDonations.setFixedCellSize(32.0);

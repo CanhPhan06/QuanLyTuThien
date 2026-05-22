@@ -10,7 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 
 public class SponsorPortalController {
@@ -75,19 +75,19 @@ public class SponsorPortalController {
         }
 
         colMaChienDich.setVisible(false);
-        colMaChienDich.setCellValueFactory(new PropertyValueFactory<>("maChienDich"));
-        colTenChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
-        colMucTieu.setCellValueFactory(new PropertyValueFactory<>("mucTieuTienText"));
-        colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
+        colMaChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaChienDich()));
+        colTenChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colMucTieu.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMucTieuTienText()));
+        colTrangThai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
 
         colMaQuyenGop.setVisible(false);
-        colMaQuyenGop.setCellValueFactory(new PropertyValueFactory<>("maQuyenGop"));
+        colMaQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaQuyenGop()));
         colHoatDong.setText("Chiến dịch");
-        colHoatDong.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
-        colNgayQuyenGop.setCellValueFactory(new PropertyValueFactory<>("ngayQuyenGop"));
-        colHinhThuc.setCellValueFactory(new PropertyValueFactory<>("hinhThuc"));
-        colNoiDungQuyenGop.setCellValueFactory(new PropertyValueFactory<>("noiDungQuyenGop"));
-        colSoTien.setCellValueFactory(new PropertyValueFactory<>("soTienText"));
+        colHoatDong.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colNgayQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayQuyenGop()));
+        colHinhThuc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getHinhThuc()));
+        colNoiDungQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNoiDungQuyenGop()));
+        colSoTien.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSoTienText()));
 
         tableCampaigns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableSupport.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);

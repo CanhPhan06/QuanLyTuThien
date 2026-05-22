@@ -11,7 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 
 public class ContentController {
@@ -59,16 +59,16 @@ public class ContentController {
 
     @FXML
     private void initialize() {
-        colNhomBang.setCellValueFactory(new PropertyValueFactory<>("tenNhomBang"));
-        colMaChinh.setCellValueFactory(new PropertyValueFactory<>("maChinh"));
+        colNhomBang.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenNhomBang()));
+        colMaChinh.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaChinh()));
         colMaChinh.setVisible(false);
         colMaLienKet.setText("Đối tượng liên quan");
-        colMaLienKet.setCellValueFactory(new PropertyValueFactory<>("tenLienKet"));
-        colTieuDe.setCellValueFactory(new PropertyValueFactory<>("tieuDe"));
-        colNoiDung.setCellValueFactory(new PropertyValueFactory<>("noiDung"));
-        colNgay.setCellValueFactory(new PropertyValueFactory<>("ngay"));
-        colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
-        colGhiChu.setCellValueFactory(new PropertyValueFactory<>("ghiChu"));
+        colMaLienKet.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenLienKet()));
+        colTieuDe.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTieuDe()));
+        colNoiDung.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNoiDung()));
+        colNgay.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgay()));
+        colTrangThai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
+        colGhiChu.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGhiChu()));
 
         tableRecords.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableRecords.setFixedCellSize(32.0);

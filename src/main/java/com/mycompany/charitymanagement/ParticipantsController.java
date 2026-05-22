@@ -11,7 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 
 public class ParticipantsController {
@@ -56,19 +56,19 @@ public class ParticipantsController {
 
     @FXML
     private void initialize() {
-        colMaTaiKhoan.setCellValueFactory(new PropertyValueFactory<>("maTaiKhoan"));
+        colMaTaiKhoan.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaTaiKhoan()));
         colMaTaiKhoan.setVisible(false);
-        colMaHoSo.setCellValueFactory(new PropertyValueFactory<>("maHoSo"));
+        colMaHoSo.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaHoSo()));
         colMaHoSo.setVisible(false);
-        colHoTen.setCellValueFactory(new PropertyValueFactory<>("hoTen"));
-        colMssv.setCellValueFactory(new PropertyValueFactory<>("mssv"));
-        colSoDienThoai.setCellValueFactory(new PropertyValueFactory<>("soDienThoai"));
-        colKhoa.setCellValueFactory(new PropertyValueFactory<>("khoa"));
-        colTruong.setCellValueFactory(new PropertyValueFactory<>("truong"));
+        colHoTen.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getHoTen()));
+        colMssv.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMssv()));
+        colSoDienThoai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSoDienThoai()));
+        colKhoa.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getKhoa()));
+        colTruong.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTruong()));
         colMaChienDich.setText("Chiến dịch");
-        colMaChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
-        colTrangThaiDuyet.setCellValueFactory(new PropertyValueFactory<>("trangThaiDuyet"));
-        colDiemDanhGia.setCellValueFactory(new PropertyValueFactory<>("diemDanhGia"));
+        colMaChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colTrangThaiDuyet.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThaiDuyet()));
+        colDiemDanhGia.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDiemDanhGia()));
 
         tableParticipants.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableParticipants.setFixedCellSize(32.0);

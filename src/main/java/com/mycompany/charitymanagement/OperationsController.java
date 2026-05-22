@@ -11,7 +11,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.layout.VBox;
 
 public class OperationsController {
@@ -360,18 +360,18 @@ public class OperationsController {
             TableColumn<SystemRecord, String> colNgayTao,
             TableColumn<SystemRecord, String> colNgayXuLy,
             TableColumn<SystemRecord, String> colTrangThai) {
-        colLoai.setCellValueFactory(new PropertyValueFactory<>("nhomBang"));
-        colMa.setCellValueFactory(new PropertyValueFactory<>("maChinh"));
+        colLoai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNhomBang()));
+        colMa.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaChinh()));
         colMa.setVisible(false);
         colChienDich.setText("Chiến dịch");
-        colChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
+        colChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
         colDoiTuong.setText("Đối tượng liên quan");
-        colDoiTuong.setCellValueFactory(new PropertyValueFactory<>("tenLienKet"));
-        colTieuDe.setCellValueFactory(new PropertyValueFactory<>("tieuDe"));
-        colNguoiXuLy.setCellValueFactory(new PropertyValueFactory<>("nguoiXuLy"));
-        colNgayTao.setCellValueFactory(new PropertyValueFactory<>("ngayTao"));
-        colNgayXuLy.setCellValueFactory(new PropertyValueFactory<>("ngayXuLy"));
-        colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
+        colDoiTuong.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenLienKet()));
+        colTieuDe.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTieuDe()));
+        colNguoiXuLy.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNguoiXuLy()));
+        colNgayTao.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayTao()));
+        colNgayXuLy.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayXuLy()));
+        colTrangThai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
     }
 
     private void resetForm() {

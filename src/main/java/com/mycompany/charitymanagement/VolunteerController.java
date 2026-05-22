@@ -10,7 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 
@@ -94,20 +94,20 @@ public class VolunteerController {
         }
 
         colMaChienDich.setVisible(false);
-        colMaChienDich.setCellValueFactory(new PropertyValueFactory<>("maChienDich"));
-        colTenChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
-        colNgayBatDau.setCellValueFactory(new PropertyValueFactory<>("ngayBatDau"));
-        colNgayKetThuc.setCellValueFactory(new PropertyValueFactory<>("ngayKetThuc"));
-        colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
+        colMaChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaChienDich()));
+        colTenChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colNgayBatDau.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayBatDau()));
+        colNgayKetThuc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayKetThuc()));
+        colTrangThai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
 
-        colTaskType.setCellValueFactory(new PropertyValueFactory<>("nhomBang"));
-        colTaskTitle.setCellValueFactory(new PropertyValueFactory<>("tieuDe"));
-        colTaskDate.setCellValueFactory(new PropertyValueFactory<>("ngayTao"));
-        colTaskStatus.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
+        colTaskType.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNhomBang()));
+        colTaskTitle.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTieuDe()));
+        colTaskDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayTao()));
+        colTaskStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
 
-        colNoticeTitle.setCellValueFactory(new PropertyValueFactory<>("tieuDe"));
-        colNoticeDate.setCellValueFactory(new PropertyValueFactory<>("ngayTao"));
-        colNoticeStatus.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
+        colNoticeTitle.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTieuDe()));
+        colNoticeDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayTao()));
+        colNoticeStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
 
         tableCampaigns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableTasks.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);

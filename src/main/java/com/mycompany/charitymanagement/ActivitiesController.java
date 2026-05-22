@@ -19,7 +19,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -70,14 +70,14 @@ public class ActivitiesController {
             currentUser = new UserAccount("ADMIN", "123", UserAccount.ROLE_ADMIN, "Người quản lý hệ thống", "TK001");
         }
 
-        colMaChienDich.setCellValueFactory(new PropertyValueFactory<>("maChienDich"));
+        colMaChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMaChienDich()));
         colMaChienDich.setVisible(false);
-        colTenChienDich.setCellValueFactory(new PropertyValueFactory<>("tenChienDich"));
-        colNgayBatDau.setCellValueFactory(new PropertyValueFactory<>("ngayBatDau"));
-        colNgayKetThuc.setCellValueFactory(new PropertyValueFactory<>("ngayKetThuc"));
-        colMucTieuTien.setCellValueFactory(new PropertyValueFactory<>("mucTieuTienText"));
-        colDiaDiem.setCellValueFactory(new PropertyValueFactory<>("diaDiem"));
-        colTrangThai.setCellValueFactory(new PropertyValueFactory<>("trangThai"));
+        colTenChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colNgayBatDau.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayBatDau()));
+        colNgayKetThuc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayKetThuc()));
+        colMucTieuTien.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMucTieuTienText()));
+        colDiaDiem.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDiaDiem()));
+        colTrangThai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
 
         tableActivities.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableActivities.setFixedCellSize(32.0);
