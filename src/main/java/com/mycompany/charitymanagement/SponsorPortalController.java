@@ -91,6 +91,8 @@ public class SponsorPortalController {
 
         tableCampaigns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableSupport.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableCampaigns.setFixedCellSize(32.0);
+        tableSupport.setFixedCellSize(32.0);
         tableCampaigns.setItems(AppData.getActivities());
         tableSupport.setItems(sponsorSupport);
 
@@ -131,7 +133,7 @@ public class SponsorPortalController {
 
     @FXML
     private void handleCampaigns() throws IOException {
-        App.setRoot("activities");
+        NavigationService.navigateTo(NavigationService.VIEW_ACTIVITIES);
     }
 
     @FXML
@@ -189,8 +191,7 @@ public class SponsorPortalController {
 
     @FXML
     private void handleLogout() throws IOException {
-        UserSession.clear();
-        App.setRoot("primary");
+        NavigationService.navigateTo(NavigationService.VIEW_LOGIN);
     }
 
     private void refreshView() {

@@ -3,59 +3,39 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.mycompany.charitymanagement.ActivitiesController"
-            prefWidth="1180" prefHeight="700"
-            stylesheets="@../com/mycompany/charitymanagement/style.css">
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.mycompany.charitymanagement.ActivitiesController"
+      spacing="14" styleClass="main-content">
 
-    <left>
-        <VBox spacing="8" styleClass="sidebar">
-            <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
-            <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
-            <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button-active"/>
-            <Button fx:id="btnParticipantsMenu" text="♟  Tình nguyện viên" onAction="#handleParticipants" styleClass="menu-button"/>
-            <Button fx:id="btnSponsorsMenu" text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button"/>
-            <Button fx:id="btnDonationsMenu" text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
-            <Button fx:id="btnOperationsMenu" text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
-            <Button fx:id="btnContentMenu" text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
-            <Button fx:id="btnReportsMenu" text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
-            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
-        </VBox>
-    </left>
+    <Label text="CHIẾN DỊCH" styleClass="page-title"/>
 
-    <center>
-        <VBox spacing="14" styleClass="main-content">
-            <Label text="CHIẾN DỊCH" styleClass="page-title"/>
+    <HBox spacing="12" styleClass="filter-card">
+        <ComboBox fx:id="cboActivityStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="cboActivityLocationFilter" promptText="Lọc địa điểm" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtActivitySearch" promptText="Tìm tên chiến dịch, mô tả, địa điểm..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+        <Button text="Bỏ lọc" onAction="#handleClearActivityFilters" styleClass="quick-button"/>
+    </HBox>
 
-            <HBox spacing="12" styleClass="filter-card">
-                <ComboBox fx:id="cboActivityStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <ComboBox fx:id="cboActivityLocationFilter" promptText="Lọc địa điểm" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="txtActivitySearch" promptText="Tìm tên chiến dịch, mô tả, địa điểm..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
-                <Button text="Bỏ lọc" onAction="#handleClearActivityFilters" styleClass="quick-button"/>
-            </HBox>
+    <HBox spacing="10" styleClass="action-bar">
+        <Button text="Xem chi tiết chiến dịch" onAction="#handleOpenSelectedCampaignDetail" styleClass="primary-button"/>
+        <Button text="Xuất file" onAction="#handleExportActivities" styleClass="quick-button"/>
+    </HBox>
 
-            <HBox spacing="10" styleClass="action-bar">
-                <Button text="Xem chi tiết chiến dịch" onAction="#handleOpenSelectedCampaignDetail" styleClass="primary-button"/>
-                <Button text="Xuất file" onAction="#handleExportActivities" styleClass="quick-button"/>
-            </HBox>
+    <TableView fx:id="tableActivities" styleClass="activity-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colMaChienDich" text="Mã chiến dịch" prefWidth="110"/>
+            <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="260"/>
+            <TableColumn fx:id="colNgayBatDau" text="Ngày bắt đầu" prefWidth="115"/>
+            <TableColumn fx:id="colNgayKetThuc" text="Ngày kết thúc" prefWidth="115"/>
+            <TableColumn fx:id="colMucTieuTien" text="Mục tiêu tiền" prefWidth="135"/>
+            <TableColumn fx:id="colDiaDiem" text="Địa điểm" prefWidth="140"/>
+            <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="130"/>
+        </columns>
+    </TableView>
 
-            <TableView fx:id="tableActivities" styleClass="activity-table" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colMaChienDich" text="Mã chiến dịch" prefWidth="110"/>
-                    <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="260"/>
-                    <TableColumn fx:id="colNgayBatDau" text="Ngày bắt đầu" prefWidth="115"/>
-                    <TableColumn fx:id="colNgayKetThuc" text="Ngày kết thúc" prefWidth="115"/>
-                    <TableColumn fx:id="colMucTieuTien" text="Mục tiêu tiền" prefWidth="135"/>
-                    <TableColumn fx:id="colDiaDiem" text="Địa điểm" prefWidth="140"/>
-                    <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="130"/>
-                </columns>
-            </TableView>
-
-            <HBox fx:id="adminActionBar" spacing="10" styleClass="action-bar">
-                <Button text="Thêm chiến dịch" onAction="#handleAddActivity" styleClass="primary-button"/>
-                <Button text="Cập nhật chiến dịch" onAction="#handleUpdateActivity" styleClass="quick-button"/>
-                <Button text="Xóa chiến dịch" onAction="#handleDeleteActivity" styleClass="danger-button"/>
-            </HBox>
-        </VBox>
-    </center>
-</BorderPane>
+    <HBox fx:id="adminActionBar" spacing="10" styleClass="action-bar">
+        <Button text="Thêm chiến dịch" onAction="#handleAddActivity" styleClass="primary-button"/>
+        <Button text="Cập nhật chiến dịch" onAction="#handleUpdateActivity" styleClass="quick-button"/>
+        <Button text="Xóa chiến dịch" onAction="#handleDeleteActivity" styleClass="danger-button"/>
+    </HBox>
+</VBox>

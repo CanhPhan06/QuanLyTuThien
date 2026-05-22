@@ -3,84 +3,64 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.mycompany.charitymanagement.SponsorsController"
-            prefWidth="1180" prefHeight="700"
-            stylesheets="@../com/mycompany/charitymanagement/style.css">
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.mycompany.charitymanagement.SponsorsController"
+      spacing="16" styleClass="main-content">
 
-    <left>
-        <VBox spacing="8" styleClass="sidebar">
-            <Label text="QUẢN LÝ HOẠT ĐỘNG&#10;TỪ THIỆN" styleClass="sidebar-title"/>
-            <Button text="⌂  Trang chủ" onAction="#handleBackHome" styleClass="menu-button"/>
-            <Button text="▣  Chiến dịch" onAction="#handleActivities" styleClass="menu-button"/>
-            <Button text="♟  Tình nguyện viên" onAction="#handleParticipants" styleClass="menu-button"/>
-            <Button text="♥  Nhà tài trợ" onAction="#handleSponsors" styleClass="menu-button-active"/>
-            <Button text="◉  Quyên góp" onAction="#handleDonations" styleClass="menu-button"/>
-            <Button text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
-            <Button text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
-            <Button text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
-            <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
-        </VBox>
-    </left>
+    <Label text="NHÀ TÀI TRỢ &amp; ĐỐI TÁC" styleClass="page-title"/>
 
-    <center>
-        <VBox spacing="16" styleClass="main-content">
-            <Label text="NHÀ TÀI TRỢ &amp; ĐỐI TÁC" styleClass="page-title"/>
+    <HBox spacing="18">
+        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
+            <Label text="♥" styleClass="metric-icon green-soft"/>
+            <VBox spacing="2">
+                <Label text="Tổng tài trợ" styleClass="metric-title"/>
+                <Label fx:id="lblTotalSponsor" text="0 VNĐ" styleClass="stat-number green"/>
+                <Label text="Giá trị đã cam kết" styleClass="muted-text"/>
+            </VBox>
+        </HBox>
+        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
+            <Label text="●" styleClass="metric-icon blue-soft"/>
+            <VBox spacing="2">
+                <Label text="Đối tác" styleClass="metric-title"/>
+                <Label fx:id="lblSponsorCount" text="0" styleClass="stat-number"/>
+                <Label text="Hồ sơ đang quản lý" styleClass="muted-text"/>
+            </VBox>
+        </HBox>
+        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
+            <Label text="▣" styleClass="metric-icon purple-soft"/>
+            <VBox spacing="2">
+                <Label text="Chiến dịch" styleClass="metric-title"/>
+                <Label fx:id="lblSponsorCampaignCount" text="0" styleClass="stat-number purple"/>
+                <Label text="Đã có tài trợ" styleClass="muted-text"/>
+            </VBox>
+        </HBox>
+    </HBox>
 
-            <HBox spacing="18">
-                <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                    <Label text="♥" styleClass="metric-icon green-soft"/>
-                    <VBox spacing="2">
-                        <Label text="Tổng tài trợ" styleClass="metric-title"/>
-                        <Label fx:id="lblTotalSponsor" text="0 VNĐ" styleClass="stat-number green"/>
-                        <Label text="Giá trị đã cam kết" styleClass="muted-text"/>
-                    </VBox>
-                </HBox>
-                <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                    <Label text="●" styleClass="metric-icon blue-soft"/>
-                    <VBox spacing="2">
-                        <Label text="Đối tác" styleClass="metric-title"/>
-                        <Label fx:id="lblSponsorCount" text="0" styleClass="stat-number"/>
-                        <Label text="Hồ sơ đang quản lý" styleClass="muted-text"/>
-                    </VBox>
-                </HBox>
-                <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-                    <Label text="▣" styleClass="metric-icon purple-soft"/>
-                    <VBox spacing="2">
-                        <Label text="Chiến dịch" styleClass="metric-title"/>
-                        <Label fx:id="lblSponsorCampaignCount" text="0" styleClass="stat-number purple"/>
-                        <Label text="Đã có tài trợ" styleClass="muted-text"/>
-                    </VBox>
-                </HBox>
-            </HBox>
+    <HBox spacing="12" styleClass="filter-card">
+        <ComboBox fx:id="cboSponsorCampaignFilter" promptText="Lọc theo chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="cboSponsorFieldFilter" promptText="Lọc lĩnh vực" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtSponsorSearch" promptText="Tìm tên, email, số điện thoại, địa chỉ..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+        <Button text="Bỏ lọc" onAction="#handleClearSponsorFilters" styleClass="quick-button"/>
+    </HBox>
 
-            <HBox spacing="12" styleClass="filter-card">
-                <ComboBox fx:id="cboSponsorCampaignFilter" promptText="Lọc theo chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <ComboBox fx:id="cboSponsorFieldFilter" promptText="Lọc lĩnh vực" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="txtSponsorSearch" promptText="Tìm tên, email, số điện thoại, địa chỉ..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
-                <Button text="Bỏ lọc" onAction="#handleClearSponsorFilters" styleClass="quick-button"/>
-            </HBox>
+    <HBox spacing="12" styleClass="action-bar">
+        <Button text="+  Thêm" onAction="#handleAddSponsor" styleClass="primary-button"/>
+        <Button text="✎  Cập nhật" onAction="#handleUpdateSponsor" styleClass="quick-button"/>
+        <Button text="⌫  Xóa" onAction="#handleDeleteSponsor" styleClass="danger-button"/>
+        <Button text="⇩  Xuất file" onAction="#handleExportSponsors" styleClass="quick-button"/>
+    </HBox>
 
-            <HBox spacing="12" styleClass="action-bar">
-                <Button text="+  Thêm" onAction="#handleAddSponsor" styleClass="primary-button"/>
-                <Button text="✎  Cập nhật" onAction="#handleUpdateSponsor" styleClass="quick-button"/>
-                <Button text="⌫  Xóa" onAction="#handleDeleteSponsor" styleClass="danger-button"/>
-                <Button text="⇩  Xuất file" onAction="#handleExportSponsors" styleClass="quick-button"/>
-            </HBox>
-
-            <TableView fx:id="tableSponsors" styleClass="activity-table" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colMaDoiTac" text="Mã" prefWidth="70"/>
-                    <TableColumn fx:id="colTenDoiTac" text="Đối tác / nhà tài trợ" prefWidth="190"/>
-                    <TableColumn fx:id="colLinhVuc" text="Lĩnh vực" prefWidth="120"/>
-                    <TableColumn fx:id="colSoDienThoai" text="SĐT" prefWidth="105"/>
-                    <TableColumn fx:id="colEmail" text="Email" prefWidth="160"/>
-                    <TableColumn fx:id="colDiaChi" text="Địa chỉ" prefWidth="145"/>
-                    <TableColumn fx:id="colMaChienDich" text="Chiến dịch" prefWidth="175"/>
-                    <TableColumn fx:id="colGiaTriTaiTro" text="Giá trị" prefWidth="130"/>
-                    <TableColumn fx:id="colNgayKyKet" text="Ngày ký" prefWidth="95"/>
-                </columns>
-            </TableView>
-        </VBox>
-    </center>
-</BorderPane>
+    <TableView fx:id="tableSponsors" styleClass="activity-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colMaDoiTac" text="Mã" prefWidth="70"/>
+            <TableColumn fx:id="colTenDoiTac" text="Đối tác / nhà tài trợ" prefWidth="190"/>
+            <TableColumn fx:id="colLinhVuc" text="Lĩnh vực" prefWidth="120"/>
+            <TableColumn fx:id="colSoDienThoai" text="SĐT" prefWidth="105"/>
+            <TableColumn fx:id="colEmail" text="Email" prefWidth="160"/>
+            <TableColumn fx:id="colDiaChi" text="Địa chỉ" prefWidth="145"/>
+            <TableColumn fx:id="colMaChienDich" text="Chiến dịch" prefWidth="175"/>
+            <TableColumn fx:id="colGiaTriTaiTro" text="Giá trị" prefWidth="130"/>
+            <TableColumn fx:id="colNgayKyKet" text="Ngày ký" prefWidth="95"/>
+        </columns>
+    </TableView>
+</VBox>

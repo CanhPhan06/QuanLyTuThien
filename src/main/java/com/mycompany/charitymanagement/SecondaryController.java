@@ -58,83 +58,82 @@ public class SecondaryController {
 
     @FXML
     private void handleActivityManagement() throws IOException {
-        App.setRoot("activities");
+        NavigationService.navigateTo(NavigationService.VIEW_ACTIVITIES);
     }
 
     @FXML
     private void handleParticipants() throws IOException {
-        App.setRoot("participants");
+        NavigationService.navigateTo(NavigationService.VIEW_PARTICIPANTS);
     }
 
     @FXML
     private void handleSponsors() throws IOException {
-        App.setRoot("sponsors");
+        NavigationService.navigateTo(NavigationService.VIEW_SPONSORS);
     }
 
     @FXML
     private void handleDonations() throws IOException {
-        App.setRoot("donations");
+        NavigationService.navigateTo(NavigationService.VIEW_DONATIONS);
     }
 
     @FXML
     private void handleOperations() throws IOException {
-        App.setRoot("operations");
+        NavigationService.navigateTo(NavigationService.VIEW_OPERATIONS);
     }
 
     @FXML
     private void handleContent() throws IOException {
-        App.setRoot("content");
+        NavigationService.navigateTo(NavigationService.VIEW_CONTENT);
     }
 
     @FXML
     private void handleReports() throws IOException {
-        App.setRoot("reports");
+        NavigationService.navigateTo(NavigationService.VIEW_REPORTS);
     }
 
     @FXML
     private void handleCreateActivity() throws IOException {
-        App.setRoot("activities");
+        NavigationService.navigateTo(NavigationService.VIEW_ACTIVITIES);
     }
 
     @FXML
     private void handleAddParticipant() throws IOException {
-        App.setRoot("participants");
+        NavigationService.navigateTo(NavigationService.VIEW_PARTICIPANTS);
     }
 
     @FXML
     private void handleAddSponsor() throws IOException {
-        App.setRoot("sponsors");
+        NavigationService.navigateTo(NavigationService.VIEW_SPONSORS);
     }
 
     @FXML
     private void handleRecordDonation() throws IOException {
-        App.setRoot("donations");
+        NavigationService.navigateTo(NavigationService.VIEW_DONATIONS);
     }
 
     @FXML
     private void handleManageOperations() throws IOException {
-        App.setRoot("operations");
+        NavigationService.navigateTo(NavigationService.VIEW_OPERATIONS);
     }
 
     @FXML
     private void handleManageContent() throws IOException {
-        App.setRoot("content");
+        NavigationService.navigateTo(NavigationService.VIEW_CONTENT);
     }
 
     @FXML
     private void handleViewReport() throws IOException {
-        App.setRoot("reports");
+        NavigationService.navigateTo(NavigationService.VIEW_REPORTS);
     }
 
     @FXML
     private void handleViewDetail() throws IOException {
-        App.setRoot("activities");
+        NavigationService.navigateTo(NavigationService.VIEW_ACTIVITIES);
     }
 
     @FXML
     private void handleLogout() throws IOException {
-        UserSession.clear();
-        App.setRoot("primary");
+        NavigationService.navigateTo(NavigationService.VIEW_LOGIN);
     }
 
     private void updateDashboard() {

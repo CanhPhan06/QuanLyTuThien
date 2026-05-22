@@ -145,6 +145,8 @@ public class OperationsController {
 
         tablePendingRecords.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableDoneRecords.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tablePendingRecords.setFixedCellSize(32.0);
+        tableDoneRecords.setFixedCellSize(32.0);
         filteredPendingRecords = new FilteredList<>(pendingRecords, item -> true);
         filteredDoneRecords = new FilteredList<>(doneRecords, item -> true);
         tablePendingRecords.setItems(filteredPendingRecords);
@@ -259,48 +261,47 @@ public class OperationsController {
 
     @FXML
     private void handleBackHome() throws IOException {
-        App.setRoot("secondary");
+        NavigationService.navigateTo(NavigationService.VIEW_DASHBOARD);
     }
 
     @FXML
     private void handleActivities() throws IOException {
-        App.setRoot("activities");
+        NavigationService.navigateTo(NavigationService.VIEW_ACTIVITIES);
     }
 
     @FXML
     private void handleParticipants() throws IOException {
-        App.setRoot("participants");
+        NavigationService.navigateTo(NavigationService.VIEW_PARTICIPANTS);
     }
 
     @FXML
     private void handleSponsors() throws IOException {
-        App.setRoot("sponsors");
+        NavigationService.navigateTo(NavigationService.VIEW_SPONSORS);
     }
 
     @FXML
     private void handleDonations() throws IOException {
-        App.setRoot("donations");
+        NavigationService.navigateTo(NavigationService.VIEW_DONATIONS);
     }
 
     @FXML
     private void handleOperations() throws IOException {
-        App.setRoot("operations");
+        NavigationService.navigateTo(NavigationService.VIEW_OPERATIONS);
     }
 
     @FXML
     private void handleContent() throws IOException {
-        App.setRoot("content");
+        NavigationService.navigateTo(NavigationService.VIEW_CONTENT);
     }
 
     @FXML
     private void handleReports() throws IOException {
-        App.setRoot("reports");
+        NavigationService.navigateTo(NavigationService.VIEW_REPORTS);
     }
 
     @FXML
     private void handleLogout() throws IOException {
-        UserSession.clear();
-        App.setRoot("primary");
+        NavigationService.navigateTo(NavigationService.VIEW_LOGIN);
     }
 
     private void saveNewRecord(SystemRecord record) {

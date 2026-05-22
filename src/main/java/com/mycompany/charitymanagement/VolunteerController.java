@@ -112,6 +112,9 @@ public class VolunteerController {
         tableCampaigns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableTasks.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableNotifications.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableCampaigns.setFixedCellSize(32.0);
+        tableTasks.setFixedCellSize(32.0);
+        tableNotifications.setFixedCellSize(32.0);
         tableCampaigns.setItems(AppData.getActivities());
         tableTasks.setItems(volunteerTasks);
         tableNotifications.setItems(volunteerNotifications);
@@ -250,8 +253,7 @@ public class VolunteerController {
 
     @FXML
     private void handleLogout() throws IOException {
-        UserSession.clear();
-        App.setRoot("primary");
+        NavigationService.navigateTo(NavigationService.VIEW_LOGIN);
     }
 
     private void refreshView() {

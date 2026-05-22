@@ -32,11 +32,11 @@ public class PrimaryController {
         UserSession.setCurrentUser(account);
 
         if (account.isAdmin()) {
-            App.setRoot("secondary");
+            App.setRootToMainLayout(NavigationService.VIEW_DASHBOARD);
         } else if (account.isVolunteer()) {
-            App.setRoot("volunteer");
+            NavigationService.navigateTo(NavigationService.VIEW_VOLUNTEER);
         } else if (account.isSponsor()) {
-            App.setRoot("sponsorportal");
+            NavigationService.navigateTo(NavigationService.VIEW_SPONSORPORTAL);
         } else {
             lblMessage.setText("Vai trò tài khoản chưa được hỗ trợ");
         }
