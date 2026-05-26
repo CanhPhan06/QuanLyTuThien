@@ -64,6 +64,9 @@ PROMPT ===== 05_SEED_DATA.sql =====
 PROMPT ===== 06_VIEWS_FOR_JAVA.sql =====
 @@06_VIEWS_FOR_JAVA.sql
 
+PROMPT ===== 07_FIX_VIETNAMESE_ENCODING.sql =====
+@@07_FIX_VIETNAMESE_ENCODING.sql
+
 COMMIT;
 
 PROMPT ============================================================

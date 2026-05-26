@@ -35,7 +35,7 @@ public final class UiText {
         String best = repaired;
         best = better(best, repairKnownBrokenText(decodeUtf8ReadAsLatin1(repaired)));
         best = better(best, repairKnownBrokenText(decodeUtf8ReadAsWindows1252(repaired)));
-        return best;
+        return looksBroken(best) ? fallbackForBrokenText(best) : best;
     }
 
     public static boolean looksBroken(String value) {
@@ -164,5 +164,13 @@ public final class UiText {
 
     private static boolean looksLikeQuestionLoss(String value) {
         return value.indexOf('?') >= 0 || value.indexOf('\uFFFD') >= 0;
+    }
+
+    private static String fallbackForBrokenText(String value) {
+        String repaired = repairWholeValue(value);
+        if (!looksBroken(repaired)) {
+            return repaired;
+        }
+        return "Đang cập nhật";
     }
 }
