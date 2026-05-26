@@ -2,12 +2,14 @@ package com.mycompany.charitymanagement;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class UiText {
 
     private static final Charset WINDOWS_1252 = Charset.forName("windows-1252");
+    private static final String BAD_CHAR = Character.toString((char) 0xFFFD);
     private static final Pattern MOJIBAKE_PATTERN = Pattern.compile(
             "(?:\\u00C3[\\u0080-\\u00BF\\u00C0-\\u00FF])"
             + "|(?:\\u00E1[\\u00BA\\u00BB][\\u0080-\\u00BF\\u00C0-\\u00FF]?)"
@@ -74,11 +76,26 @@ public final class UiText {
 
     private static String repairKnownBrokenText(String value) {
         String text = value;
-        text = repairWholeValue(text);
         text = text.replace("Chuy??n kho?n", "Chuyển khoản");
         text = text.replace("Chuy?n kho?n", "Chuyển khoản");
         text = text.replace("Ti?n m?t", "Tiền mặt");
         text = text.replace("V?t ph?m", "Vật phẩm");
+        text = text.replace("?ang th?c hi??n", "Đang thực hiện");
+        text = text.replace("?ang th?c hi?n", "Đang thực hiện");
+        text = text.replace("Đã duy" + BAD_CHAR + "?t", "Đã duyệt");
+        text = text.replace("Đã duy?t", "Đã duyệt");
+        text = text.replace("Ch? duy??t", "Chờ duyệt");
+        text = text.replace("Ch? duy?t", "Chờ duyệt");
+        text = text.replace(BAD_CHAR + "?ã đăng", "Đã đăng");
+        text = text.replace("?ã đăng", "Đã đăng");
+        text = text.replace("Ch?a ???c", "Chưa đọc");
+        text = text.replace("Ch?a ??c", "Chưa đọc");
+        text = text.replace("Công ngh" + BAD_CHAR + "?", "Công nghệ");
+        text = text.replace("Công ngh?", "Công nghệ");
+        text = text.replace("Đ" + BAD_CHAR + "? Khánh Ngân", "Đỗ Khánh Ngân");
+        text = text.replace("?ỗ Khánh Ngân", "Đỗ Khánh Ngân");
+        text = text.replace(BAD_CHAR + "?ông ấm", "Đông ấm");
+        text = text.replace("?ông ấm", "Đông ấm");
         text = text.replace("Công ty Hưng Th?nh", "Công ty Hưng Thịnh");
         text = text.replace("Câu lạc b? Xanh", "Câu lạc bộ Xanh");
         text = text.replace("Qu? C?ng ???ng", "Quỹ Cộng Đồng");
@@ -96,9 +113,30 @@ public final class UiText {
         if (!looksLikeQuestionLoss(value)) {
             return value;
         }
-        String lower = value.toLowerCase();
+        String lower = value.toLowerCase(Locale.ROOT);
         if (lower.contains("ti?p") && lower.contains("s?c") && lower.contains("tr??ng")) {
             return "Tiếp sức đến trường 2026";
+        }
+        if (lower.contains("n") && lower.contains("s?ch") && lower.contains("h?c")) {
+            return "Nước sạch học đường 2026";
+        }
+        if (lower.contains("duy") && lower.contains("ch")) {
+            return "Chờ duyệt";
+        }
+        if (lower.contains("duy")) {
+            return "Đã duyệt";
+        }
+        if (lower.contains("th") && lower.contains("hi") && lower.contains("ang")) {
+            return "Đang thực hiện";
+        }
+        if (lower.contains("đăng") || lower.contains("dang")) {
+            return "Đã đăng";
+        }
+        if (lower.contains("đọc") || lower.contains("??c")) {
+            return "Chưa đọc";
+        }
+        if (lower.contains("quy") && lower.contains("gi")) {
+            return "Điểm quy đổi một giờ tham gia";
         }
         if ((lower.contains("kh?m") || lower.contains("khám")) && lower.contains("b?nh") && lower.contains("thi?n")) {
             return "Khám bệnh thiện nguyện 2026";
