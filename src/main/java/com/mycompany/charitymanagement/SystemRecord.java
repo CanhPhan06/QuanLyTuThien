@@ -24,18 +24,18 @@ public class SystemRecord {
     public SystemRecord(String nhomBang, String maChinh, String maChienDich, String maLienKet,
             String tieuDe, String noiDung, String ngay, String ngayXuLy, String trangThai,
             String nguoiTao, String nguoiXuLy, String ghiChu) {
-        this.nhomBang = nhomBang;
-        this.maChinh = maChinh;
-        this.maChienDich = maChienDich;
-        this.maLienKet = maLienKet;
-        this.tieuDe = tieuDe;
-        this.noiDung = noiDung;
-        this.ngay = ngay;
-        this.ngayXuLy = ngayXuLy;
-        this.trangThai = trangThai;
-        this.nguoiTao = nguoiTao;
-        this.nguoiXuLy = nguoiXuLy;
-        this.ghiChu = ghiChu;
+        this.nhomBang = UiText.clean(nhomBang);
+        this.maChinh = UiText.clean(maChinh);
+        this.maChienDich = UiText.clean(maChienDich);
+        this.maLienKet = UiText.clean(maLienKet);
+        this.tieuDe = UiText.clean(tieuDe);
+        this.noiDung = UiText.clean(noiDung);
+        this.ngay = UiText.clean(ngay);
+        this.ngayXuLy = UiText.clean(ngayXuLy);
+        this.trangThai = UiText.clean(trangThai);
+        this.nguoiTao = UiText.clean(nguoiTao);
+        this.nguoiXuLy = UiText.clean(nguoiXuLy);
+        this.ghiChu = UiText.clean(ghiChu);
     }
 
     private static String inferCampaignId(String value) {
@@ -47,7 +47,7 @@ public class SystemRecord {
     }
 
     public void setNhomBang(String nhomBang) {
-        this.nhomBang = nhomBang;
+        this.nhomBang = UiText.clean(nhomBang);
     }
 
     public String getLoaiNghiepVu() {
@@ -79,7 +79,7 @@ public class SystemRecord {
     }
 
     public void setMaChinh(String maChinh) {
-        this.maChinh = maChinh;
+        this.maChinh = UiText.clean(maChinh);
     }
 
     public String getMaVanHanh() {
@@ -91,7 +91,7 @@ public class SystemRecord {
     }
 
     public void setMaChienDich(String maChienDich) {
-        this.maChienDich = maChienDich;
+        this.maChienDich = UiText.clean(maChienDich);
     }
 
     public String getMaLienKet() {
@@ -99,7 +99,7 @@ public class SystemRecord {
     }
 
     public void setMaLienKet(String maLienKet) {
-        this.maLienKet = maLienKet;
+        this.maLienKet = UiText.clean(maLienKet);
     }
 
     public String getDoiTuongLienKet() {
@@ -129,7 +129,7 @@ public class SystemRecord {
     }
 
     public void setTieuDe(String tieuDe) {
-        this.tieuDe = tieuDe;
+        this.tieuDe = UiText.clean(tieuDe);
     }
 
     public String getNoiDung() {
@@ -137,7 +137,7 @@ public class SystemRecord {
     }
 
     public void setNoiDung(String noiDung) {
-        this.noiDung = noiDung;
+        this.noiDung = UiText.clean(noiDung);
     }
 
     public String getNgay() {
@@ -145,7 +145,7 @@ public class SystemRecord {
     }
 
     public void setNgay(String ngay) {
-        this.ngay = ngay;
+        this.ngay = UiText.clean(ngay);
     }
 
     public String getNgayTao() {
@@ -157,7 +157,7 @@ public class SystemRecord {
     }
 
     public void setNgayXuLy(String ngayXuLy) {
-        this.ngayXuLy = ngayXuLy;
+        this.ngayXuLy = UiText.clean(ngayXuLy);
     }
 
     public String getTrangThai() {
@@ -165,7 +165,7 @@ public class SystemRecord {
     }
 
     public void setTrangThai(String trangThai) {
-        this.trangThai = trangThai;
+        this.trangThai = UiText.clean(trangThai);
     }
 
     public String getNguoiTao() {
@@ -173,7 +173,7 @@ public class SystemRecord {
     }
 
     public void setNguoiTao(String nguoiTao) {
-        this.nguoiTao = nguoiTao;
+        this.nguoiTao = UiText.clean(nguoiTao);
     }
 
     public String getNguoiXuLy() {
@@ -181,7 +181,7 @@ public class SystemRecord {
     }
 
     public void setNguoiXuLy(String nguoiXuLy) {
-        this.nguoiXuLy = nguoiXuLy;
+        this.nguoiXuLy = UiText.clean(nguoiXuLy);
     }
 
     public String getGhiChu() {
@@ -189,6 +189,6 @@ public class SystemRecord {
     }
 
     public void setGhiChu(String ghiChu) {
-        this.ghiChu = ghiChu;
+        this.ghiChu = UiText.clean(ghiChu);
     }
 }

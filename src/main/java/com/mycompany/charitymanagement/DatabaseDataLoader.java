@@ -55,11 +55,11 @@ public final class DatabaseDataLoader {
                         + "from tai_khoan where trang_thai = 'ACTIVE' order by ten_dang_nhap")) {
             while (rs.next()) {
                 target.add(new UserAccount(
-                        rs.getString("ten_dang_nhap"),
-                        rs.getString("mat_khau"),
-                        rs.getString("vai_tro"),
-                        rs.getString("ho_ten_hien_thi"),
-                        rs.getString("ma_lien_ket")
+                        text(rs, "ten_dang_nhap"),
+                        text(rs, "mat_khau"),
+                        text(rs, "vai_tro"),
+                        text(rs, "ho_ten_hien_thi"),
+                        text(rs, "ma_lien_ket")
                 ));
             }
         }
@@ -75,15 +75,15 @@ public final class DatabaseDataLoader {
                         + "FROM chien_dich ORDER BY ma_chien_dich")) {
             while (rs.next()) {
                 target.add(new ActivityModel(
-                        rs.getString("ma_chien_dich"),
-                        rs.getString("ten_chien_dich"),
-                        rs.getString("mo_ta"),
-                        rs.getString("dia_diem"),
-                        rs.getString("ngay_bat_dau"),
-                        rs.getString("ngay_ket_thuc"),
+                        text(rs, "ma_chien_dich"),
+                        text(rs, "ten_chien_dich"),
+                        text(rs, "mo_ta"),
+                        text(rs, "dia_diem"),
+                        text(rs, "ngay_bat_dau"),
+                        text(rs, "ngay_ket_thuc"),
                         rs.getDouble("muc_tieu_tien"),
-                        rs.getString("trang_thai"),
-                        rs.getString("ma_nguoi_tao")
+                        text(rs, "trang_thai"),
+                        text(rs, "ma_nguoi_tao")
                 ));
             }
         }
@@ -96,16 +96,16 @@ public final class DatabaseDataLoader {
                         + "ma_chien_dich, trang_thai_duyet, diem_danh_gia from ho_so_tnv order by ma_tai_khoan")) {
             while (rs.next()) {
                 target.add(new ParticipantModel(
-                        rs.getString("ma_tai_khoan"),
-                        rs.getString("ma_ho_so"),
-                        rs.getString("ho_ten"),
-                        rs.getString("mssv"),
-                        rs.getString("so_dien_thoai"),
-                        rs.getString("khoa"),
-                        rs.getString("truong"),
-                        rs.getString("ma_chien_dich"),
-                        rs.getString("trang_thai_duyet"),
-                        rs.getString("diem_danh_gia")
+                        text(rs, "ma_tai_khoan"),
+                        text(rs, "ma_ho_so"),
+                        text(rs, "ho_ten"),
+                        text(rs, "mssv"),
+                        text(rs, "so_dien_thoai"),
+                        text(rs, "khoa"),
+                        text(rs, "truong"),
+                        text(rs, "ma_chien_dich"),
+                        text(rs, "trang_thai_duyet"),
+                        text(rs, "diem_danh_gia")
                 ));
             }
         }
@@ -118,15 +118,15 @@ public final class DatabaseDataLoader {
                         + "ma_chien_dich, gia_tri_tai_tro, ngay_ky_ket from doi_tac_tai_tro order by ma_doi_tac")) {
             while (rs.next()) {
                 target.add(new SponsorModel(
-                        rs.getString("ma_doi_tac"),
-                        rs.getString("ten_doi_tac"),
-                        rs.getString("linh_vuc"),
-                        rs.getString("so_dien_thoai"),
-                        rs.getString("email"),
-                        rs.getString("dia_chi"),
-                        rs.getString("ma_chien_dich"),
+                        text(rs, "ma_doi_tac"),
+                        text(rs, "ten_doi_tac"),
+                        text(rs, "linh_vuc"),
+                        text(rs, "so_dien_thoai"),
+                        text(rs, "email"),
+                        text(rs, "dia_chi"),
+                        text(rs, "ma_chien_dich"),
                         rs.getDouble("gia_tri_tai_tro"),
-                        rs.getString("ngay_ky_ket")
+                        text(rs, "ngay_ky_ket")
                 ));
             }
         }
@@ -139,12 +139,12 @@ public final class DatabaseDataLoader {
                         + "noi_dung_quyen_gop, so_tien from quyen_gop order by ma_quyen_gop")) {
             while (rs.next()) {
                 target.add(new DonationModel(
-                        rs.getString("ma_quyen_gop"),
-                        rs.getString("nguoi_quyen_gop"),
-                        rs.getString("ma_chien_dich"),
-                        rs.getString("ngay_quyen_gop"),
-                        rs.getString("hinh_thuc"),
-                        rs.getString("noi_dung_quyen_gop"),
+                        text(rs, "ma_quyen_gop"),
+                        text(rs, "nguoi_quyen_gop"),
+                        text(rs, "ma_chien_dich"),
+                        text(rs, "ngay_quyen_gop"),
+                        text(rs, "hinh_thuc"),
+                        text(rs, "noi_dung_quyen_gop"),
                         rs.getDouble("so_tien")
                 ));
             }
@@ -161,18 +161,18 @@ public final class DatabaseDataLoader {
                         + "FROM van_hanh ORDER BY ma_chinh")) {
             while (rs.next()) {
                 target.add(new SystemRecord(
-                        rs.getString("nhom_bang"),
-                        rs.getString("ma_chinh"),
-                        rs.getString("ma_chien_dich"),
-                        rs.getString("ma_lien_ket"),
-                        rs.getString("tieu_de"),
-                        rs.getString("noi_dung"),
-                        rs.getString("ngay_tao"),
-                        rs.getString("ngay_xu_ly"),
-                        rs.getString("trang_thai"),
-                        rs.getString("nguoi_tao"),
-                        rs.getString("nguoi_xu_ly"),
-                        rs.getString("ghi_chu")
+                        text(rs, "nhom_bang"),
+                        text(rs, "ma_chinh"),
+                        text(rs, "ma_chien_dich"),
+                        text(rs, "ma_lien_ket"),
+                        text(rs, "tieu_de"),
+                        text(rs, "noi_dung"),
+                        text(rs, "ngay_tao"),
+                        text(rs, "ngay_xu_ly"),
+                        text(rs, "trang_thai"),
+                        text(rs, "nguoi_tao"),
+                        text(rs, "nguoi_xu_ly"),
+                        text(rs, "ghi_chu")
                 ));
             }
         }
@@ -186,16 +186,20 @@ public final class DatabaseDataLoader {
                         + "FROM noi_dung ORDER BY ma_chinh")) {
             while (rs.next()) {
                 target.add(new SystemRecord(
-                        rs.getString("nhom_bang"),
-                        rs.getString("ma_chinh"),
-                        rs.getString("ma_lien_ket"),
-                        rs.getString("tieu_de"),
-                        rs.getString("noi_dung"),
-                        rs.getString("ngay_tao"),
-                        rs.getString("trang_thai"),
-                        rs.getString("ghi_chu")
+                        text(rs, "nhom_bang"),
+                        text(rs, "ma_chinh"),
+                        text(rs, "ma_lien_ket"),
+                        text(rs, "tieu_de"),
+                        text(rs, "noi_dung"),
+                        text(rs, "ngay_tao"),
+                        text(rs, "trang_thai"),
+                        text(rs, "ghi_chu")
                 ));
             }
         }
+    }
+
+    private static String text(ResultSet rs, String column) throws SQLException {
+        return UiText.clean(rs.getString(column));
     }
 }

@@ -18,15 +18,15 @@ public class SponsorModel {
 
     public SponsorModel(String maDoiTac, String tenDoiTac, String linhVuc, String soDienThoai, String email,
             String diaChi, String maChienDich, double giaTriTaiTro, String ngayKyKet) {
-        this.maDoiTac = maDoiTac;
-        this.tenDoiTac = tenDoiTac;
-        this.linhVuc = linhVuc;
-        this.soDienThoai = soDienThoai;
-        this.email = email;
-        this.diaChi = diaChi;
-        this.maChienDich = maChienDich;
+        this.maDoiTac = UiText.clean(maDoiTac);
+        this.tenDoiTac = UiText.clean(tenDoiTac);
+        this.linhVuc = UiText.clean(linhVuc);
+        this.soDienThoai = UiText.clean(soDienThoai);
+        this.email = UiText.clean(email);
+        this.diaChi = UiText.clean(diaChi);
+        this.maChienDich = UiText.clean(maChienDich);
         this.giaTriTaiTro = giaTriTaiTro;
-        this.ngayKyKet = ngayKyKet;
+        this.ngayKyKet = UiText.clean(ngayKyKet);
     }
 
     public String getMaDoiTac() {
@@ -34,7 +34,7 @@ public class SponsorModel {
     }
 
     public void setMaDoiTac(String maDoiTac) {
-        this.maDoiTac = maDoiTac;
+        this.maDoiTac = UiText.clean(maDoiTac);
     }
 
     public String getTenDoiTac() {
@@ -42,7 +42,7 @@ public class SponsorModel {
     }
 
     public void setTenDoiTac(String tenDoiTac) {
-        this.tenDoiTac = tenDoiTac;
+        this.tenDoiTac = UiText.clean(tenDoiTac);
     }
 
     public String getLinhVuc() {
@@ -50,7 +50,7 @@ public class SponsorModel {
     }
 
     public void setLinhVuc(String linhVuc) {
-        this.linhVuc = linhVuc;
+        this.linhVuc = UiText.clean(linhVuc);
     }
 
     public String getSoDienThoai() {
@@ -58,7 +58,7 @@ public class SponsorModel {
     }
 
     public void setSoDienThoai(String soDienThoai) {
-        this.soDienThoai = soDienThoai;
+        this.soDienThoai = UiText.clean(soDienThoai);
     }
 
     public String getEmail() {
@@ -66,7 +66,7 @@ public class SponsorModel {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = UiText.clean(email);
     }
 
     public String getDiaChi() {
@@ -74,7 +74,7 @@ public class SponsorModel {
     }
 
     public void setDiaChi(String diaChi) {
-        this.diaChi = diaChi;
+        this.diaChi = UiText.clean(diaChi);
     }
 
     public String getMaChienDich() {
@@ -82,7 +82,7 @@ public class SponsorModel {
     }
 
     public void setMaChienDich(String maChienDich) {
-        this.maChienDich = maChienDich;
+        this.maChienDich = UiText.clean(maChienDich);
     }
 
     public double getGiaTriTaiTro() {
@@ -102,7 +102,7 @@ public class SponsorModel {
     }
 
     public void setNgayKyKet(String ngayKyKet) {
-        this.ngayKyKet = ngayKyKet;
+        this.ngayKyKet = UiText.clean(ngayKyKet);
     }
 
     public String getMaNhaTaiTro() {
@@ -110,7 +110,7 @@ public class SponsorModel {
     }
 
     public void setMaNhaTaiTro(String maNhaTaiTro) {
-        this.maDoiTac = maNhaTaiTro;
+        this.maDoiTac = UiText.clean(maNhaTaiTro);
     }
 
     public String getTenNhaTaiTro() {
@@ -118,7 +118,7 @@ public class SponsorModel {
     }
 
     public void setTenNhaTaiTro(String tenNhaTaiTro) {
-        this.tenDoiTac = tenNhaTaiTro;
+        this.tenDoiTac = UiText.clean(tenNhaTaiTro);
     }
 
     public String getHinhThuc() {
@@ -126,7 +126,7 @@ public class SponsorModel {
     }
 
     public void setHinhThuc(String hinhThuc) {
-        this.linhVuc = hinhThuc;
+        this.linhVuc = UiText.clean(hinhThuc);
     }
 
     public double getSoTien() {

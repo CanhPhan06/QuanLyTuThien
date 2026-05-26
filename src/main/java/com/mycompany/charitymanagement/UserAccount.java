@@ -13,11 +13,11 @@ public class UserAccount {
     private final String linkedId;
 
     public UserAccount(String username, String password, String role, String displayName, String linkedId) {
-        this.username = username;
+        this.username = UiText.clean(username);
         this.password = password;
-        this.role = role;
-        this.displayName = displayName;
-        this.linkedId = linkedId;
+        this.role = UiText.clean(role);
+        this.displayName = UiText.clean(displayName);
+        this.linkedId = UiText.clean(linkedId);
     }
 
     public String getUsername() {

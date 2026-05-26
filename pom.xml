@@ -39,6 +39,7 @@
                 <version>3.8.0</version>
                 <configuration>
                     <release>11</release>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             <plugin>
@@ -47,6 +48,10 @@
                 <version>0.0.4</version>
                 <configuration>
                     <mainClass>com.mycompany.charitymanagement.App</mainClass>
+                    <options>
+                        <option>-Dfile.encoding=UTF-8</option>
+                        <option>-Dsun.jnu.encoding=UTF-8</option>
+                    </options>
                 </configuration>
                 <executions>
                     <execution>

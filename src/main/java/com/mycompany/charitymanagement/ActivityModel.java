@@ -23,15 +23,15 @@ public class ActivityModel {
 
     public ActivityModel(String maChienDich, String tenChienDich, String moTa, String diaDiem,
             String ngayBatDau, String ngayKetThuc, double mucTieuTien, String trangThai, String maNguoiTao) {
-        this.maChienDich = maChienDich;
-        this.tenChienDich = tenChienDich;
-        this.moTa = moTa;
-        this.diaDiem = diaDiem;
-        this.ngayBatDau = ngayBatDau;
-        this.ngayKetThuc = ngayKetThuc;
+        this.maChienDich = UiText.clean(maChienDich);
+        this.tenChienDich = UiText.clean(tenChienDich);
+        this.moTa = UiText.clean(moTa);
+        this.diaDiem = UiText.clean(diaDiem);
+        this.ngayBatDau = UiText.clean(ngayBatDau);
+        this.ngayKetThuc = UiText.clean(ngayKetThuc);
         this.mucTieuTien = mucTieuTien;
-        this.trangThai = trangThai;
-        this.maNguoiTao = maNguoiTao;
+        this.trangThai = UiText.clean(trangThai);
+        this.maNguoiTao = UiText.clean(maNguoiTao);
     }
 
     public String getMaChienDich() {
@@ -39,7 +39,7 @@ public class ActivityModel {
     }
 
     public void setMaChienDich(String maChienDich) {
-        this.maChienDich = maChienDich;
+        this.maChienDich = UiText.clean(maChienDich);
     }
 
     public String getTenChienDich() {
@@ -47,7 +47,7 @@ public class ActivityModel {
     }
 
     public void setTenChienDich(String tenChienDich) {
-        this.tenChienDich = tenChienDich;
+        this.tenChienDich = UiText.clean(tenChienDich);
     }
 
     public String getMoTa() {
@@ -55,7 +55,7 @@ public class ActivityModel {
     }
 
     public void setMoTa(String moTa) {
-        this.moTa = moTa;
+        this.moTa = UiText.clean(moTa);
     }
 
     public String getDiaDiem() {
@@ -63,7 +63,7 @@ public class ActivityModel {
     }
 
     public void setDiaDiem(String diaDiem) {
-        this.diaDiem = diaDiem;
+        this.diaDiem = UiText.clean(diaDiem);
     }
 
     public String getNgayBatDau() {
@@ -71,7 +71,7 @@ public class ActivityModel {
     }
 
     public void setNgayBatDau(String ngayBatDau) {
-        this.ngayBatDau = ngayBatDau;
+        this.ngayBatDau = UiText.clean(ngayBatDau);
     }
 
     public String getNgayKetThuc() {
@@ -79,7 +79,7 @@ public class ActivityModel {
     }
 
     public void setNgayKetThuc(String ngayKetThuc) {
-        this.ngayKetThuc = ngayKetThuc;
+        this.ngayKetThuc = UiText.clean(ngayKetThuc);
     }
 
     public double getMucTieuTien() {
@@ -99,7 +99,7 @@ public class ActivityModel {
     }
 
     public void setTrangThai(String trangThai) {
-        this.trangThai = trangThai;
+        this.trangThai = UiText.clean(trangThai);
     }
 
     public String getMaNguoiTao() {
@@ -107,7 +107,7 @@ public class ActivityModel {
     }
 
     public void setMaNguoiTao(String maNguoiTao) {
-        this.maNguoiTao = maNguoiTao;
+        this.maNguoiTao = UiText.clean(maNguoiTao);
     }
 
     public String getMaHoatDong() {
@@ -115,7 +115,7 @@ public class ActivityModel {
     }
 
     public void setMaHoatDong(String maHoatDong) {
-        this.maChienDich = maHoatDong;
+        this.maChienDich = UiText.clean(maHoatDong);
     }
 
     public String getTenHoatDong() {
@@ -123,6 +123,6 @@ public class ActivityModel {
     }
 
     public void setTenHoatDong(String tenHoatDong) {
-        this.tenChienDich = tenHoatDong;
+        this.tenChienDich = UiText.clean(tenHoatDong);
     }
 }

@@ -19,16 +19,16 @@ public class ParticipantModel {
 
     public ParticipantModel(String maTaiKhoan, String maHoSo, String hoTen, String mssv, String soDienThoai,
             String khoa, String truong, String maChienDich, String trangThaiDuyet, String diemDanhGia) {
-        this.maTaiKhoan = maTaiKhoan;
-        this.maHoSo = maHoSo;
-        this.hoTen = hoTen;
-        this.mssv = mssv;
-        this.soDienThoai = soDienThoai;
-        this.khoa = khoa;
-        this.truong = truong;
-        this.maChienDich = maChienDich;
-        this.trangThaiDuyet = trangThaiDuyet;
-        this.diemDanhGia = diemDanhGia;
+        this.maTaiKhoan = UiText.clean(maTaiKhoan);
+        this.maHoSo = UiText.clean(maHoSo);
+        this.hoTen = UiText.clean(hoTen);
+        this.mssv = UiText.clean(mssv);
+        this.soDienThoai = UiText.clean(soDienThoai);
+        this.khoa = UiText.clean(khoa);
+        this.truong = UiText.clean(truong);
+        this.maChienDich = UiText.clean(maChienDich);
+        this.trangThaiDuyet = UiText.clean(trangThaiDuyet);
+        this.diemDanhGia = UiText.clean(diemDanhGia);
     }
 
     public String getMaTaiKhoan() {
@@ -36,7 +36,7 @@ public class ParticipantModel {
     }
 
     public void setMaTaiKhoan(String maTaiKhoan) {
-        this.maTaiKhoan = maTaiKhoan;
+        this.maTaiKhoan = UiText.clean(maTaiKhoan);
     }
 
     public String getMaHoSo() {
@@ -44,7 +44,7 @@ public class ParticipantModel {
     }
 
     public void setMaHoSo(String maHoSo) {
-        this.maHoSo = maHoSo;
+        this.maHoSo = UiText.clean(maHoSo);
     }
 
     public String getHoTen() {
@@ -52,7 +52,7 @@ public class ParticipantModel {
     }
 
     public void setHoTen(String hoTen) {
-        this.hoTen = hoTen;
+        this.hoTen = UiText.clean(hoTen);
     }
 
     public String getMssv() {
@@ -60,7 +60,7 @@ public class ParticipantModel {
     }
 
     public void setMssv(String mssv) {
-        this.mssv = mssv;
+        this.mssv = UiText.clean(mssv);
     }
 
     public String getSoDienThoai() {
@@ -68,7 +68,7 @@ public class ParticipantModel {
     }
 
     public void setSoDienThoai(String soDienThoai) {
-        this.soDienThoai = soDienThoai;
+        this.soDienThoai = UiText.clean(soDienThoai);
     }
 
     public String getKhoa() {
@@ -76,7 +76,7 @@ public class ParticipantModel {
     }
 
     public void setKhoa(String khoa) {
-        this.khoa = khoa;
+        this.khoa = UiText.clean(khoa);
     }
 
     public String getTruong() {
@@ -84,7 +84,7 @@ public class ParticipantModel {
     }
 
     public void setTruong(String truong) {
-        this.truong = truong;
+        this.truong = UiText.clean(truong);
     }
 
     public String getMaChienDich() {
@@ -92,7 +92,7 @@ public class ParticipantModel {
     }
 
     public void setMaChienDich(String maChienDich) {
-        this.maChienDich = maChienDich;
+        this.maChienDich = UiText.clean(maChienDich);
     }
 
     public String getTrangThaiDuyet() {
@@ -100,7 +100,7 @@ public class ParticipantModel {
     }
 
     public void setTrangThaiDuyet(String trangThaiDuyet) {
-        this.trangThaiDuyet = trangThaiDuyet;
+        this.trangThaiDuyet = UiText.clean(trangThaiDuyet);
     }
 
     public String getDiemDanhGia() {
@@ -108,7 +108,7 @@ public class ParticipantModel {
     }
 
     public void setDiemDanhGia(String diemDanhGia) {
-        this.diemDanhGia = diemDanhGia;
+        this.diemDanhGia = UiText.clean(diemDanhGia);
     }
 
     public String getMaNguoiThamGia() {
@@ -116,7 +116,7 @@ public class ParticipantModel {
     }
 
     public void setMaNguoiThamGia(String maNguoiThamGia) {
-        this.maTaiKhoan = maNguoiThamGia;
+        this.maTaiKhoan = UiText.clean(maNguoiThamGia);
     }
 
     public String getEmail() {
@@ -124,7 +124,7 @@ public class ParticipantModel {
     }
 
     public void setEmail(String email) {
-        this.mssv = email;
+        this.mssv = UiText.clean(email);
     }
 
     public String getHoatDong() {
@@ -132,7 +132,7 @@ public class ParticipantModel {
     }
 
     public void setHoatDong(String hoatDong) {
-        this.maChienDich = hoatDong;
+        this.maChienDich = UiText.clean(hoatDong);
     }
 
     public String getTenChienDich() {

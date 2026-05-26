@@ -10,18 +10,20 @@ public class DonationModel {
     private double soTien;
     private String hinhThuc;
 
-    public DonationModel(String maQuyenGop, String nguoiQuyenGop, String hoatDong, String ngayQuyenGop, double soTien, String hinhThuc) {
+    public DonationModel(String maQuyenGop, String nguoiQuyenGop, String hoatDong, String ngayQuyenGop,
+            double soTien, String hinhThuc) {
         this(maQuyenGop, nguoiQuyenGop, hoatDong, ngayQuyenGop, hinhThuc, "Tiền mặt", soTien);
     }
 
-    public DonationModel(String maQuyenGop, String nguoiQuyenGop, String hoatDong, String ngayQuyenGop, String hinhThuc, String noiDungQuyenGop, double soTien) {
-        this.maQuyenGop = maQuyenGop;
-        this.nguoiQuyenGop = nguoiQuyenGop;
-        this.hoatDong = hoatDong;
-        this.ngayQuyenGop = ngayQuyenGop;
-        this.noiDungQuyenGop = noiDungQuyenGop;
+    public DonationModel(String maQuyenGop, String nguoiQuyenGop, String hoatDong, String ngayQuyenGop,
+            String hinhThuc, String noiDungQuyenGop, double soTien) {
+        this.maQuyenGop = UiText.clean(maQuyenGop);
+        this.nguoiQuyenGop = UiText.clean(nguoiQuyenGop);
+        this.hoatDong = UiText.clean(hoatDong);
+        this.ngayQuyenGop = UiText.clean(ngayQuyenGop);
+        this.noiDungQuyenGop = UiText.clean(noiDungQuyenGop);
         this.soTien = soTien;
-        this.hinhThuc = hinhThuc;
+        this.hinhThuc = UiText.clean(hinhThuc);
     }
 
     public String getMaQuyenGop() {
@@ -29,7 +31,7 @@ public class DonationModel {
     }
 
     public void setMaQuyenGop(String maQuyenGop) {
-        this.maQuyenGop = maQuyenGop;
+        this.maQuyenGop = UiText.clean(maQuyenGop);
     }
 
     public String getNguoiQuyenGop() {
@@ -37,7 +39,7 @@ public class DonationModel {
     }
 
     public void setNguoiQuyenGop(String nguoiQuyenGop) {
-        this.nguoiQuyenGop = nguoiQuyenGop;
+        this.nguoiQuyenGop = UiText.clean(nguoiQuyenGop);
     }
 
     public String getHoatDong() {
@@ -45,7 +47,7 @@ public class DonationModel {
     }
 
     public void setHoatDong(String hoatDong) {
-        this.hoatDong = hoatDong;
+        this.hoatDong = UiText.clean(hoatDong);
     }
 
     public String getNgayQuyenGop() {
@@ -53,7 +55,7 @@ public class DonationModel {
     }
 
     public void setNgayQuyenGop(String ngayQuyenGop) {
-        this.ngayQuyenGop = ngayQuyenGop;
+        this.ngayQuyenGop = UiText.clean(ngayQuyenGop);
     }
 
     public String getNoiDungQuyenGop() {
@@ -61,7 +63,7 @@ public class DonationModel {
     }
 
     public void setNoiDungQuyenGop(String noiDungQuyenGop) {
-        this.noiDungQuyenGop = noiDungQuyenGop;
+        this.noiDungQuyenGop = UiText.clean(noiDungQuyenGop);
     }
 
     public double getSoTien() {
@@ -77,7 +79,7 @@ public class DonationModel {
     }
 
     public void setHinhThuc(String hinhThuc) {
-        this.hinhThuc = hinhThuc;
+        this.hinhThuc = UiText.clean(hinhThuc);
     }
 
     public String getSoTienText() {
