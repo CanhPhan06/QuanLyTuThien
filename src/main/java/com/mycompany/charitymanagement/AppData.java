@@ -25,6 +25,7 @@ public final class AppData {
         addDonations();
         addOperations();
         addContents();
+        DatabaseDataLoader.loadIntoMemory();
     }
 
     private AppData() {
