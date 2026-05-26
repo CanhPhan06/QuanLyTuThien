@@ -1,9 +1,12 @@
-set pagesize 100
-set linesize 200
-column object_type format a20
-column object_name format a40
-select object_type, object_name, status
-from user_objects
-where object_type in ('TRIGGER', 'PROCEDURE', 'FUNCTION', 'SEQUENCE')
-order by object_type, object_name;
-exit
+SET PAGESIZE 200
+SET LINESIZE 220
+COLUMN OBJECT_TYPE FORMAT A16
+COLUMN OBJECT_NAME FORMAT A40
+COLUMN STATUS FORMAT A10
+
+SELECT OBJECT_TYPE, OBJECT_NAME, STATUS
+FROM USER_OBJECTS
+WHERE OBJECT_TYPE IN ('TRIGGER', 'PROCEDURE', 'FUNCTION', 'SEQUENCE', 'VIEW')
+ORDER BY OBJECT_TYPE, OBJECT_NAME;
+
+EXIT

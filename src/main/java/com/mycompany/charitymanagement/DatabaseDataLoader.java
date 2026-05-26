@@ -68,8 +68,11 @@ public final class DatabaseDataLoader {
     private static void loadCampaigns(Connection connection, ObservableList<ActivityModel> target) throws SQLException {
         try (Statement statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(
-                        "select ma_chien_dich, ten_chien_dich, mo_ta, dia_diem, ngay_bat_dau, ngay_ket_thuc, "
-                        + "muc_tieu_tien, trang_thai, ma_nguoi_tao from chien_dich order by ma_chien_dich")) {
+                        "SELECT ma_chien_dich, ten_chien_dich, mo_ta, dia_diem, "
+                        + "TO_CHAR(ngay_bat_dau, 'DD/MM/YYYY') AS ngay_bat_dau, "
+                        + "TO_CHAR(ngay_ket_thuc, 'DD/MM/YYYY') AS ngay_ket_thuc, "
+                        + "muc_tieu_tien, trang_thai, ma_nguoi_tao "
+                        + "FROM chien_dich ORDER BY ma_chien_dich")) {
             while (rs.next()) {
                 target.add(new ActivityModel(
                         rs.getString("ma_chien_dich"),
@@ -151,9 +154,11 @@ public final class DatabaseDataLoader {
     private static void loadOperations(Connection connection, ObservableList<SystemRecord> target) throws SQLException {
         try (Statement statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(
-                        "select nhom_bang, ma_chinh, ma_chien_dich, ma_lien_ket, tieu_de, noi_dung, "
-                        + "ngay_tao, ngay_xu_ly, trang_thai, nguoi_tao, nguoi_xu_ly, ghi_chu "
-                        + "from van_hanh order by ma_chinh")) {
+                        "SELECT nhom_bang, ma_chinh, ma_chien_dich, ma_lien_ket, tieu_de, noi_dung, "
+                        + "TO_CHAR(ngay_tao, 'DD/MM/YYYY') AS ngay_tao, "
+                        + "TO_CHAR(ngay_xu_ly, 'DD/MM/YYYY') AS ngay_xu_ly, "
+                        + "trang_thai, nguoi_tao, nguoi_xu_ly, ghi_chu "
+                        + "FROM van_hanh ORDER BY ma_chinh")) {
             while (rs.next()) {
                 target.add(new SystemRecord(
                         rs.getString("nhom_bang"),
@@ -176,8 +181,9 @@ public final class DatabaseDataLoader {
     private static void loadContents(Connection connection, ObservableList<SystemRecord> target) throws SQLException {
         try (Statement statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(
-                        "select nhom_bang, ma_chinh, ma_lien_ket, tieu_de, noi_dung, ngay_tao, trang_thai, ghi_chu "
-                        + "from noi_dung order by ma_chinh")) {
+                        "SELECT nhom_bang, ma_chinh, ma_lien_ket, tieu_de, noi_dung, "
+                        + "TO_CHAR(ngay_tao, 'DD/MM/YYYY') AS ngay_tao, trang_thai, ghi_chu "
+                        + "FROM noi_dung ORDER BY ma_chinh")) {
             while (rs.next()) {
                 target.add(new SystemRecord(
                         rs.getString("nhom_bang"),

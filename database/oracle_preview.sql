@@ -1,66 +1,89 @@
-set pagesize 200
-set linesize 220
-column table_name format a28
-column object_type format a16
-column object_name format a38
-column status format a10
-column ten_dang_nhap format a14
-column vai_tro format a12
-column ho_ten_hien_thi format a28
-column ma_chien_dich format a14
-column ten_chien_dich format a34
-column trang_thai format a22
-column ho_ten format a24
-column truong format a10
-column ten_doi_tac format a24
-column nguoi_quyen_gop format a24
-column hinh_thuc format a18
+-- ============================================================
+-- oracle_preview.sql
+-- Xem nhanh database CHARITY sau khi chay oracle_setup.sql.
+-- ============================================================
 
-prompt ===== TABLES =====
-select table_name from user_tables order by table_name;
+SET PAGESIZE 300
+SET LINESIZE 240
+COLUMN TABLE_NAME FORMAT A32
+COLUMN OBJECT_TYPE FORMAT A16
+COLUMN OBJECT_NAME FORMAT A40
+COLUMN STATUS FORMAT A10
+COLUMN TEN_DANG_NHAP FORMAT A14
+COLUMN VAI_TRO FORMAT A12
+COLUMN HO_TEN_HIEN_THI FORMAT A28
+COLUMN MA_CHIEN_DICH FORMAT A14
+COLUMN TEN_CHIEN_DICH FORMAT A36
+COLUMN TRANG_THAI FORMAT A22
+COLUMN TEN_DOI_TAC FORMAT A24
+COLUMN NGUOI_QUYEN_GOP FORMAT A24
+COLUMN HINH_THUC FORMAT A18
 
-prompt ===== ROW COUNTS =====
-select 'TAI_KHOAN' table_name, count(*) rows_count from tai_khoan
-union all select 'CHIEN_DICH', count(*) from chien_dich
-union all select 'HO_SO_TNV', count(*) from ho_so_tnv
-union all select 'DOI_TAC_TAI_TRO', count(*) from doi_tac_tai_tro
-union all select 'QUYEN_GOP', count(*) from quyen_gop
-union all select 'VAN_HANH', count(*) from van_hanh
-union all select 'NOI_DUNG', count(*) from noi_dung;
+PROMPT ===== TABLES =====
+SELECT TABLE_NAME
+FROM USER_TABLES
+ORDER BY TABLE_NAME;
 
-prompt ===== BUSINESS OBJECTS =====
-select object_type, object_name, status
-from user_objects
-where object_type in ('TRIGGER', 'PROCEDURE', 'FUNCTION', 'SEQUENCE')
-order by object_type, object_name;
+PROMPT ===== ROW COUNTS =====
+SELECT 'TAI_KHOAN' AS TABLE_NAME, COUNT(*) AS ROWS_COUNT FROM TAI_KHOAN
+UNION ALL SELECT 'HO_SO_SINH_VIEN', COUNT(*) FROM HO_SO_SINH_VIEN
+UNION ALL SELECT 'CHIEN_DICH', COUNT(*) FROM CHIEN_DICH
+UNION ALL SELECT 'THAM_GIA_TNV', COUNT(*) FROM THAM_GIA_TNV
+UNION ALL SELECT 'CONG_VIEC', COUNT(*) FROM CONG_VIEC
+UNION ALL SELECT 'PHAN_CONG', COUNT(*) FROM PHAN_CONG
+UNION ALL SELECT 'DIEM_DANH', COUNT(*) FROM DIEM_DANH
+UNION ALL SELECT 'DOI_TAC', COUNT(*) FROM DOI_TAC
+UNION ALL SELECT 'TAI_TRO', COUNT(*) FROM TAI_TRO
+UNION ALL SELECT 'QUYEN_GOP_TIEN', COUNT(*) FROM QUYEN_GOP_TIEN
+UNION ALL SELECT 'PHIEU_QUYEN_GOP_VP', COUNT(*) FROM PHIEU_QUYEN_GOP_VP
+UNION ALL SELECT 'CHI_TIET_QUYEN_GOP_VP', COUNT(*) FROM CHI_TIET_QUYEN_GOP_VP
+UNION ALL SELECT 'LOAI_VAT_PHAM', COUNT(*) FROM LOAI_VAT_PHAM
+UNION ALL SELECT 'PHIEU_XUAT_VAT_PHAM', COUNT(*) FROM PHIEU_XUAT_VAT_PHAM
+UNION ALL SELECT 'CHI_TIEU', COUNT(*) FROM CHI_TIEU
+UNION ALL SELECT 'TIN_TUC', COUNT(*) FROM TIN_TUC
+UNION ALL SELECT 'BINH_LUAN', COUNT(*) FROM BINH_LUAN
+UNION ALL SELECT 'THONG_BAO', COUNT(*) FROM THONG_BAO
+UNION ALL SELECT 'NHAT_KY_HE_THONG', COUNT(*) FROM NHAT_KY_HE_THONG;
 
-prompt ===== SAMPLE ACCOUNTS =====
-select ten_dang_nhap, vai_tro, ho_ten_hien_thi, ma_lien_ket
-from tai_khoan
-order by ten_dang_nhap
-fetch first 8 rows only;
+PROMPT ===== BUSINESS OBJECTS =====
+SELECT OBJECT_TYPE, OBJECT_NAME, STATUS
+FROM USER_OBJECTS
+WHERE OBJECT_TYPE IN ('TRIGGER', 'PROCEDURE', 'FUNCTION', 'SEQUENCE', 'VIEW')
+ORDER BY OBJECT_TYPE, OBJECT_NAME;
 
-prompt ===== SAMPLE CAMPAIGNS =====
-select ma_chien_dich, ten_chien_dich, muc_tieu_tien, trang_thai,
-       fn_tong_nguon_luc_chien_dich(ma_chien_dich) tong_da_ghi_nhan,
-       fn_so_tnv_chien_dich(ma_chien_dich) so_tnv
-from chien_dich
-order by ma_chien_dich;
+PROMPT ===== SAMPLE ACCOUNTS =====
+SELECT TEN_DANG_NHAP, VAI_TRO, HO_TEN_HIEN_THI, MA_LIEN_KET
+FROM TAI_KHOAN
+ORDER BY TEN_DANG_NHAP
+FETCH FIRST 12 ROWS ONLY;
 
-prompt ===== SAMPLE VOLUNTEERS =====
-select ma_tai_khoan, ho_ten, mssv, so_dien_thoai, truong, ma_chien_dich, trang_thai_duyet
-from ho_so_tnv
-order by ma_tai_khoan
-fetch first 8 rows only;
+PROMPT ===== SAMPLE CAMPAIGN REPORT =====
+SELECT MA_CHIEN_DICH, TEN_CHIEN_DICH, MUC_TIEU_TIEN, TONG_QUYEN_GOP_TIEN,
+       TONG_TAI_TRO, TONG_CHI_TIEU, SO_TNV, TY_LE_DAT_MUC_TIEU, TRANG_THAI_TONG_HOP
+FROM BAO_CAO_CHIEN_DICH
+ORDER BY MA_CHIEN_DICH;
 
-prompt ===== SAMPLE SPONSORS =====
-select ma_doi_tac, ten_doi_tac, so_dien_thoai, email, ma_chien_dich, gia_tri_tai_tro
-from doi_tac_tai_tro
-order by ma_doi_tac;
+PROMPT ===== SAMPLE VOLUNTEERS VIEW FOR JAVA =====
+SELECT MA_TAI_KHOAN, HO_TEN, MSSV, SO_DIEN_THOAI, TRUONG, MA_CHIEN_DICH, TRANG_THAI_DUYET
+FROM HO_SO_TNV
+ORDER BY MA_TAI_KHOAN, MA_CHIEN_DICH
+FETCH FIRST 12 ROWS ONLY;
 
-prompt ===== SAMPLE DONATIONS =====
-select ma_quyen_gop, nguoi_quyen_gop, ma_chien_dich, hinh_thuc, so_tien
-from quyen_gop
-order by ma_quyen_gop;
+PROMPT ===== SAMPLE SPONSORS VIEW FOR JAVA =====
+SELECT MA_DOI_TAC, TEN_DOI_TAC, SO_DIEN_THOAI, EMAIL, MA_CHIEN_DICH, GIA_TRI_TAI_TRO
+FROM DOI_TAC_TAI_TRO
+ORDER BY MA_DOI_TAC, MA_CHIEN_DICH
+FETCH FIRST 12 ROWS ONLY;
 
-exit
+PROMPT ===== SAMPLE DONATIONS VIEW FOR JAVA =====
+SELECT MA_QUYEN_GOP, NGUOI_QUYEN_GOP, MA_CHIEN_DICH, HINH_THUC, SO_TIEN
+FROM QUYEN_GOP
+ORDER BY MA_QUYEN_GOP
+FETCH FIRST 12 ROWS ONLY;
+
+PROMPT ===== INVENTORY =====
+SELECT MA_LOAI, TEN_LOAI, DON_VI_TINH, SO_LUONG_TON
+FROM LOAI_VAT_PHAM
+ORDER BY MA_LOAI;
+
+EXIT
