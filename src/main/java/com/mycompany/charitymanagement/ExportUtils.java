@@ -276,13 +276,44 @@ public final class ExportUtils {
             String[] candidates = {
                 "C:\\Windows\\Fonts\\arial.ttf",
                 "C:\\Windows\\Fonts\\segoeui.ttf",
-                "C:\\Windows\\Fonts\\tahoma.ttf"
+                "C:\\Windows\\Fonts\\tahoma.ttf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+                "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
+                "/usr/share/fonts/TTF/DejaVuSans.ttf",
+                "/usr/share/fonts/truetype/msttcorefonts/Arial.ttf"
             };
             for (String candidate : candidates) {
                 File fontFile = new File(candidate);
                 if (fontFile.exists()) {
                     return PDType0Font.load(document, fontFile);
                 }
+            }
+            IOException first = null;
+            try {
+                java.nio.file.Path fontDir = java.nio.file.Paths.get("/usr/share/fonts");
+                if (java.nio.file.Files.isDirectory(fontDir)) {
+                    java.util.stream.Stream<java.nio.file.Path> walk = java.nio.file.Files.walk(fontDir);
+                    try {
+                        java.util.Optional<java.nio.file.Path> ttf = walk
+                            .filter(p -> p.toString().endsWith(".ttf"))
+                            .filter(p -> {
+                                String name = p.getFileName().toString().toLowerCase();
+                                return name.contains("sans") || name.contains("arial") || name.contains("dejavu");
+                            })
+                            .findFirst();
+                        if (ttf.isPresent()) {
+                            return PDType0Font.load(document, ttf.get().toFile());
+                        }
+                    } finally {
+                        walk.close();
+                    }
+                }
+            } catch (IOException e) {
+                first = e;
+            }
+            if (first != null) {
+                throw first;
             }
             throw new IOException("Không tìm thấy font Unicode để xuất PDF.");
         }

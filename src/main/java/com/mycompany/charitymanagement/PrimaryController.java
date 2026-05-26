@@ -24,7 +24,7 @@ public class PrimaryController {
         UserAccount account = AppData.authenticate(username, password);
 
         if (account == null) {
-            lblMessage.setText("Sai tài khoản hoặc mật khẩu");
+            lblMessage.setText("Sai tài khoản/mật khẩu");
             return;
         }
 
