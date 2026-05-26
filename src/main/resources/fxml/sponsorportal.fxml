@@ -11,14 +11,16 @@
     <left>
         <VBox spacing="8" styleClass="sidebar">
             <Label text="NHÀ TÀI TRỢ" styleClass="sidebar-title"/>
-            <Button text="⌂  Tổng quan" styleClass="menu-button-active"/>
+            <Button text="⌂  Tổng quan" onAction="#handleOverview" styleClass="menu-button-active"/>
+            <Button text="☷  Hồ sơ" onAction="#handleShowProfile" styleClass="menu-button"/>
             <Button text="▣  Chiến dịch" onAction="#handleCampaigns" styleClass="menu-button"/>
             <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
         </VBox>
     </left>
 
     <center>
-        <VBox spacing="14" styleClass="main-content">
+        <StackPane styleClass="main-content">
+        <VBox fx:id="overviewSection" spacing="14">
             <Label text="CỔNG NHÀ TÀI TRỢ" styleClass="page-title"/>
             <Label fx:id="lblWelcome" text="Xin chào" styleClass="section-title"/>
 
@@ -118,5 +120,87 @@
                 </tabs>
             </TabPane>
         </VBox>
+        <VBox fx:id="profileSection" spacing="14" visible="false" managed="false">
+            <Label text="HỒ SƠ NHÀ TÀI TRỢ" styleClass="page-title"/>
+            <ScrollPane fitToWidth="true" pannable="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
+                <content>
+                    <VBox spacing="14">
+                        <HBox spacing="14">
+                            <VBox spacing="8" styleClass="profile-card" HBox.hgrow="ALWAYS">
+                                <Label fx:id="lblSponsorProfileName" text="Nhà tài trợ" styleClass="featured-title"/>
+                                <Label fx:id="lblSponsorProfileRole" text="Nhà tài trợ" styleClass="content-category"/>
+                                <HBox spacing="12">
+                                    <VBox styleClass="stat-card report-mini-card">
+                                        <Label fx:id="lblSponsorCampaignCount" text="0" styleClass="stat-number"/>
+                                        <Label text="Chiến dịch" styleClass="report-card-label"/>
+                                    </VBox>
+                                    <VBox styleClass="stat-card report-mini-card">
+                                        <Label fx:id="lblSponsorDonationCount" text="0" styleClass="stat-number green"/>
+                                        <Label text="Lượt đóng góp" styleClass="report-card-label"/>
+                                    </VBox>
+                                    <VBox styleClass="stat-card report-mini-card">
+                                        <Label fx:id="lblSponsorTotalCash" text="0 VNĐ" styleClass="stat-number purple"/>
+                                        <Label text="Tổng giá trị" styleClass="report-card-label"/>
+                                    </VBox>
+                                    <VBox styleClass="stat-card report-mini-card">
+                                        <Label fx:id="lblSponsorContributionLevel" text="Mới" styleClass="stat-number orange"/>
+                                        <Label text="Mức đóng góp" styleClass="report-card-label"/>
+                                    </VBox>
+                                </HBox>
+                                <VBox spacing="4" styleClass="profile-highlight">
+                                    <Label text="Chiến dịch đóng góp nổi bật" styleClass="muted-text"/>
+                                    <Label fx:id="lblSponsorTopCampaign" text="-" styleClass="activity-title" wrapText="true"/>
+                                </VBox>
+                            </VBox>
+
+                            <GridPane hgap="14" vgap="10" styleClass="profile-card" HBox.hgrow="ALWAYS">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="34"/>
+                                    <ColumnConstraints percentWidth="66" hgrow="ALWAYS"/>
+                                </columnConstraints>
+                                <Label text="Mã tổ chức" styleClass="profile-field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblSponsorOrgId" text="-" styleClass="profile-field-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                <Label text="Lĩnh vực" styleClass="profile-field-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblSponsorOrgField" text="-" styleClass="profile-field-value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                <Label text="SĐT" styleClass="profile-field-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblSponsorOrgPhone" text="-" styleClass="profile-field-value" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                <Label text="Email" styleClass="profile-field-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblSponsorOrgEmail" text="-" styleClass="profile-field-value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                                <Label text="Địa chỉ" styleClass="profile-field-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblSponsorOrgAddress" text="-" styleClass="profile-field-value" wrapText="true" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                            </GridPane>
+                        </HBox>
+
+                        <HBox spacing="14" VBox.vgrow="ALWAYS">
+                            <VBox spacing="10" styleClass="profile-card" HBox.hgrow="ALWAYS">
+                                <Label text="Lịch sử đồng hành chiến dịch" styleClass="portal-section-title"/>
+                                <TableView fx:id="tableSponsorPartnerHistory" styleClass="activity-table" prefHeight="220" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colSponsorPartnerCampaign" text="Chiến dịch" prefWidth="250"/>
+                                        <TableColumn fx:id="colSponsorPartnerField" text="Lĩnh vực" prefWidth="130"/>
+                                        <TableColumn fx:id="colSponsorPartnerDate" text="Ngày ký" prefWidth="110"/>
+                                        <TableColumn fx:id="colSponsorPartnerValue" text="Giá trị" prefWidth="140"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                            <VBox spacing="10" styleClass="profile-card" HBox.hgrow="ALWAYS">
+                                <Label text="Lịch sử đóng góp" styleClass="portal-section-title"/>
+                                <TableView fx:id="tableSponsorContributionHistory" styleClass="activity-table" prefHeight="220" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colSponsorHistoryCampaign" text="Chiến dịch" prefWidth="170"/>
+                                        <TableColumn fx:id="colSponsorHistoryDate" text="Ngày" prefWidth="95"/>
+                                        <TableColumn fx:id="colSponsorHistoryType" text="Hình thức" prefWidth="110"/>
+                                        <TableColumn fx:id="colSponsorHistoryContent" text="Nội dung" prefWidth="240"/>
+                                        <TableColumn fx:id="colSponsorHistoryValue" text="Giá trị" prefWidth="120"/>
+                                        <TableColumn fx:id="colSponsorHistoryStatus" text="Trạng thái" prefWidth="120"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </VBox>
+        </StackPane>
     </center>
 </BorderPane>

@@ -300,6 +300,38 @@
     -fx-effect: dropshadow(gaussian, rgba(15,35,65,0.08), 10, 0, 0, 3);
 }
 
+.profile-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-padding: 16px;
+    -fx-min-width: 0;
+    -fx-effect: dropshadow(gaussian, rgba(15,35,65,0.08), 10, 0, 0, 3);
+}
+
+.profile-highlight {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px 12px;
+}
+
+.profile-field-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6b7280;
+}
+
+.profile-field-value {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102a43;
+}
+
+.profile-card .stat-number {
+    -fx-wrap-text: true;
+    -fx-text-alignment: CENTER;
+}
+
 .metric-card {
     -fx-background-color: white;
     -fx-background-radius: 10px;

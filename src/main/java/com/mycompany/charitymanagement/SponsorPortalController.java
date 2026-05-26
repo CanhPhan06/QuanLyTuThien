@@ -33,6 +33,30 @@ public class SponsorPortalController {
     @FXML
     private Label lblSupportTotal;
     @FXML
+    private Label lblSponsorProfileName;
+    @FXML
+    private Label lblSponsorProfileRole;
+    @FXML
+    private Label lblSponsorOrgId;
+    @FXML
+    private Label lblSponsorOrgField;
+    @FXML
+    private Label lblSponsorOrgPhone;
+    @FXML
+    private Label lblSponsorOrgEmail;
+    @FXML
+    private Label lblSponsorOrgAddress;
+    @FXML
+    private Label lblSponsorContributionLevel;
+    @FXML
+    private Label lblSponsorCampaignCount;
+    @FXML
+    private Label lblSponsorDonationCount;
+    @FXML
+    private Label lblSponsorTotalCash;
+    @FXML
+    private Label lblSponsorTopCampaign;
+    @FXML
     private Label lblSelectedCampaign;
     @FXML
     private Label lblCampaignGoal;
@@ -54,6 +78,10 @@ public class SponsorPortalController {
     private VBox campaignCommentList;
     @FXML
     private VBox campaignPortalBox;
+    @FXML
+    private VBox overviewSection;
+    @FXML
+    private VBox profileSection;
 
     @FXML
     private TableView<ActivityModel> tableCampaigns;
@@ -81,7 +109,35 @@ public class SponsorPortalController {
     @FXML
     private TableColumn<DonationModel, String> colSoTien;
 
+    @FXML
+    private TableView<SponsorModel> tableSponsorPartnerHistory;
+    @FXML
+    private TableColumn<SponsorModel, String> colSponsorPartnerCampaign;
+    @FXML
+    private TableColumn<SponsorModel, String> colSponsorPartnerField;
+    @FXML
+    private TableColumn<SponsorModel, String> colSponsorPartnerDate;
+    @FXML
+    private TableColumn<SponsorModel, String> colSponsorPartnerValue;
+
+    @FXML
+    private TableView<DonationModel> tableSponsorContributionHistory;
+    @FXML
+    private TableColumn<DonationModel, String> colSponsorHistoryCampaign;
+    @FXML
+    private TableColumn<DonationModel, String> colSponsorHistoryDate;
+    @FXML
+    private TableColumn<DonationModel, String> colSponsorHistoryType;
+    @FXML
+    private TableColumn<DonationModel, String> colSponsorHistoryContent;
+    @FXML
+    private TableColumn<DonationModel, String> colSponsorHistoryValue;
+    @FXML
+    private TableColumn<DonationModel, String> colSponsorHistoryStatus;
+
     private final ObservableList<DonationModel> sponsorSupport = FXCollections.observableArrayList();
+    private final ObservableList<SponsorModel> sponsorPartnerHistory = FXCollections.observableArrayList();
+    private final ObservableList<DonationModel> sponsorContributionHistory = FXCollections.observableArrayList();
     private UserAccount currentUser;
 
     @FXML
@@ -105,13 +161,29 @@ public class SponsorPortalController {
         colHinhThuc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getHinhThuc()));
         colNoiDungQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNoiDungQuyenGop()));
         colSoTien.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSoTienText()));
+        colSponsorPartnerCampaign.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colSponsorPartnerField.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getLinhVuc()));
+        colSponsorPartnerDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayKyKet()));
+        colSponsorPartnerValue.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGiaTriTaiTroText()));
+        colSponsorHistoryCampaign.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colSponsorHistoryDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayQuyenGop()));
+        colSponsorHistoryType.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getHinhThuc()));
+        colSponsorHistoryContent.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNoiDungQuyenGop()));
+        colSponsorHistoryValue.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSoTienText()));
+        colSponsorHistoryStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThaiXuLy()));
 
         tableCampaigns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableSupport.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableSponsorPartnerHistory.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableSponsorContributionHistory.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableCampaigns.setFixedCellSize(32.0);
         tableSupport.setFixedCellSize(32.0);
+        tableSponsorPartnerHistory.setFixedCellSize(32.0);
+        tableSponsorContributionHistory.setFixedCellSize(32.0);
         tableCampaigns.setItems(AppData.getActivities());
         tableSupport.setItems(sponsorSupport);
+        tableSponsorPartnerHistory.setItems(sponsorPartnerHistory);
+        tableSponsorContributionHistory.setItems(sponsorContributionHistory);
 
         cboCampaign.setItems(buildCampaignChoices());
         cboSupportType.setItems(FXCollections.observableArrayList(
@@ -155,10 +227,25 @@ public class SponsorPortalController {
         }
         refreshView();
         renderCampaignPortal();
+        showSection(overviewSection);
+    }
+
+    @FXML
+    private void handleOverview() {
+        refreshView();
+        renderCampaignPortal();
+        showSection(overviewSection);
+    }
+
+    @FXML
+    private void handleShowProfile() {
+        refreshView();
+        showSection(profileSection);
     }
 
     @FXML
     private void handleCampaigns() {
+        showSection(overviewSection);
         renderCampaignPortal();
         if (campaignPortalBox != null) {
             campaignPortalBox.requestFocus();
@@ -306,10 +393,118 @@ public class SponsorPortalController {
                 item.getNguoiQuyenGop().equalsIgnoreCase(currentUser.getDisplayName())
         ));
         lblSupportCount.setText(String.valueOf(sponsorSupport.size()));
-        double total = sponsorSupport.stream()
+        refreshProfile();
+        double total = totalSponsorCash();
+        lblSupportTotal.setText(FormatUtils.money(total));
+    }
+
+    private void showSection(VBox activeSection) {
+        VBox[] sections = {overviewSection, profileSection};
+        for (VBox section : sections) {
+            if (section != null) {
+                boolean active = section == activeSection;
+                section.setVisible(active);
+                section.setManaged(active);
+            }
+        }
+    }
+
+    private void refreshProfile() {
+        SponsorModel sponsor = findSponsorProfile();
+        sponsorPartnerHistory.setAll(AppData.getSponsors().filtered(this::isCurrentSponsorRecord));
+        sponsorContributionHistory.setAll(AppData.getDonations().filtered(this::isCurrentSponsorDonation));
+
+        String sponsorName = sponsor == null ? currentUser.getDisplayName() : sponsor.getTenDoiTac();
+        lblSponsorProfileName.setText(sponsorName);
+        lblSponsorProfileRole.setText("Nhà tài trợ");
+        lblSponsorOrgId.setText(sponsor == null ? emptyAsDash(currentUser.getLinkedId()) : sponsor.getMaDoiTac());
+        lblSponsorOrgField.setText(sponsor == null ? "-" : emptyAsDash(sponsor.getLinhVuc()));
+        lblSponsorOrgPhone.setText(sponsor == null ? "-" : emptyAsDash(sponsor.getSoDienThoai()));
+        lblSponsorOrgEmail.setText(sponsor == null ? "-" : emptyAsDash(sponsor.getEmail()));
+        lblSponsorOrgAddress.setText(sponsor == null ? "-" : emptyAsDash(sponsor.getDiaChi()));
+
+        int campaignCount = sponsorCampaignCount();
+        int donationCount = sponsorPartnerHistory.size() + sponsorContributionHistory.size();
+        double totalCash = totalSponsorCash();
+        lblSponsorCampaignCount.setText(String.valueOf(campaignCount));
+        lblSponsorDonationCount.setText(String.valueOf(donationCount));
+        lblSponsorTotalCash.setText(FormatUtils.money(totalCash));
+        lblSponsorContributionLevel.setText(sponsorLevel(totalCash, campaignCount));
+        lblSponsorTopCampaign.setText(topSponsorCampaign());
+    }
+
+    private SponsorModel findSponsorProfile() {
+        for (SponsorModel sponsor : AppData.getSponsors()) {
+            if (isCurrentSponsorRecord(sponsor)) {
+                return sponsor;
+            }
+        }
+        return null;
+    }
+
+    private boolean isCurrentSponsorRecord(SponsorModel sponsor) {
+        return sponsor.getMaDoiTac().equalsIgnoreCase(currentUser.getLinkedId())
+                || sponsor.getTenDoiTac().equalsIgnoreCase(currentUser.getDisplayName());
+    }
+
+    private boolean isCurrentSponsorDonation(DonationModel donation) {
+        return donation.getNguoiQuyenGop().equalsIgnoreCase(currentUser.getDisplayName());
+    }
+
+    private double totalSponsorCash() {
+        double sponsorTotal = sponsorPartnerHistory.stream()
+                .mapToDouble(SponsorModel::getGiaTriTaiTro)
+                .sum();
+        double donationTotal = sponsorContributionHistory.stream()
                 .mapToDouble(DonationModel::getSoTien)
                 .sum();
-        lblSupportTotal.setText(FormatUtils.money(total));
+        return sponsorTotal + donationTotal;
+    }
+
+    private int sponsorCampaignCount() {
+        return (int) java.util.stream.Stream.concat(
+                sponsorPartnerHistory.stream().map(SponsorModel::getMaChienDich),
+                sponsorContributionHistory.stream().map(DonationModel::getHoatDong)
+        )
+                .filter(value -> value != null && !value.isBlank())
+                .distinct()
+                .count();
+    }
+
+    private String sponsorLevel(double totalCash, int campaignCount) {
+        if (totalCash >= 25000000 || campaignCount >= 4) {
+            return "Đối tác chiến lược";
+        }
+        if (totalCash >= 10000000 || campaignCount >= 2) {
+            return "Tài trợ tích cực";
+        }
+        if (totalCash > 0 || campaignCount > 0) {
+            return "Đồng hành";
+        }
+        return "Mới";
+    }
+
+    private String topSponsorCampaign() {
+        String bestCampaignId = "";
+        double bestValue = -1;
+        for (SponsorModel sponsor : sponsorPartnerHistory) {
+            if (sponsor.getGiaTriTaiTro() > bestValue) {
+                bestValue = sponsor.getGiaTriTaiTro();
+                bestCampaignId = sponsor.getMaChienDich();
+            }
+        }
+        for (DonationModel donation : sponsorContributionHistory) {
+            if (donation.getSoTien() > bestValue) {
+                bestValue = donation.getSoTien();
+                bestCampaignId = donation.getHoatDong();
+            }
+        }
+        ActivityModel campaign = AppData.findCampaign(bestCampaignId);
+        return campaign == null ? "-" : campaign.getTenChienDich();
+    }
+
+    private String emptyAsDash(String value) {
+        return value == null || value.isBlank() ? "-" : value;
     }
 
     private ObservableList<String> buildCampaignChoices() {

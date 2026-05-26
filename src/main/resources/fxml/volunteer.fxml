@@ -12,6 +12,7 @@
         <VBox spacing="8" styleClass="sidebar">
             <Label text="TÌNH NGUYỆN VIÊN" styleClass="sidebar-title"/>
             <Button text="⌂  Tổng quan" onAction="#handleShowOverview" styleClass="menu-button-active"/>
+            <Button text="☷  Hồ sơ" onAction="#handleShowProfile" styleClass="menu-button"/>
             <Button text="▣  Chiến dịch" onAction="#handleShowCampaigns" styleClass="menu-button"/>
             <Button text="▤  Công việc" onAction="#handleShowTasks" styleClass="menu-button"/>
             <Button text="✎  Minh chứng" onAction="#handleShowProof" styleClass="menu-button"/>
@@ -50,6 +51,89 @@
                     <Button text="Xem công việc" onAction="#handleShowTasks" styleClass="quick-button"/>
                     <Button text="Gửi minh chứng" onAction="#handleShowProof" styleClass="quick-button"/>
                 </HBox>
+            </VBox>
+
+            <VBox fx:id="profileSection" spacing="14" visible="false" managed="false">
+                <Label text="HỒ SƠ TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
+                <ScrollPane fitToWidth="true" pannable="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox spacing="14">
+                            <HBox spacing="14">
+                                <VBox spacing="8" styleClass="profile-card" HBox.hgrow="ALWAYS">
+                                    <Label fx:id="lblProfileName" text="Tình nguyện viên" styleClass="featured-title"/>
+                                    <Label fx:id="lblProfileRole" text="Tình nguyện viên" styleClass="content-category"/>
+                                    <HBox spacing="12">
+                                        <VBox styleClass="stat-card report-mini-card">
+                                            <Label fx:id="lblProfileCampaignCount" text="0" styleClass="stat-number"/>
+                                            <Label text="Chiến dịch" styleClass="report-card-label"/>
+                                        </VBox>
+                                        <VBox styleClass="stat-card report-mini-card">
+                                            <Label fx:id="lblProfileCheckInCount" text="0" styleClass="stat-number green"/>
+                                            <Label text="Lượt có mặt" styleClass="report-card-label"/>
+                                        </VBox>
+                                        <VBox styleClass="stat-card report-mini-card">
+                                            <Label fx:id="lblProfileScore" text="Chưa có" styleClass="stat-number purple"/>
+                                            <Label text="Điểm TB" styleClass="report-card-label"/>
+                                        </VBox>
+                                        <VBox styleClass="stat-card report-mini-card">
+                                            <Label fx:id="lblProfileContributionLevel" text="Mới" styleClass="stat-number orange"/>
+                                            <Label text="Mức đóng góp" styleClass="report-card-label"/>
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
+
+                                <GridPane hgap="14" vgap="10" styleClass="profile-card" HBox.hgrow="ALWAYS">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="34"/>
+                                        <ColumnConstraints percentWidth="66" hgrow="ALWAYS"/>
+                                    </columnConstraints>
+                                    <Label text="Mã tài khoản" styleClass="profile-field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblProfileAccountId" text="-" styleClass="profile-field-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                                    <Label text="Mã hồ sơ" styleClass="profile-field-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblProfileId" text="-" styleClass="profile-field-value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                                    <Label text="SĐT" styleClass="profile-field-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblProfilePhone" text="-" styleClass="profile-field-value" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                                    <Label text="MSSV/Email" styleClass="profile-field-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblProfileEmail" text="-" styleClass="profile-field-value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                                    <Label text="Khoa" styleClass="profile-field-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblProfileDepartment" text="-" styleClass="profile-field-value" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                                    <Label text="Trường" styleClass="profile-field-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblProfileSchool" text="-" styleClass="profile-field-value" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                                    <Label text="Chiến dịch hiện tại" styleClass="profile-field-label" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblProfileCurrentCampaign" text="-" styleClass="profile-field-value" wrapText="true" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                                    <Label text="Trạng thái" styleClass="profile-field-label" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                                    <Label fx:id="lblProfileStatus" text="-" styleClass="profile-field-value" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                                </GridPane>
+                            </HBox>
+
+                            <HBox spacing="14" VBox.vgrow="ALWAYS">
+                                <VBox spacing="10" styleClass="profile-card" HBox.hgrow="ALWAYS">
+                                    <Label text="Lịch sử tham gia chiến dịch" styleClass="portal-section-title"/>
+                                    <TableView fx:id="tableParticipationHistory" styleClass="activity-table" prefHeight="220" VBox.vgrow="ALWAYS">
+                                        <columns>
+                                            <TableColumn fx:id="colProfileCampaign" text="Chiến dịch" prefWidth="260"/>
+                                            <TableColumn fx:id="colProfileStatus" text="Trạng thái" prefWidth="120"/>
+                                            <TableColumn fx:id="colProfileScoreColumn" text="Điểm" prefWidth="80"/>
+                                            <TableColumn fx:id="colProfileSchool" text="Trường" prefWidth="130"/>
+                                        </columns>
+                                    </TableView>
+                                </VBox>
+                                <VBox spacing="10" styleClass="profile-card" HBox.hgrow="ALWAYS">
+                                    <Label text="Lịch sử đóng góp và vận hành" styleClass="portal-section-title"/>
+                                    <TableView fx:id="tableProfileHistory" styleClass="activity-table" prefHeight="220" VBox.vgrow="ALWAYS">
+                                        <columns>
+                                            <TableColumn fx:id="colProfileHistoryType" text="Nhóm" prefWidth="120"/>
+                                            <TableColumn fx:id="colProfileHistoryCampaign" text="Chiến dịch" prefWidth="180"/>
+                                            <TableColumn fx:id="colProfileHistoryTitle" text="Nội dung" prefWidth="240"/>
+                                            <TableColumn fx:id="colProfileHistoryDate" text="Ngày" prefWidth="95"/>
+                                            <TableColumn fx:id="colProfileHistoryStatus" text="Trạng thái" prefWidth="120"/>
+                                        </columns>
+                                    </TableView>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                    </content>
+                </ScrollPane>
             </VBox>
 
             <VBox fx:id="campaignsSection" spacing="14" visible="false" managed="false">

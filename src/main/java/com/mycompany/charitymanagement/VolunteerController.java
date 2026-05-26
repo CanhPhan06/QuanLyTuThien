@@ -35,6 +35,34 @@ public class VolunteerController {
     @FXML
     private Label lblNotificationCount;
     @FXML
+    private Label lblProfileName;
+    @FXML
+    private Label lblProfileRole;
+    @FXML
+    private Label lblProfileAccountId;
+    @FXML
+    private Label lblProfileId;
+    @FXML
+    private Label lblProfilePhone;
+    @FXML
+    private Label lblProfileEmail;
+    @FXML
+    private Label lblProfileDepartment;
+    @FXML
+    private Label lblProfileSchool;
+    @FXML
+    private Label lblProfileCurrentCampaign;
+    @FXML
+    private Label lblProfileStatus;
+    @FXML
+    private Label lblProfileCampaignCount;
+    @FXML
+    private Label lblProfileCheckInCount;
+    @FXML
+    private Label lblProfileScore;
+    @FXML
+    private Label lblProfileContributionLevel;
+    @FXML
     private Label lblSelectedCampaign;
     @FXML
     private Label lblSelectedTime;
@@ -56,6 +84,8 @@ public class VolunteerController {
     private VBox campaignPortalBox;
     @FXML
     private VBox overviewSection;
+    @FXML
+    private VBox profileSection;
     @FXML
     private VBox campaignsSection;
     @FXML
@@ -98,8 +128,34 @@ public class VolunteerController {
     @FXML
     private TableColumn<SystemRecord, String> colNoticeStatus;
 
+    @FXML
+    private TableView<ParticipantModel> tableParticipationHistory;
+    @FXML
+    private TableColumn<ParticipantModel, String> colProfileCampaign;
+    @FXML
+    private TableColumn<ParticipantModel, String> colProfileStatus;
+    @FXML
+    private TableColumn<ParticipantModel, String> colProfileScoreColumn;
+    @FXML
+    private TableColumn<ParticipantModel, String> colProfileSchool;
+
+    @FXML
+    private TableView<SystemRecord> tableProfileHistory;
+    @FXML
+    private TableColumn<SystemRecord, String> colProfileHistoryType;
+    @FXML
+    private TableColumn<SystemRecord, String> colProfileHistoryCampaign;
+    @FXML
+    private TableColumn<SystemRecord, String> colProfileHistoryTitle;
+    @FXML
+    private TableColumn<SystemRecord, String> colProfileHistoryDate;
+    @FXML
+    private TableColumn<SystemRecord, String> colProfileHistoryStatus;
+
     private final ObservableList<SystemRecord> volunteerTasks = FXCollections.observableArrayList();
     private final ObservableList<SystemRecord> volunteerNotifications = FXCollections.observableArrayList();
+    private final ObservableList<ParticipantModel> participationHistory = FXCollections.observableArrayList();
+    private final ObservableList<SystemRecord> profileHistory = FXCollections.observableArrayList();
     private UserAccount currentUser;
     private String selectedCampaignId;
 
@@ -125,16 +181,31 @@ public class VolunteerController {
         colNoticeTitle.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTieuDe()));
         colNoticeDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayTao()));
         colNoticeStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
+        colProfileCampaign.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colProfileStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThaiDuyet()));
+        colProfileScoreColumn.setCellValueFactory(cell -> new SimpleStringProperty(emptyAsDash(cell.getValue().getDiemDanhGia())));
+        colProfileSchool.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTruong()));
+        colProfileHistoryType.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNhomBang()));
+        colProfileHistoryCampaign.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
+        colProfileHistoryTitle.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTieuDe()));
+        colProfileHistoryDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayTao()));
+        colProfileHistoryStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
 
         tableCampaigns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableTasks.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableNotifications.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableParticipationHistory.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        tableProfileHistory.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableCampaigns.setFixedCellSize(32.0);
         tableTasks.setFixedCellSize(32.0);
         tableNotifications.setFixedCellSize(32.0);
+        tableParticipationHistory.setFixedCellSize(32.0);
+        tableProfileHistory.setFixedCellSize(32.0);
         tableCampaigns.setItems(AppData.getActivities());
         tableTasks.setItems(volunteerTasks);
         tableNotifications.setItems(volunteerNotifications);
+        tableParticipationHistory.setItems(participationHistory);
+        tableProfileHistory.setItems(profileHistory);
 
         cboCampaign.setItems(buildCampaignChoices());
         cboProofType.setItems(FXCollections.observableArrayList(
@@ -180,6 +251,12 @@ public class VolunteerController {
     @FXML
     private void handleShowOverview() {
         showSection(overviewSection);
+    }
+
+    @FXML
+    private void handleShowProfile() {
+        refreshView();
+        showSection(profileSection);
     }
 
     @FXML
@@ -335,10 +412,11 @@ public class VolunteerController {
         if (lblNotificationCount != null) {
             lblNotificationCount.setText(String.valueOf(volunteerNotifications.size()));
         }
+        refreshProfile();
     }
 
     private void showSection(VBox activeSection) {
-        VBox[] sections = {overviewSection, campaignsSection, tasksSection, proofSection, notificationsSection};
+        VBox[] sections = {overviewSection, profileSection, campaignsSection, tasksSection, proofSection, notificationsSection};
         for (VBox section : sections) {
             if (section != null) {
                 boolean active = section == activeSection;
@@ -402,10 +480,106 @@ public class VolunteerController {
     }
 
     private ParticipantModel findParticipant() {
-        return AppData.getParticipants().stream()
-                .filter(item -> item.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername()))
-                .findFirst()
-                .orElse(null);
+        ParticipantModel latest = null;
+        for (ParticipantModel item : AppData.getParticipants()) {
+            if (item.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername())) {
+                latest = item;
+            }
+        }
+        return latest;
+    }
+
+    private void refreshProfile() {
+        ParticipantModel profile = findParticipant();
+        ObservableList<ParticipantModel> profiles = AppData.getParticipants().filtered(item ->
+                item.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername()));
+        participationHistory.setAll(profiles);
+
+        lblProfileName.setText(currentUser.getDisplayName());
+        lblProfileRole.setText("Tình nguyện viên");
+        lblProfileAccountId.setText(currentUser.getUsername());
+        lblProfileId.setText(profile == null ? emptyAsDash(currentUser.getLinkedId()) : emptyAsDash(profile.getMaHoSo()));
+        lblProfilePhone.setText(profile == null ? "-" : emptyAsDash(profile.getSoDienThoai()));
+        lblProfileEmail.setText(profile == null ? "-" : emptyAsDash(profile.getMssv()));
+        lblProfileDepartment.setText(profile == null ? "-" : emptyAsDash(profile.getKhoa()));
+        lblProfileSchool.setText(profile == null ? "-" : emptyAsDash(profile.getTruong()));
+        lblProfileCurrentCampaign.setText(profile == null ? "Chưa tham gia" : profile.getTenChienDich());
+        lblProfileStatus.setText(profile == null ? "Chưa đăng ký" : profile.getTrangThaiDuyet());
+
+        int campaignCount = distinctCampaignCount(profiles);
+        int checkInCount = countVolunteerOperations("diem danh");
+        double score = averageScore(profiles);
+        lblProfileCampaignCount.setText(String.valueOf(campaignCount));
+        lblProfileCheckInCount.setText(String.valueOf(checkInCount));
+        lblProfileScore.setText(score <= 0 ? "Chưa có" : String.format("%.1f", score));
+        lblProfileContributionLevel.setText(volunteerLevel(campaignCount, checkInCount, score));
+
+        profileHistory.setAll(AppData.getOperations().filtered(record ->
+                isVolunteerHistoryRecord(record, profiles)));
+    }
+
+    private boolean isVolunteerHistoryRecord(SystemRecord record, ObservableList<ParticipantModel> profiles) {
+        if (record.getMaLienKet().equalsIgnoreCase(currentUser.getUsername())) {
+            return true;
+        }
+        String type = groupCode(record);
+        if (!type.contains("cong viec")) {
+            return false;
+        }
+        for (ParticipantModel profile : profiles) {
+            if (profile.getMaChienDich().equalsIgnoreCase(record.getMaChienDich())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int distinctCampaignCount(ObservableList<ParticipantModel> profiles) {
+        return (int) profiles.stream()
+                .map(ParticipantModel::getMaChienDich)
+                .filter(value -> value != null && !value.isBlank())
+                .distinct()
+                .count();
+    }
+
+    private int countVolunteerOperations(String normalizedType) {
+        return (int) AppData.getOperations().stream()
+                .filter(record -> record.getMaLienKet().equalsIgnoreCase(currentUser.getUsername()))
+                .filter(record -> groupCode(record).contains(normalizedType))
+                .count();
+    }
+
+    private double averageScore(ObservableList<ParticipantModel> profiles) {
+        double total = 0;
+        int count = 0;
+        for (ParticipantModel profile : profiles) {
+            try {
+                if (profile.getDiemDanhGia() != null && !profile.getDiemDanhGia().isBlank()) {
+                    total += Double.parseDouble(profile.getDiemDanhGia().replace(',', '.'));
+                    count++;
+                }
+            } catch (NumberFormatException ex) {
+                // Ignore legacy text scores.
+            }
+        }
+        return count == 0 ? 0 : Math.round(total / count * 10.0) / 10.0;
+    }
+
+    private String volunteerLevel(int campaignCount, int checkInCount, double score) {
+        if (campaignCount >= 4 || checkInCount >= 4 || score >= 9) {
+            return "Nòng cốt";
+        }
+        if (campaignCount >= 2 || checkInCount >= 2 || score >= 8) {
+            return "Tích cực";
+        }
+        if (campaignCount >= 1) {
+            return "Đang tham gia";
+        }
+        return "Mới";
+    }
+
+    private String emptyAsDash(String value) {
+        return value == null || value.isBlank() ? "-" : value;
     }
 
     private ActivityModel selectedCampaign() {
