@@ -34,13 +34,15 @@ public final class DatabaseDataLoader {
                 throw new SQLException("Database khong co du lieu tai_khoan hoac chien_dich.");
             }
 
-            AppData.getAccounts().setAll(accounts);
-            AppData.getActivities().setAll(activities);
-            AppData.getParticipants().setAll(participants);
-            AppData.getSponsors().setAll(sponsors);
-            AppData.getDonations().setAll(donations);
-            AppData.getOperations().setAll(operations);
-            AppData.getContents().setAll(contents);
+            javafx.application.Platform.runLater(() -> {
+                AppData.getAccounts().setAll(accounts);
+                AppData.getActivities().setAll(activities);
+                AppData.getParticipants().setAll(participants);
+                AppData.getSponsors().setAll(sponsors);
+                AppData.getDonations().setAll(donations);
+                AppData.getOperations().setAll(operations);
+                AppData.getContents().setAll(contents);
+            });
             return true;
         } catch (SQLException ex) {
             System.err.println("Khong the nap du lieu Oracle (" + DatabaseConfig.connectionLabel() + "): " + ex.getMessage());

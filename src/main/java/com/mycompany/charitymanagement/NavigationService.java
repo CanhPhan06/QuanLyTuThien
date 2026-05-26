@@ -2,7 +2,7 @@ package com.mycompany.charitymanagement;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -21,9 +21,15 @@ public final class NavigationService {
     public static final String VIEW_SPONSORPORTAL = "sponsorportal";
     public static final String VIEW_LOGIN = "primary";
 
+    private static final int CACHE_MAX = 8;
     private static MainLayoutController mainLayoutController;
     private static String currentContentView;
-    private static final Map<String, Node> contentCache = new HashMap<>();
+    private static final Map<String, Node> contentCache = new LinkedHashMap<>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Node> eldest) {
+            return size() > CACHE_MAX;
+        }
+    };
 
     private NavigationService() {
     }

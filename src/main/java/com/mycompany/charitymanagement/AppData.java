@@ -19,9 +19,12 @@ public final class AppData {
 
     static {
         accounts.add(new UserAccount("ADMIN", "123", UserAccount.ROLE_ADMIN, "Quản lý hệ thống", "TK000"));
-        Thread loader = new Thread(() -> DatabaseDataLoader.loadIntoMemory());
-        loader.setDaemon(true);
-        loader.start();
+        accounts.add(new UserAccount("TNV001", "123", UserAccount.ROLE_VOLUNTEER, "Nguyễn Văn An", "HS001"));
+        accounts.add(new UserAccount("NTT001", "123", UserAccount.ROLE_SPONSOR, "Công ty An Phát", "DT001"));
+        javafx.application.Platform.runLater(() -> {
+            Thread loader = new Thread(() -> DatabaseDataLoader.loadIntoMemory());
+            loader.start();
+        });
     }
 
     private AppData() {

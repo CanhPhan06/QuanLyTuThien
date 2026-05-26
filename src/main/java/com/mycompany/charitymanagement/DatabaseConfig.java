@@ -8,7 +8,7 @@ public final class DatabaseConfig {
 
     private static final String URL = System.getProperty(
             "charity.db.url",
-            "jdbc:oracle:thin:@//localhost:1522/XE"
+            "jdbc:oracle:thin:@//localhost:1521/XEPDB1"
     );
     private static final String USER = System.getProperty("charity.db.user", "CHARITY");
     private static final String PASSWORD = System.getProperty("charity.db.password", "charity123");

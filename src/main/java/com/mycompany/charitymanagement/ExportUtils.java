@@ -29,29 +29,16 @@ public final class ExportUtils {
             return;
         }
 
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle(title);
-        chooser.setInitialFileName(defaultPdfName(defaultFileName));
-        FileChooser.ExtensionFilter pdfFilter = new FileChooser.ExtensionFilter("PDF", "*.pdf");
-        FileChooser.ExtensionFilter csvFilter = new FileChooser.ExtensionFilter("CSV UTF-8", "*.csv");
-        chooser.getExtensionFilters().addAll(pdfFilter, csvFilter);
-        chooser.setSelectedExtensionFilter(pdfFilter);
-
-        File file = chooser.showSaveDialog(App.getScene() == null ? null : App.getScene().getWindow());
-        if (file == null) {
-            return;
-        }
+        ExportTarget target = chooseExportTarget(title, defaultFileName);
+        if (target == null) return;
 
         try {
-            FileChooser.ExtensionFilter selectedFilter = chooser.getSelectedExtensionFilter();
-            boolean csvSelected = selectedFilter == csvFilter || file.getName().toLowerCase().endsWith(".csv");
-            File target = ensureExtension(file, csvSelected ? ".csv" : ".pdf");
-            if (csvSelected) {
-                writeTableCsv(table, target);
+            if (target.csv) {
+                writeTableCsv(table, target.file);
             } else {
-                writeTablePdf(table, target, title);
+                writeTablePdf(table, target.file, title);
             }
-            DialogUtils.info("Đã xuất file: " + target.getAbsolutePath());
+            DialogUtils.info("Đã xuất file: " + target.file.getAbsolutePath());
         } catch (IOException ex) {
             DialogUtils.warning("Không thể xuất file. Vui lòng kiểm tra quyền ghi file hoặc thử thư mục khác.");
         }
@@ -63,6 +50,27 @@ public final class ExportUtils {
             return;
         }
 
+        ExportTarget target = chooseExportTarget(title, defaultFileName);
+        if (target == null) return;
+
+        try {
+            if (target.csv) {
+                try (PrintWriter writer = new PrintWriter(new FileWriter(target.file, StandardCharsets.UTF_8))) {
+                    writer.println("Nội dung báo cáo");
+                    for (String line : content.split("\\R")) {
+                        writer.println(csv(line));
+                    }
+                }
+            } else {
+                writeTextPdf(title, target.file, content);
+            }
+            DialogUtils.info("Đã xuất file: " + target.file.getAbsolutePath());
+        } catch (IOException ex) {
+            DialogUtils.warning("Không thể xuất file. Vui lòng kiểm tra quyền ghi file hoặc thử thư mục khác.");
+        }
+    }
+
+    private static ExportTarget chooseExportTarget(String title, String defaultFileName) {
         FileChooser chooser = new FileChooser();
         chooser.setTitle(title);
         chooser.setInitialFileName(defaultPdfName(defaultFileName));
@@ -72,27 +80,19 @@ public final class ExportUtils {
         chooser.setSelectedExtensionFilter(pdfFilter);
 
         File file = chooser.showSaveDialog(App.getScene() == null ? null : App.getScene().getWindow());
-        if (file == null) {
-            return;
-        }
+        if (file == null) return null;
 
-        try {
-            FileChooser.ExtensionFilter selectedFilter = chooser.getSelectedExtensionFilter();
-            boolean csvSelected = selectedFilter == csvFilter || file.getName().toLowerCase().endsWith(".csv");
-            File target = ensureExtension(file, csvSelected ? ".csv" : ".pdf");
-            if (csvSelected) {
-                try (PrintWriter writer = new PrintWriter(new FileWriter(target, StandardCharsets.UTF_8))) {
-                    writer.println("Nội dung báo cáo");
-                    for (String line : content.split("\\R")) {
-                        writer.println(csv(line));
-                    }
-                }
-            } else {
-                writeTextPdf(title, target, content);
-            }
-            DialogUtils.info("Đã xuất file: " + target.getAbsolutePath());
-        } catch (IOException ex) {
-            DialogUtils.warning("Không thể xuất file. Vui lòng kiểm tra quyền ghi file hoặc thử thư mục khác.");
+        FileChooser.ExtensionFilter selectedFilter = chooser.getSelectedExtensionFilter();
+        boolean csvSelected = selectedFilter == csvFilter || file.getName().toLowerCase().endsWith(".csv");
+        return new ExportTarget(ensureExtension(file, csvSelected ? ".csv" : ".pdf"), csvSelected);
+    }
+
+    private static final class ExportTarget {
+        final File file;
+        final boolean csv;
+        ExportTarget(File file, boolean csv) {
+            this.file = file;
+            this.csv = csv;
         }
     }
 
@@ -100,18 +100,14 @@ public final class ExportUtils {
         try (PrintWriter writer = new PrintWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             List<TableColumn<T, ?>> columns = visibleColumns(table);
             for (int i = 0; i < columns.size(); i++) {
-                if (i > 0) {
-                    writer.print(',');
-                }
+                if (i > 0) writer.print(',');
                 writer.print(csv(columns.get(i).getText()));
             }
             writer.println();
 
             for (T item : table.getItems()) {
                 for (int i = 0; i < columns.size(); i++) {
-                    if (i > 0) {
-                        writer.print(',');
-                    }
+                    if (i > 0) writer.print(',');
                     Object value = columns.get(i).getCellObservableValue(item) == null
                             ? ""
                             : columns.get(i).getCellObservableValue(item).getValue();
@@ -123,11 +119,8 @@ public final class ExportUtils {
     }
 
     private static <T> void writeTablePdf(TableView<T> table, File file, String title) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PdfTextWriter writer = new PdfTextWriter(document);
-            writer.line(title);
-            writer.line("");
-            List<TableColumn<T, ?>> columns = visibleColumns(table);
+        List<TableColumn<T, ?>> columns = visibleColumns(table);
+        writePdf(title, file, writer -> {
             writer.wrappedLine(columns.stream().map(TableColumn::getText).collect(Collectors.joining(" | ")));
             writer.line("--------------------------------------------------------------------------------");
             for (T item : table.getItems()) {
@@ -142,22 +135,31 @@ public final class ExportUtils {
                 writer.wrappedLine(row);
                 writer.line("");
             }
+        });
+    }
+
+    private static void writeTextPdf(String title, File file, String content) throws IOException {
+        writePdf(title, file, writer -> {
+            for (String line : content.split("\\R")) {
+                writer.wrappedLine(line);
+            }
+        });
+    }
+
+    private static void writePdf(String title, File file, PdfContentWriter contentWriter) throws IOException {
+        try (PDDocument document = new PDDocument()) {
+            PdfTextWriter writer = new PdfTextWriter(document);
+            writer.line(title);
+            writer.line("");
+            contentWriter.write(writer);
             writer.close();
             document.save(file);
         }
     }
 
-    private static void writeTextPdf(String title, File file, String content) throws IOException {
-        try (PDDocument document = new PDDocument()) {
-            PdfTextWriter writer = new PdfTextWriter(document);
-            writer.line(title);
-            writer.line("");
-            for (String line : content.split("\\R")) {
-                writer.wrappedLine(line);
-            }
-            writer.close();
-            document.save(file);
-        }
+    @FunctionalInterface
+    private interface PdfContentWriter {
+        void write(PdfTextWriter writer) throws IOException;
     }
 
     private static <T> List<TableColumn<T, ?>> visibleColumns(TableView<T> table) {
