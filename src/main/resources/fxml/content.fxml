@@ -3,71 +3,161 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.mycompany.charitymanagement.ContentController"
-      spacing="16" styleClass="main-content">
+<ScrollPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.charitymanagement.ContentController"
+            fitToWidth="true" pannable="true" hbarPolicy="NEVER"
+            styleClass="content-scroll admin-content-scroll">
+    <content>
+        <VBox spacing="18" styleClass="main-content">
 
-    <Label text="TRUNG TÂM NỘI DUNG" styleClass="page-title"/>
+        <Label text="TRUNG TÂM NỘI DUNG" styleClass="page-title"/>
 
-    <HBox spacing="18">
-        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-            <Label text="▤" styleClass="metric-icon blue-soft"/>
-            <VBox spacing="2">
-                <Label text="Tin tức" styleClass="metric-title"/>
-                <Label fx:id="lblNewsCount" text="0" styleClass="stat-number"/>
-                <Label text="Bài viết / bình luận" styleClass="muted-text"/>
+        <HBox spacing="16" styleClass="content-layout" minHeight="520">
+            <VBox spacing="14" HBox.hgrow="ALWAYS">
+                <HBox fx:id="featuredCard" spacing="18" styleClass="featured-news-card">
+                    <StackPane styleClass="featured-visual">
+                        <VBox alignment="TOP_LEFT" spacing="70">
+                            <Label text="NỔI BẬT" styleClass="featured-badge"/>
+                            <Label text="Tình nguyện kết nối" styleClass="featured-image-title"/>
+                        </VBox>
+                    </StackPane>
+                    <VBox spacing="10" HBox.hgrow="ALWAYS">
+                        <Label fx:id="lblFeaturedCategory" text="CHIẾN DỊCH" styleClass="content-category"/>
+                        <Label fx:id="lblFeaturedTitle" text="Chiến dịch nổi bật" styleClass="featured-title"/>
+                        <Label fx:id="lblFeaturedSummary" text="Thông tin nổi bật của chiến dịch." styleClass="featured-summary" wrapText="true"/>
+                        <HBox spacing="18" styleClass="featured-meta">
+                            <Label fx:id="lblFeaturedDate" text="25/05/2026"/>
+                            <Label fx:id="lblFeaturedPlace" text="TP.HCM"/>
+                            <Label fx:id="lblFeaturedOrg" text="Đoàn TNCS HCM"/>
+                            <Label fx:id="lblFeaturedParticipant" text="0 tham gia"/>
+                        </HBox>
+                        <HBox spacing="18" styleClass="featured-actions">
+                            <Label fx:id="lblFeaturedLikes" text="128"/>
+                            <Label fx:id="lblFeaturedComments" text="18"/>
+                            <Label fx:id="lblSaveFeatured" text="Lưu tin" styleClass="clickable-label"/>
+                        </HBox>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="10" styleClass="portal-section">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Hoạt động sắp diễn ra" styleClass="portal-section-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Xem tất cả" onAction="#handleViewAllCampaigns" styleClass="link-button"/>
+                    </HBox>
+                    <GridPane fx:id="upcomingGrid" hgap="12" vgap="12"/>
+                </VBox>
+
+                <VBox spacing="10" styleClass="comment-panel">
+                    <VBox spacing="3">
+                        <Label text="Bình luận chiến dịch" styleClass="portal-section-title"/>
+                        <Label fx:id="lblSelectedCommentCampaign" text="Chọn chiến dịch để xem bình luận" styleClass="muted-text"/>
+                    </VBox>
+                    <ScrollPane fitToWidth="true" pannable="true" hbarPolicy="NEVER" prefHeight="245" styleClass="content-scroll comment-scroll">
+                        <content>
+                            <VBox fx:id="commentList" spacing="10"/>
+                        </content>
+                    </ScrollPane>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <TextField fx:id="txtQuickComment" promptText="Viết bình luận của bạn..." styleClass="input-field comment-input" HBox.hgrow="ALWAYS"/>
+                        <Button text="Gửi" onAction="#handleSendQuickComment" styleClass="primary-button"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <VBox spacing="12" styleClass="right-portal">
+                <VBox spacing="10" styleClass="side-panel">
+                    <Label text="Thống kê nhanh" styleClass="side-title"/>
+                    <VBox fx:id="quickStatsBox" spacing="8"/>
+                    <Button text="Xem thông báo" onAction="#handleOpenNotifications" styleClass="quick-button"/>
+                </VBox>
+                <VBox spacing="10" styleClass="side-panel">
+                    <Label text="Hoạt động nổi bật" styleClass="side-title"/>
+                    <VBox fx:id="topActivitiesBox" spacing="8"/>
+                </VBox>
+                <VBox spacing="10" styleClass="side-panel">
+                    <Label text="Xu hướng" styleClass="side-title"/>
+                    <HBox fx:id="trendsBox" spacing="8"/>
+                </VBox>
+                <VBox spacing="10" styleClass="side-panel register-panel">
+                    <Label text="Đăng ký tham gia" styleClass="side-title"/>
+                    <Label text="Nhận thông tin về các hoạt động mới nhất và cơ hội tình nguyện phù hợp." wrapText="true" styleClass="muted-text"/>
+                    <TextField fx:id="txtRegisterContact" promptText="Nhập email hoặc số điện thoại" styleClass="input-field"/>
+                    <Button text="Tham gia ngay" onAction="#handleJoinNow" styleClass="green-button"/>
+                </VBox>
             </VBox>
         </HBox>
-        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-            <Label text="✉" styleClass="metric-icon green-soft"/>
-            <VBox spacing="2">
-                <Label text="Thông báo" styleClass="metric-title"/>
-                <Label fx:id="lblNoticeCount" text="0" styleClass="stat-number green"/>
-                <Label text="Gửi cho người dùng" styleClass="muted-text"/>
-            </VBox>
-        </HBox>
-        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-            <Label text="◷" styleClass="metric-icon orange-soft"/>
-            <VBox spacing="2">
-                <Label text="Chờ xử lý" styleClass="metric-title"/>
-                <Label fx:id="lblPendingContent" text="0" styleClass="stat-number orange"/>
-                <Label text="Nháp / chờ duyệt" styleClass="muted-text"/>
-            </VBox>
-        </HBox>
-        <HBox spacing="14" styleClass="metric-card" HBox.hgrow="ALWAYS">
-            <Label text="◉" styleClass="metric-icon purple-soft"/>
-            <VBox spacing="2">
-                <Label text="Đang hiển thị" styleClass="metric-title"/>
-                <Label fx:id="lblVisibleCount" text="0" styleClass="stat-number purple"/>
-                <Label text="Nội dung công khai" styleClass="muted-text"/>
-            </VBox>
-        </HBox>
-    </HBox>
 
-    <HBox spacing="12" styleClass="filter-card">
-        <ComboBox fx:id="cboContentTypeFilter" promptText="Loại nội dung" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <ComboBox fx:id="cboContentStatusFilter" promptText="Trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <TextField fx:id="txtContentSearch" promptText="Tìm theo tiêu đề hoặc nội dung" styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
-        <Button text="Bỏ lọc" onAction="#handleClearContentFilters" styleClass="quick-button"/>
-    </HBox>
+        <VBox spacing="12" styleClass="management-panel" VBox.vgrow="ALWAYS">
+            <Label text="Quản lý nội dung" styleClass="section-title"/>
+            <HBox spacing="12" styleClass="filter-card">
+                <ComboBox fx:id="cboCampaignFilter" promptText="Chiến dịch" styleClass="input-field wide-input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="cboContentTypeFilter" promptText="Loại trong chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="cboContentStatusFilter" promptText="Trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="txtContentSearch" promptText="Tìm tiêu đề, nội dung, người nhận..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+                <Button text="Bỏ lọc" onAction="#handleClearContentFilters" styleClass="quick-button"/>
+            </HBox>
 
-    <HBox spacing="12" styleClass="action-bar">
-        <Button text="+  Tạo nội dung" onAction="#handleAddRecord" styleClass="primary-button"/>
-        <Button text="✎  Chỉnh sửa" onAction="#handleUpdateRecord" styleClass="quick-button"/>
-        <Button text="⌫  Xóa" onAction="#handleDeleteRecord" styleClass="danger-button"/>
-        <Button text="⇩  Xuất danh sách" onAction="#handleExportContent" styleClass="quick-button"/>
-    </HBox>
+            <HBox spacing="12" styleClass="action-bar">
+                <Button text="+  Tạo nội dung" onAction="#handleAddRecord" styleClass="primary-button"/>
+                <Button text="✎  Chỉnh sửa" onAction="#handleUpdateRecord" styleClass="quick-button"/>
+                <Button text="⌫  Xóa" onAction="#handleDeleteRecord" styleClass="danger-button"/>
+                <Button text="⇩  Xuất danh sách" onAction="#handleExportContent" styleClass="quick-button"/>
+            </HBox>
 
-    <TableView fx:id="tableRecords" styleClass="activity-table content-table" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="colNhomBang" text="Loại" prefWidth="120"/>
-            <TableColumn fx:id="colMaChinh" text="Mã" prefWidth="75"/>
-            <TableColumn fx:id="colMaLienKet" text="Liên quan đến" prefWidth="170"/>
-            <TableColumn fx:id="colTieuDe" text="Tiêu đề" prefWidth="210"/>
-            <TableColumn fx:id="colNoiDung" text="Nội dung tóm tắt" prefWidth="310"/>
-            <TableColumn fx:id="colNgay" text="Ngày tạo" prefWidth="105"/>
-            <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="115"/>
-            <TableColumn fx:id="colGhiChu" text="Ghi chú" prefWidth="120"/>
-        </columns>
-    </TableView>
-</VBox>
+            <TabPane fx:id="tabContentArea" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                <tabs>
+                    <Tab text="Tin tức &amp; bình luận chiến dịch">
+                        <VBox spacing="10" styleClass="content-tab-body">
+                            <Label text="Mỗi chiến dịch có danh sách tin tức riêng; bình luận của người dùng được theo dõi trong cùng luồng chiến dịch." styleClass="muted-text"/>
+                            <TableView fx:id="tableRecords" styleClass="activity-table content-table" VBox.vgrow="ALWAYS">
+                                <columns>
+                                    <TableColumn fx:id="colNhomBang" text="Loại" prefWidth="110"/>
+                                    <TableColumn fx:id="colMaChinh" text="Mã" prefWidth="75"/>
+                                    <TableColumn fx:id="colMaLienKet" text="Chiến dịch / người bình luận" prefWidth="250"/>
+                                    <TableColumn fx:id="colTieuDe" text="Tiêu đề" prefWidth="220"/>
+                                    <TableColumn fx:id="colNoiDung" text="Nội dung tóm tắt" prefWidth="320"/>
+                                    <TableColumn fx:id="colNgay" text="Ngày tạo" prefWidth="110"/>
+                                    <TableColumn fx:id="colTrangThai" text="Trạng thái" prefWidth="125"/>
+                                    <TableColumn fx:id="colGhiChu" text="Ghi chú" prefWidth="120"/>
+                                    <TableColumn fx:id="colThaoTac" text="Thao tác" prefWidth="145"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </Tab>
+                    <Tab text="Thông báo">
+                        <VBox spacing="10" styleClass="content-tab-body">
+                            <Label text="Thông báo được tách riêng để quản lý tin gửi đến tình nguyện viên, nhà tài trợ và quản trị viên." styleClass="muted-text"/>
+                            <TableView fx:id="tableNotifications" styleClass="activity-table content-table" VBox.vgrow="ALWAYS">
+                                <columns>
+                                    <TableColumn fx:id="colNotifyTarget" text="Người nhận" prefWidth="210"/>
+                                    <TableColumn fx:id="colNotifyTitle" text="Tiêu đề" prefWidth="240"/>
+                                    <TableColumn fx:id="colNotifyContent" text="Nội dung thông báo" prefWidth="420"/>
+                                    <TableColumn fx:id="colNotifyDate" text="Ngày gửi" prefWidth="115"/>
+                                    <TableColumn fx:id="colNotifyStatus" text="Trạng thái" prefWidth="125"/>
+                                    <TableColumn fx:id="colNotifyAction" text="Thao tác" prefWidth="145"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </Tab>
+                    <Tab text="Nhật ký hệ thống">
+                        <VBox spacing="10" styleClass="content-tab-body">
+                            <Label text="Nhật ký ghi lại thao tác quản trị, thay đổi dữ liệu và các tham số đang áp dụng trong hệ thống." styleClass="muted-text"/>
+                            <TableView fx:id="tableLogs" styleClass="activity-table content-table" VBox.vgrow="ALWAYS">
+                                <columns>
+                                    <TableColumn fx:id="colLogActor" text="Đối tượng" prefWidth="210"/>
+                                    <TableColumn fx:id="colLogTitle" text="Hành động" prefWidth="240"/>
+                                    <TableColumn fx:id="colLogContent" text="Chi tiết" prefWidth="420"/>
+                                    <TableColumn fx:id="colLogDate" text="Thời gian" prefWidth="115"/>
+                                    <TableColumn fx:id="colLogStatus" text="Trạng thái" prefWidth="125"/>
+                                    <TableColumn fx:id="colLogNote" text="Ghi chú" prefWidth="160"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </Tab>
+                </tabs>
+            </TabPane>
+        </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

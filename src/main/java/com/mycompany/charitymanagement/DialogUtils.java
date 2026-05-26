@@ -3,6 +3,7 @@ package com.mycompany.charitymanagement;
 import javafx.geometry.Pos;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -15,11 +16,11 @@ public final class DialogUtils {
     }
 
     public static void info(String message) {
-        show("Thông báo", message, "dialog-info-title");
+        showAlert(Alert.AlertType.INFORMATION, "Thông báo", message);
     }
 
     public static void warning(String message) {
-        show("Cảnh báo", message, "dialog-warning-title");
+        showAlert(Alert.AlertType.WARNING, "Cảnh báo", message);
     }
 
     public static boolean confirm(String message) {
@@ -101,5 +102,20 @@ public final class DialogUtils {
         });
         Platform.runLater(closeButton::requestFocus);
         Platform.enterNestedEventLoop(overlay);
+    }
+
+    private static void showAlert(Alert.AlertType type, String title, String message) {
+        if (!Platform.isFxApplicationThread()) {
+            return;
+        }
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(title);
+        alert.setContentText(message);
+        Scene scene = App.getScene();
+        if (scene != null && scene.getWindow() != null) {
+            alert.initOwner(scene.getWindow());
+        }
+        alert.show();
     }
 }

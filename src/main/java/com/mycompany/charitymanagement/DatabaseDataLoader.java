@@ -37,16 +37,22 @@ public final class DatabaseDataLoader {
             javafx.application.Platform.runLater(() -> {
                 AppData.getAccounts().setAll(accounts);
                 AppData.getActivities().setAll(activities);
-                AppData.getParticipants().setAll(participants);
-                AppData.getSponsors().setAll(sponsors);
-                AppData.getDonations().setAll(donations);
-                AppData.getOperations().setAll(operations);
-                AppData.getContents().setAll(contents);
+                replaceWhenDatabaseHasData(AppData.getParticipants(), participants);
+                replaceWhenDatabaseHasData(AppData.getSponsors(), sponsors);
+                replaceWhenDatabaseHasData(AppData.getDonations(), donations);
+                replaceWhenDatabaseHasData(AppData.getOperations(), operations);
+                replaceWhenDatabaseHasData(AppData.getContents(), contents);
             });
             return true;
         } catch (SQLException ex) {
             System.err.println("Khong the nap du lieu Oracle (" + DatabaseConfig.connectionLabel() + "): " + ex.getMessage());
             return false;
+        }
+    }
+
+    private static <T> void replaceWhenDatabaseHasData(ObservableList<T> target, ObservableList<T> source) {
+        if (!source.isEmpty()) {
+            target.setAll(source);
         }
     }
 
@@ -183,18 +189,28 @@ public final class DatabaseDataLoader {
     private static void loadContents(Connection connection, ObservableList<SystemRecord> target) throws SQLException {
         try (Statement statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(
-                        "SELECT nhom_bang, ma_chinh, ma_lien_ket, tieu_de, noi_dung, "
-                        + "TO_CHAR(ngay_tao, 'DD/MM/YYYY') AS ngay_tao, trang_thai, ghi_chu "
-                        + "FROM noi_dung ORDER BY ma_chinh")) {
+                        "SELECT nd.nhom_bang, nd.ma_chinh, "
+                        + "CASE "
+                        + "WHEN nd.nhom_bang = 'TinTuc' AND nd.ma_lien_ket LIKE 'CD%' THEN nd.ma_lien_ket "
+                        + "WHEN nd.nhom_bang = 'BinhLuan' AND nd.ma_lien_ket LIKE 'TT%' THEN "
+                        + "(SELECT MAX(tt.ma_chien_dich) FROM tin_tuc tt WHERE tt.ma_tin_tuc = nd.ma_lien_ket) "
+                        + "ELSE NULL END AS ma_chien_dich, "
+                        + "nd.ma_lien_ket, nd.tieu_de, nd.noi_dung, "
+                        + "TO_CHAR(nd.ngay_tao, 'DD/MM/YYYY') AS ngay_tao, nd.trang_thai, nd.ghi_chu "
+                        + "FROM noi_dung nd ORDER BY nd.ma_chinh")) {
             while (rs.next()) {
                 target.add(new SystemRecord(
                         text(rs, "nhom_bang"),
                         text(rs, "ma_chinh"),
+                        text(rs, "ma_chien_dich"),
                         text(rs, "ma_lien_ket"),
                         text(rs, "tieu_de"),
                         text(rs, "noi_dung"),
                         text(rs, "ngay_tao"),
+                        "",
                         text(rs, "trang_thai"),
+                        "ADMIN",
+                        "",
                         text(rs, "ghi_chu")
                 ));
             }

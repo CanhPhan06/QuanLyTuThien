@@ -1,6 +1,8 @@
 package com.mycompany.charitymanagement;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import javafx.fxml.FXML;
@@ -8,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 public class MainLayoutController {
 
@@ -106,43 +109,43 @@ public class MainLayoutController {
     }
 
     @FXML
-    private void handleHome() throws IOException {
-        NavigationService.loadContentInLayout(NavigationService.VIEW_DASHBOARD);
+    private void handleHome() {
+        loadViewSafely(NavigationService.VIEW_DASHBOARD);
     }
 
     @FXML
-    private void handleActivities() throws IOException {
-        NavigationService.loadContentInLayout(NavigationService.VIEW_ACTIVITIES);
+    private void handleActivities() {
+        loadViewSafely(NavigationService.VIEW_ACTIVITIES);
     }
 
     @FXML
-    private void handleParticipants() throws IOException {
-        NavigationService.loadContentInLayout(NavigationService.VIEW_PARTICIPANTS);
+    private void handleParticipants() {
+        loadViewSafely(NavigationService.VIEW_PARTICIPANTS);
     }
 
     @FXML
-    private void handleSponsors() throws IOException {
-        NavigationService.loadContentInLayout(NavigationService.VIEW_SPONSORS);
+    private void handleSponsors() {
+        loadViewSafely(NavigationService.VIEW_SPONSORS);
     }
 
     @FXML
-    private void handleDonations() throws IOException {
-        NavigationService.loadContentInLayout(NavigationService.VIEW_DONATIONS);
+    private void handleDonations() {
+        loadViewSafely(NavigationService.VIEW_DONATIONS);
     }
 
     @FXML
-    private void handleOperations() throws IOException {
-        NavigationService.loadContentInLayout(NavigationService.VIEW_OPERATIONS);
+    private void handleOperations() {
+        loadViewSafely(NavigationService.VIEW_OPERATIONS);
     }
 
     @FXML
-    private void handleContent() throws IOException {
-        NavigationService.loadContentInLayout(NavigationService.VIEW_CONTENT);
+    private void handleContent() {
+        loadViewSafely(NavigationService.VIEW_CONTENT);
     }
 
     @FXML
-    private void handleReports() throws IOException {
-        NavigationService.loadContentInLayout(NavigationService.VIEW_REPORTS);
+    private void handleReports() {
+        loadViewSafely(NavigationService.VIEW_REPORTS);
     }
 
     @FXML
@@ -156,5 +159,45 @@ public class MainLayoutController {
             node.setVisible(visible);
             node.setManaged(visible);
         }
+    }
+
+    private void loadViewSafely(String viewName) {
+        try {
+            DetailDialogUtils.closeActiveOverlay();
+            NavigationService.loadContentInLayout(viewName);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showInlineLoadError(viewName, rootCauseMessage(ex));
+        }
+    }
+
+    private String rootCauseMessage(Throwable throwable) {
+        Throwable cause = throwable;
+        while (cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        String message = cause.getMessage();
+        if (message != null && !message.trim().isEmpty()) {
+            return message;
+        }
+        StringWriter writer = new StringWriter();
+        cause.printStackTrace(new PrintWriter(writer));
+        return writer.toString();
+    }
+
+    private void showInlineLoadError(String viewName, String message) {
+        Label title = new Label("Không mở được màn hình");
+        title.getStyleClass().add("section-title");
+        Label detail = new Label(message);
+        detail.getStyleClass().add("dashboard-main-text");
+        detail.setWrapText(true);
+        Button retryButton = new Button("Thử lại");
+        retryButton.getStyleClass().add("primary-button");
+        retryButton.setOnAction(event -> loadViewSafely(viewName));
+        VBox card = new VBox(14, title, detail, retryButton);
+        card.getStyleClass().add("dashboard-large-card");
+        card.setMaxWidth(720);
+        contentArea.getChildren().setAll(card);
+        updateActiveButton(viewName);
     }
 }
