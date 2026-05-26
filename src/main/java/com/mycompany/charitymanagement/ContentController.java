@@ -28,6 +28,7 @@ public class ContentController {
     private static final String ALL_CAMPAIGN_CONTENT = "Tin tức và bình luận";
     private static final String ALL_STATUSES = "Tất cả trạng thái";
     private static final int MAX_VISIBLE_COMMENTS = 8;
+    private static final int MAX_VISIBLE_ALL_COMMENTS = 12;
     private static final int MAX_VISIBLE_REPLIES = 4;
     private static final String REPLY_MARKER = "REPLY_TO=";
     private static final String REACTION_PREFIX = "REACTION_";
@@ -73,6 +74,8 @@ public class ContentController {
     private GridPane upcomingGrid;
     @FXML
     private VBox commentList;
+    @FXML
+    private VBox allCommentList;
     @FXML
     private VBox quickStatsBox;
     @FXML
@@ -847,6 +850,14 @@ public class ContentController {
     }
 
     private void renderComments() {
+        renderSelectedCampaignComments();
+        renderAllCampaignComments();
+    }
+
+    private void renderSelectedCampaignComments() {
+        if (commentList == null) {
+            return;
+        }
         commentList.getChildren().clear();
         ActivityModel campaign = selectedCampaign();
         String campaignId = campaign == null ? "" : campaign.getMaChienDich();
@@ -863,7 +874,7 @@ public class ContentController {
                     || !campaignId.equalsIgnoreCase(campaignId(record))) {
                 continue;
             }
-            commentList.getChildren().add(commentCard(record));
+            commentList.getChildren().add(commentCard(record, false));
             count++;
             if (count >= MAX_VISIBLE_COMMENTS) {
                 break;
@@ -878,13 +889,41 @@ public class ContentController {
         }
     }
 
-    private VBox commentCard(SystemRecord record) {
+    private void renderAllCampaignComments() {
+        if (allCommentList == null) {
+            return;
+        }
+        allCommentList.getChildren().clear();
+        int count = 0;
+        for (SystemRecord record : AppData.getContents()) {
+            if (!groupCode(record).contains("binhluan") || isReplyRecord(record)) {
+                continue;
+            }
+            allCommentList.getChildren().add(commentCard(record, true));
+            count++;
+            if (count >= MAX_VISIBLE_ALL_COMMENTS) {
+                break;
+            }
+        }
+        if (count == 0) {
+            Label empty = new Label("Chưa có bình luận nào từ các chiến dịch.");
+            empty.getStyleClass().add("muted-text");
+            allCommentList.getChildren().add(empty);
+        }
+    }
+
+    private VBox commentCard(SystemRecord record, boolean showCampaignContext) {
         VBox wrapper = new VBox(8);
         wrapper.getStyleClass().add("comment-card");
 
         HBox row = new HBox(10);
         row.getStyleClass().add("comment-row");
-        row.setOnMouseClicked(event -> showRecordDetail(record));
+        row.setOnMouseClicked(event -> {
+            if (showCampaignContext) {
+                selectCampaignById(campaignId(record), true);
+            }
+            showRecordDetail(record);
+        });
         Label avatar = new Label(initials(record.getTenLienKet()));
         avatar.getStyleClass().add("comment-avatar");
 
@@ -892,6 +931,8 @@ public class ContentController {
         HBox.setHgrow(body, javafx.scene.layout.Priority.ALWAYS);
         Label name = new Label(record.getTenLienKet() + "  ·  " + record.getNgay());
         name.getStyleClass().add("comment-author");
+        Label campaignLabel = new Label(campaignContextText(record));
+        campaignLabel.getStyleClass().add("comment-campaign-chip");
         Label content = new Label(record.getNoiDung());
         content.setWrapText(true);
         content.getStyleClass().add("comment-text");
@@ -928,7 +969,11 @@ public class ContentController {
         replies.getStyleClass().add("reply-list");
         renderReplies(record, replies);
 
-        body.getChildren().addAll(name, content, status, reactions, replies, replyBox);
+        body.getChildren().add(name);
+        if (showCampaignContext) {
+            body.getChildren().add(campaignLabel);
+        }
+        body.getChildren().addAll(content, status, reactions, replies, replyBox);
         row.getChildren().addAll(avatar, body);
         wrapper.getChildren().add(row);
         return wrapper;
@@ -1237,6 +1282,7 @@ public class ContentController {
     private long campaignCommentCount(String campaignId) {
         return AppData.getContents().stream()
                 .filter(record -> groupCode(record).contains("binhluan"))
+                .filter(record -> !isReplyRecord(record))
                 .filter(record -> campaignId.equalsIgnoreCase(campaignId(record)))
                 .count();
     }
@@ -1391,6 +1437,13 @@ public class ContentController {
         }
         ActivityModel campaign = AppData.findCampaign(id);
         return campaign == null ? id : campaign.getTenChienDich();
+    }
+
+    private String campaignContextText(SystemRecord record) {
+        String id = campaignId(record);
+        return id.isEmpty()
+                ? "Không gắn chiến dịch"
+                : id + " - " + campaignName(record);
     }
 
     private String resolveCampaignForRecord(String groupCode, String maLienKet, SystemRecord current) {

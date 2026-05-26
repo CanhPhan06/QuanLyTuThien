@@ -624,6 +624,15 @@
     -fx-text-fill: #102a43;
 }
 
+.comment-campaign-chip {
+    -fx-background-color: #e8f1ff;
+    -fx-background-radius: 8px;
+    -fx-padding: 3px 8px;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1768d1;
+}
+
 .comment-text {
     -fx-text-fill: #334155;
     -fx-font-size: 13px;
