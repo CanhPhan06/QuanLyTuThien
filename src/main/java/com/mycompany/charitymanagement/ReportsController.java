@@ -12,11 +12,13 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.util.StringConverter;
 
 public class ReportsController {
 
@@ -61,6 +63,7 @@ public class ReportsController {
     private void initialize() {
         allCampaignRows = loadCampaignReportRows();
         setupCampaignSelector();
+        setupIntegerVolunteerAxis();
         handleRefreshReport();
     }
 
@@ -157,6 +160,24 @@ public class ReportsController {
         cboCampaignReport.setItems(FXCollections.observableArrayList(items));
         cboCampaignReport.getSelectionModel().selectFirst();
         cboCampaignReport.valueProperty().addListener((obs, oldValue, newValue) -> handleRefreshReport());
+    }
+
+    private void setupIntegerVolunteerAxis() {
+        NumberAxis axis = (NumberAxis) chartVolunteers.getYAxis();
+        axis.setTickUnit(1);
+        axis.setMinorTickCount(0);
+        axis.setForceZeroInRange(true);
+        axis.setTickLabelFormatter(new StringConverter<Number>() {
+            @Override
+            public String toString(Number value) {
+                return String.valueOf(value.intValue());
+            }
+
+            @Override
+            public Number fromString(String value) {
+                return Integer.parseInt(value);
+            }
+        });
     }
 
     private String selectedCampaignId() {

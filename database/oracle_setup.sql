@@ -67,6 +67,12 @@ PROMPT ===== 06_VIEWS_FOR_JAVA.sql =====
 PROMPT ===== 07_FIX_VIETNAMESE_ENCODING.sql =====
 @@07_FIX_VIETNAMESE_ENCODING.sql
 
+PROMPT ===== 08_RECREATE_REPORT_FUNCTIONS.sql =====
+@@08_RECREATE_REPORT_FUNCTIONS.sql
+
+PROMPT ===== 09_REPORT_SAMPLE_DATA.sql =====
+@@09_REPORT_SAMPLE_DATA.sql
+
 COMMIT;
 
 PROMPT ============================================================
