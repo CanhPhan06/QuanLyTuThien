@@ -499,6 +499,7 @@
 
 .reports-body {
     -fx-padding: 20px;
+    -fx-max-width: 100000px;
 }
 
 .chart-card {
@@ -506,6 +507,20 @@
     -fx-background-radius: 8px;
     -fx-padding: 14px 16px;
     -fx-effect: dropshadow(gaussian, rgba(15,35,65,0.08), 9, 0, 0, 3);
+    -fx-min-width: 0;
+    -fx-max-width: 100000px;
+}
+
+.report-stat-card {
+    -fx-min-width: 0;
+    -fx-pref-width: 120px;
+    -fx-max-width: 100000px;
+}
+
+.report-money-card {
+    -fx-min-width: 0;
+    -fx-pref-width: 220px;
+    -fx-max-width: 100000px;
 }
 
 .chart {

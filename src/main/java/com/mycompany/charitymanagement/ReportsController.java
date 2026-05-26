@@ -8,16 +8,24 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 
 public class ReportsController {
 
+    private static final String ALL_CAMPAIGNS = "Tất cả chiến dịch";
+
+    @FXML
+    private ComboBox<String> cboCampaignReport;
+    @FXML
+    private Label lblReportScope;
     @FXML
     private Label lblTotalActivities;
     @FXML
@@ -47,41 +55,52 @@ public class ReportsController {
     @FXML
     private TextArea txtReport;
 
+    private List<CampaignReportRow> allCampaignRows = new ArrayList<>();
+
     @FXML
     private void initialize() {
+        allCampaignRows = loadCampaignReportRows();
+        setupCampaignSelector();
         handleRefreshReport();
     }
 
     @FXML
     private void handleRefreshReport() {
-        List<CampaignReportRow> campaignRows = loadCampaignReportRows();
+        allCampaignRows = loadCampaignReportRows();
+        if (cboCampaignReport.getItems().isEmpty()) {
+            setupCampaignSelector();
+        }
 
-        double sponsorAmount = sum(campaignRows, ValueType.SPONSOR);
-        double donationAmount = sum(campaignRows, ValueType.DONATION);
-        double expenseAmount = sum(campaignRows, ValueType.EXPENSE);
+        String selectedCampaignId = selectedCampaignId();
+        List<CampaignReportRow> visibleRows = filterRowsByCampaign(allCampaignRows, selectedCampaignId);
+
+        double sponsorAmount = sum(visibleRows, ValueType.SPONSOR);
+        double donationAmount = sum(visibleRows, ValueType.DONATION);
+        double expenseAmount = sum(visibleRows, ValueType.EXPENSE);
         double totalFund = sponsorAmount + donationAmount;
 
-        lblTotalActivities.setText(String.valueOf(AppData.getActivities().size()));
-        lblTotalParticipants.setText(String.valueOf(AppData.getParticipants().size()));
-        lblTotalSponsors.setText(String.valueOf(AppData.getSponsors().size()));
-        lblTotalDonations.setText(String.valueOf(AppData.getDonations().size()));
+        lblReportScope.setText(scopeTitle(selectedCampaignId));
+        lblTotalActivities.setText(String.valueOf(visibleRows.size()));
+        lblTotalParticipants.setText(String.valueOf(countParticipants(selectedCampaignId, visibleRows)));
+        lblTotalSponsors.setText(String.valueOf(countSponsors(selectedCampaignId)));
+        lblTotalDonations.setText(String.valueOf(countDonations(selectedCampaignId)));
         lblSponsorAmount.setText(FormatUtils.money(sponsorAmount));
         lblDonationAmount.setText(FormatUtils.money(donationAmount));
         lblTotalFund.setText(FormatUtils.money(totalFund));
-        lblOperationCount.setText(String.valueOf(AppData.getOperations().size()));
-        lblContentCount.setText(String.valueOf(AppData.getContents().size()));
+        lblOperationCount.setText(String.valueOf(countOperationsByCampaign(selectedCampaignId)));
+        lblContentCount.setText(String.valueOf(countContentsByCampaign(selectedCampaignId)));
 
-        updateFinanceChart(campaignRows);
+        updateFinanceChart(visibleRows, selectedCampaignId);
         updateFundingMixChart(sponsorAmount, donationAmount, expenseAmount);
-        updateVolunteerChart(campaignRows);
-        updateOperationStatusChart();
+        updateVolunteerChart(visibleRows);
+        updateOperationStatusChart(selectedCampaignId);
 
-        txtReport.setText(buildReport(campaignRows, sponsorAmount, donationAmount, expenseAmount, totalFund));
+        txtReport.setText(buildReport(visibleRows, selectedCampaignId, sponsorAmount, donationAmount, expenseAmount, totalFund));
     }
 
     @FXML
     private void handleExportReport() {
-        ExportUtils.exportTextToCsv("Xuất báo cáo tổng hợp", "bao-cao-tong-hop.pdf", txtReport.getText());
+        ExportUtils.exportTextToCsv("Xuất báo cáo thống kê", "bao-cao-thong-ke.pdf", txtReport.getText());
     }
 
     @FXML
@@ -129,6 +148,46 @@ public class ReportsController {
         NavigationService.navigateTo(NavigationService.VIEW_LOGIN);
     }
 
+    private void setupCampaignSelector() {
+        List<String> items = new ArrayList<>();
+        items.add(ALL_CAMPAIGNS);
+        for (CampaignReportRow row : allCampaignRows) {
+            items.add(row.campaignId + " - " + row.campaignName);
+        }
+        cboCampaignReport.setItems(FXCollections.observableArrayList(items));
+        cboCampaignReport.getSelectionModel().selectFirst();
+        cboCampaignReport.valueProperty().addListener((obs, oldValue, newValue) -> handleRefreshReport());
+    }
+
+    private String selectedCampaignId() {
+        String value = cboCampaignReport.getValue();
+        if (value == null || value.equals(ALL_CAMPAIGNS)) {
+            return "";
+        }
+        int separator = value.indexOf(" - ");
+        return separator > 0 ? value.substring(0, separator) : value;
+    }
+
+    private String scopeTitle(String campaignId) {
+        if (campaignId == null || campaignId.isBlank()) {
+            return "Toàn bộ chiến dịch";
+        }
+        return allCampaignRows.stream()
+                .filter(row -> row.campaignId.equalsIgnoreCase(campaignId))
+                .map(row -> row.campaignId + " - " + row.campaignName)
+                .findFirst()
+                .orElse(campaignId);
+    }
+
+    private List<CampaignReportRow> filterRowsByCampaign(List<CampaignReportRow> rows, String campaignId) {
+        if (campaignId == null || campaignId.isBlank()) {
+            return rows;
+        }
+        return rows.stream()
+                .filter(row -> row.campaignId.equalsIgnoreCase(campaignId))
+                .collect(Collectors.toList());
+    }
+
     private List<CampaignReportRow> loadCampaignReportRows() {
         List<CampaignReportRow> databaseRows = loadCampaignReportRowsFromDatabase();
         if (!databaseRows.isEmpty()) {
@@ -147,8 +206,8 @@ public class ReportsController {
                 ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
                 rows.add(new CampaignReportRow(
-                        rs.getString("MA_CHIEN_DICH"),
-                        rs.getString("TEN_CHIEN_DICH"),
+                        UiText.clean(rs.getString("MA_CHIEN_DICH")),
+                        UiText.clean(rs.getString("TEN_CHIEN_DICH")),
                         rs.getDouble("TONG_QUYEN_GOP_TIEN"),
                         rs.getDouble("TONG_TAI_TRO"),
                         rs.getDouble("TONG_CHI_TIEU"),
@@ -190,7 +249,7 @@ public class ReportsController {
         return rows;
     }
 
-    private void updateFinanceChart(List<CampaignReportRow> rows) {
+    private void updateFinanceChart(List<CampaignReportRow> rows, String selectedCampaignId) {
         XYChart.Series<String, Number> incomeSeries = new XYChart.Series<>();
         incomeSeries.setName("Nguồn thu");
         XYChart.Series<String, Number> expenseSeries = new XYChart.Series<>();
@@ -199,7 +258,7 @@ public class ReportsController {
         balanceSeries.setName("Còn lại");
 
         for (CampaignReportRow row : rows) {
-            String label = row.campaignId;
+            String label = selectedCampaignId == null || selectedCampaignId.isBlank() ? row.campaignId : "Chiến dịch";
             double income = row.totalIncome();
             incomeSeries.getData().add(new XYChart.Data<>(label, income));
             expenseSeries.getData().add(new XYChart.Data<>(label, row.expenseAmount));
@@ -228,11 +287,12 @@ public class ReportsController {
         chartVolunteers.getData().setAll(volunteerSeries);
     }
 
-    private void updateOperationStatusChart() {
-        int pending = countOperations("Chờ duyệt", "Đang xét", "Đang phân công", "Chờ xác nhận");
-        int completed = countOperations("Đã duyệt", "Đã phân công", "Có mặt", "Đã xác nhận", "Đã xuất", "Hoàn thành");
-        int rejected = countOperations("Từ chối", "Hủy");
-        int other = Math.max(0, AppData.getOperations().size() - pending - completed - rejected);
+    private void updateOperationStatusChart(String campaignId) {
+        int pending = countOperations(campaignId, "Chờ duyệt", "Đang xét", "Đang phân công", "Chờ xác nhận");
+        int completed = countOperations(campaignId, "Đã duyệt", "Đã phân công", "Có mặt", "Đã xác nhận", "Đã xuất", "Hoàn thành");
+        int rejected = countOperations(campaignId, "Từ chối", "Hủy");
+        int total = countOperationsByCampaign(campaignId);
+        int other = Math.max(0, total - pending - completed - rejected);
 
         chartOperationStatus.setData(FXCollections.observableArrayList(
                 new PieChart.Data("Chờ xử lý: " + pending, pending),
@@ -242,25 +302,69 @@ public class ReportsController {
         ));
     }
 
-    private int countOperations(String... statuses) {
+    private int countOperations(String campaignId, String... statuses) {
         List<String> statusList = Arrays.asList(statuses);
         return (int) AppData.getOperations().stream()
+                .filter(item -> isCampaignMatch(campaignId, item.getMaChienDich()))
                 .filter(item -> statusList.stream().anyMatch(status -> status.equalsIgnoreCase(item.getTrangThai())))
                 .count();
     }
 
-    private String buildReport(List<CampaignReportRow> rows, double sponsorAmount,
+    private int countOperationsByCampaign(String campaignId) {
+        return (int) AppData.getOperations().stream()
+                .filter(item -> isCampaignMatch(campaignId, item.getMaChienDich()))
+                .count();
+    }
+
+    private int countContentsByCampaign(String campaignId) {
+        if (campaignId == null || campaignId.isBlank()) {
+            return AppData.getContents().size();
+        }
+        return (int) AppData.getContents().stream()
+                .filter(item -> campaignId.equalsIgnoreCase(item.getMaLienKet())
+                || campaignId.equalsIgnoreCase(item.getMaChienDich()))
+                .count();
+    }
+
+    private int countParticipants(String campaignId, List<CampaignReportRow> visibleRows) {
+        if (campaignId == null || campaignId.isBlank()) {
+            return AppData.getParticipants().size();
+        }
+        return visibleRows.isEmpty() ? 0 : visibleRows.get(0).volunteerCount;
+    }
+
+    private int countSponsors(String campaignId) {
+        return (int) AppData.getSponsors().stream()
+                .filter(item -> isCampaignMatch(campaignId, item.getMaChienDich()))
+                .count();
+    }
+
+    private int countDonations(String campaignId) {
+        return (int) AppData.getDonations().stream()
+                .filter(item -> isCampaignMatch(campaignId, item.getHoatDong()))
+                .count();
+    }
+
+    private boolean isCampaignMatch(String selectedCampaignId, String rowCampaignId) {
+        return selectedCampaignId == null || selectedCampaignId.isBlank()
+                || selectedCampaignId.equalsIgnoreCase(rowCampaignId);
+    }
+
+    private String buildReport(List<CampaignReportRow> rows, String campaignId, double sponsorAmount,
             double donationAmount, double expenseAmount, double totalFund) {
         StringBuilder builder = new StringBuilder();
         double balance = totalFund - expenseAmount;
 
-        builder.append("BÁO CÁO TỔNG HỢP\n\n");
-        builder.append("Chiến dịch: ").append(AppData.getActivities().size()).append('\n');
-        builder.append("Sinh viên/TNV tham gia: ").append(AppData.getParticipants().size()).append('\n');
-        builder.append("Đối tác tài trợ: ").append(AppData.getSponsors().size()).append('\n');
-        builder.append("Phiếu/khoản quyên góp: ").append(AppData.getDonations().size()).append('\n');
-        builder.append("Bản ghi vận hành: ").append(AppData.getOperations().size()).append('\n');
-        builder.append("Bản ghi nội dung - hệ thống: ").append(AppData.getContents().size()).append("\n\n");
+        builder.append(campaignId == null || campaignId.isBlank()
+                ? "BÁO CÁO TOÀN BỘ CHIẾN DỊCH\n\n"
+                : "BÁO CÁO CHIẾN DỊCH\n\n");
+        builder.append("Phạm vi: ").append(scopeTitle(campaignId)).append('\n');
+        builder.append("Số chiến dịch: ").append(rows.size()).append('\n');
+        builder.append("Sinh viên/TNV tham gia: ").append(countParticipants(campaignId, rows)).append('\n');
+        builder.append("Nhà tài trợ liên quan: ").append(countSponsors(campaignId)).append('\n');
+        builder.append("Khoản/phiếu quyên góp: ").append(countDonations(campaignId)).append('\n');
+        builder.append("Bản ghi vận hành: ").append(countOperationsByCampaign(campaignId)).append('\n');
+        builder.append("Bản ghi nội dung: ").append(countContentsByCampaign(campaignId)).append("\n\n");
         builder.append("Tổng tiền tài trợ: ").append(FormatUtils.money(sponsorAmount)).append('\n');
         builder.append("Tổng quyên góp bằng tiền: ").append(FormatUtils.money(donationAmount)).append('\n');
         builder.append("Tổng nguồn thu ghi nhận: ").append(FormatUtils.money(totalFund)).append('\n');

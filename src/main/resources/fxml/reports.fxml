@@ -5,78 +5,110 @@
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.mycompany.charitymanagement.ReportsController"
       styleClass="main-content">
 
-    <ScrollPane fitToWidth="true" styleClass="content-scroll" VBox.vgrow="ALWAYS">
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
         <VBox spacing="16" styleClass="reports-body">
             <Label text="THỐNG KÊ - BÁO CÁO" styleClass="page-title"/>
 
-            <HBox spacing="14">
-                <VBox styleClass="stat-card">
+            <GridPane hgap="12" vgap="10" styleClass="filter-card">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="28" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="42" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="15" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="15" hgrow="ALWAYS"/>
+                </columnConstraints>
+                <VBox spacing="5" GridPane.columnIndex="0">
+                    <Label text="Phạm vi báo cáo" styleClass="muted-text"/>
+                    <ComboBox fx:id="cboCampaignReport" maxWidth="Infinity"/>
+                </VBox>
+                <VBox spacing="5" GridPane.columnIndex="1">
+                    <Label text="Chiến dịch đang xem" styleClass="muted-text"/>
+                    <Label fx:id="lblReportScope" text="Toàn bộ chiến dịch" styleClass="section-title" wrapText="true"/>
+                </VBox>
+                <Button text="Làm mới" onAction="#handleRefreshReport" styleClass="primary-button"
+                        maxWidth="Infinity" GridPane.columnIndex="2" GridPane.valignment="BOTTOM"/>
+                <Button text="Xuất file" onAction="#handleExportReport" styleClass="quick-button"
+                        maxWidth="Infinity" GridPane.columnIndex="3" GridPane.valignment="BOTTOM"/>
+            </GridPane>
+
+            <GridPane hgap="12" vgap="12">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="16.66" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="16.70" hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="0">
                     <Label fx:id="lblTotalActivities" text="0" styleClass="stat-number"/>
-                    <Label text="Chiến dịch"/>
+                    <Label text="Chiến dịch" wrapText="true"/>
                 </VBox>
-                <VBox styleClass="stat-card">
+                <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="1">
                     <Label fx:id="lblTotalParticipants" text="0" styleClass="stat-number red"/>
-                    <Label text="Sinh viên/TNV"/>
+                    <Label text="Sinh viên/TNV" wrapText="true"/>
                 </VBox>
-                <VBox styleClass="stat-card">
+                <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="2">
                     <Label fx:id="lblTotalSponsors" text="0" styleClass="stat-number green"/>
-                    <Label text="Đối tác"/>
+                    <Label text="Nhà tài trợ" wrapText="true"/>
                 </VBox>
-                <VBox styleClass="stat-card">
+                <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="3">
                     <Label fx:id="lblTotalDonations" text="0" styleClass="stat-number purple"/>
-                    <Label text="Quyên góp"/>
+                    <Label text="Quyên góp" wrapText="true"/>
                 </VBox>
-                <VBox styleClass="stat-card">
+                <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="4">
                     <Label fx:id="lblOperationCount" text="0" styleClass="stat-number orange"/>
-                    <Label text="Vận hành"/>
+                    <Label text="Vận hành" wrapText="true"/>
                 </VBox>
-                <VBox styleClass="stat-card">
+                <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="5">
                     <Label fx:id="lblContentCount" text="0" styleClass="stat-number green"/>
-                    <Label text="Nội dung"/>
+                    <Label text="Nội dung" wrapText="true"/>
                 </VBox>
-            </HBox>
+            </GridPane>
 
-            <HBox spacing="14">
-                <VBox styleClass="stat-card wide-stat-card">
+            <GridPane hgap="12" vgap="12">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="33.34" hgrow="ALWAYS"/>
+                </columnConstraints>
+                <VBox styleClass="stat-card report-money-card" maxWidth="Infinity" GridPane.columnIndex="0">
                     <Label text="Tổng tài trợ" styleClass="muted-text"/>
-                    <Label fx:id="lblSponsorAmount" text="0 VNĐ" styleClass="stat-number green"/>
+                    <Label fx:id="lblSponsorAmount" text="0 VNĐ" styleClass="stat-number green" wrapText="true"/>
                 </VBox>
-                <VBox styleClass="stat-card wide-stat-card">
+                <VBox styleClass="stat-card report-money-card" maxWidth="Infinity" GridPane.columnIndex="1">
                     <Label text="Tổng quyên góp tiền" styleClass="muted-text"/>
-                    <Label fx:id="lblDonationAmount" text="0 VNĐ" styleClass="stat-number purple"/>
+                    <Label fx:id="lblDonationAmount" text="0 VNĐ" styleClass="stat-number purple" wrapText="true"/>
                 </VBox>
-                <VBox styleClass="stat-card wide-stat-card">
+                <VBox styleClass="stat-card report-money-card" maxWidth="Infinity" GridPane.columnIndex="2">
                     <Label text="Tổng nguồn lực tiền tệ" styleClass="muted-text"/>
-                    <Label fx:id="lblTotalFund" text="0 VNĐ" styleClass="stat-number"/>
+                    <Label fx:id="lblTotalFund" text="0 VNĐ" styleClass="stat-number" wrapText="true"/>
                 </VBox>
-            </HBox>
-
-            <HBox spacing="12" styleClass="action-bar">
-                <Button text="Làm mới báo cáo" onAction="#handleRefreshReport" styleClass="primary-button"/>
-                <Button text="Xuất file" onAction="#handleExportReport" styleClass="quick-button"/>
-            </HBox>
+            </GridPane>
 
             <GridPane hgap="14" vgap="14">
                 <columnConstraints>
-                    <ColumnConstraints percentWidth="50"/>
-                    <ColumnConstraints percentWidth="50"/>
+                    <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
                 </columnConstraints>
 
-                <VBox spacing="10" styleClass="chart-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                    <Label text="Tình hình thu - chi theo chiến dịch" styleClass="section-title"/>
-                    <BarChart fx:id="chartFinance" animated="false" legendVisible="true" prefHeight="315">
+                <VBox spacing="10" styleClass="chart-card" maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="Tình hình thu - chi" styleClass="section-title"/>
+                    <BarChart fx:id="chartFinance" animated="false" legendVisible="true" prefHeight="300" VBox.vgrow="ALWAYS">
                         <xAxis>
                             <CategoryAxis label="Chiến dịch"/>
                         </xAxis>
@@ -86,14 +118,14 @@
                     </BarChart>
                 </VBox>
 
-                <VBox spacing="10" styleClass="chart-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <VBox spacing="10" styleClass="chart-card" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0">
                     <Label text="Cơ cấu tài chính" styleClass="section-title"/>
-                    <PieChart fx:id="chartFundingMix" labelsVisible="true" legendVisible="true" prefHeight="315"/>
+                    <PieChart fx:id="chartFundingMix" labelsVisible="true" legendVisible="true" prefHeight="300" VBox.vgrow="ALWAYS"/>
                 </VBox>
 
-                <VBox spacing="10" styleClass="chart-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <VBox spacing="10" styleClass="chart-card" maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="1">
                     <Label text="Tình nguyện viên theo chiến dịch" styleClass="section-title"/>
-                    <BarChart fx:id="chartVolunteers" animated="false" legendVisible="false" prefHeight="295">
+                    <BarChart fx:id="chartVolunteers" animated="false" legendVisible="false" prefHeight="280" VBox.vgrow="ALWAYS">
                         <xAxis>
                             <CategoryAxis label="Chiến dịch"/>
                         </xAxis>
@@ -103,13 +135,13 @@
                     </BarChart>
                 </VBox>
 
-                <VBox spacing="10" styleClass="chart-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <VBox spacing="10" styleClass="chart-card" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <Label text="Trạng thái vận hành" styleClass="section-title"/>
-                    <PieChart fx:id="chartOperationStatus" labelsVisible="true" legendVisible="true" prefHeight="295"/>
+                    <PieChart fx:id="chartOperationStatus" labelsVisible="true" legendVisible="true" prefHeight="280" VBox.vgrow="ALWAYS"/>
                 </VBox>
             </GridPane>
 
-            <TextArea fx:id="txtReport" editable="false" wrapText="true" styleClass="report-area" prefRowCount="14"/>
+            <TextArea fx:id="txtReport" editable="false" wrapText="true" styleClass="report-area" prefRowCount="13"/>
         </VBox>
     </ScrollPane>
 </VBox>
