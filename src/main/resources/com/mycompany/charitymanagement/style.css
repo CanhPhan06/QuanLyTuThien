@@ -1,5 +1,5 @@
 .root {
-    -fx-font-family: "Segoe UI";
+    -fx-font-family: "Segoe UI", "Arial", "Tahoma";
     -fx-background-color: #f6f8fb;
 }
 
@@ -478,9 +478,37 @@
 }
 
 .report-area {
-    -fx-font-family: "Consolas";
+    -fx-font-family: "Segoe UI", "Arial", "Tahoma";
     -fx-font-size: 13px;
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
     -fx-border-color: #d0d7e2;
+}
+
+.reports-body {
+    -fx-padding: 20px;
+}
+
+.chart-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 14px 16px;
+    -fx-effect: dropshadow(gaussian, rgba(15,35,65,0.08), 9, 0, 0, 3);
+}
+
+.chart {
+    -fx-font-family: "Segoe UI", "Arial", "Tahoma";
+    -fx-font-size: 12px;
+}
+
+.chart-title {
+    -fx-text-fill: #102a43;
+}
+
+.axis-label {
+    -fx-text-fill: #334155;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
 }
