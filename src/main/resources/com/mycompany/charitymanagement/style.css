@@ -3,6 +3,18 @@
     -fx-background-color: #f6f8fb;
 }
 
+.label,
+.button,
+.text-field,
+.text-area,
+.combo-box,
+.table-view,
+.chart,
+.axis,
+.chart-legend {
+    -fx-font-family: "Segoe UI", "Arial", "Tahoma";
+}
+
 .login-container {
     -fx-background-color: #f6f8fb;
 }
