@@ -2,6 +2,7 @@ package com.mycompany.charitymanagement;
 
 import java.io.IOException;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -12,9 +13,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class VolunteerController {
+
+    private static final String REPLY_MARKER = "REPLY_TO=";
 
     @FXML
     private Label lblWelcome;
@@ -33,11 +37,17 @@ public class VolunteerController {
     @FXML
     private Label lblSelectedPlace;
     @FXML
+    private Label lblSelectedCommentThread;
+    @FXML
     private ComboBox<String> cboCampaign;
     @FXML
     private ComboBox<String> cboProofType;
     @FXML
     private TextField txtProofNote;
+    @FXML
+    private TextField txtCampaignComment;
+    @FXML
+    private VBox campaignCommentList;
     @FXML
     private VBox overviewSection;
     @FXML
@@ -145,6 +155,10 @@ public class VolunteerController {
         });
         cboCampaign.valueProperty().addListener((observable, oldValue, value) ->
                 updateSelectedCampaign(AppData.findCampaign(extractCampaignId(value))));
+        AppData.getContents().addListener((ListChangeListener<SystemRecord>) change -> {
+            refreshView();
+            renderCampaignComments();
+        });
 
         if (!cboCampaign.getItems().isEmpty()) {
             cboCampaign.setValue(cboCampaign.getItems().get(0));
@@ -181,7 +195,7 @@ public class VolunteerController {
 
     @FXML
     private void handleRegisterCampaign() {
-        ActivityModel selected = AppData.findCampaign(extractCampaignId(cboCampaign.getValue()));
+        ActivityModel selected = selectedCampaign();
         String error = BusinessRules.validateVolunteerRegistration(currentUser, selected);
         if (error != null) {
             DialogUtils.warning(error);
@@ -195,6 +209,38 @@ public class VolunteerController {
         }
         refreshView();
         DialogUtils.info("Đã gửi đăng ký tham gia chiến dịch.");
+    }
+
+    @FXML
+    private void handleSendCampaignComment() {
+        ActivityModel campaign = selectedCampaign();
+        if (campaign == null) {
+            DialogUtils.warning("Vui lòng chọn chiến dịch trước khi bình luận.");
+            return;
+        }
+        String text = value(txtCampaignComment);
+        if (text.isEmpty()) {
+            DialogUtils.warning("Vui lòng nhập nội dung bình luận.");
+            return;
+        }
+
+        AppData.getContents().add(new SystemRecord(
+                "BinhLuan",
+                AppData.nextContentId("BL"),
+                campaign.getMaChienDich(),
+                currentUser.getUsername(),
+                "Bình luận của tình nguyện viên",
+                text,
+                AppData.todayText(),
+                "",
+                "Chờ duyệt",
+                currentUser.getUsername(),
+                "ADMIN",
+                "Tạo từ cổng tình nguyện viên"
+        ));
+        txtCampaignComment.clear();
+        renderCampaignComments();
+        DialogUtils.info("Đã gửi bình luận. Admin sẽ thấy trong phần Nội dung.");
     }
 
     @FXML
@@ -310,11 +356,15 @@ public class VolunteerController {
             lblSelectedCampaign.setText("Chưa chọn chiến dịch");
             lblSelectedTime.setText("-");
             lblSelectedPlace.setText("-");
+            setLabelText(lblSelectedCommentThread, "Chọn chiến dịch để xem bình luận");
+            renderCampaignComments();
             return;
         }
         lblSelectedCampaign.setText(campaign.getTenChienDich());
         lblSelectedTime.setText(campaign.getNgayBatDau() + " - " + campaign.getNgayKetThuc());
         lblSelectedPlace.setText(campaign.getDiaDiem());
+        setLabelText(lblSelectedCommentThread, campaign.getMaChienDich() + " - " + campaign.getTenChienDich());
+        renderCampaignComments();
     }
 
     private void showCampaignDetail(ActivityModel campaign) {
@@ -335,5 +385,162 @@ public class VolunteerController {
                 .filter(item -> item.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private ActivityModel selectedCampaign() {
+        return AppData.findCampaign(extractCampaignId(cboCampaign.getValue()));
+    }
+
+    private void renderCampaignComments() {
+        if (campaignCommentList == null) {
+            return;
+        }
+        campaignCommentList.getChildren().clear();
+        ActivityModel campaign = selectedCampaign();
+        if (campaign == null) {
+            Label empty = new Label("Chưa có chiến dịch để hiển thị bình luận.");
+            empty.getStyleClass().add("muted-text");
+            campaignCommentList.getChildren().add(empty);
+            return;
+        }
+
+        int count = 0;
+        for (SystemRecord record : AppData.getContents()) {
+            if (!groupCode(record).contains("binhluan")
+                    || isReplyRecord(record)
+                    || !campaign.getMaChienDich().equalsIgnoreCase(campaignId(record))) {
+                continue;
+            }
+            campaignCommentList.getChildren().add(commentCard(record));
+            count++;
+        }
+        if (count == 0) {
+            Label empty = new Label("Chưa có bình luận cho chiến dịch này.");
+            empty.getStyleClass().add("muted-text");
+            campaignCommentList.getChildren().add(empty);
+        }
+    }
+
+    private VBox commentCard(SystemRecord record) {
+        VBox wrapper = new VBox(6);
+        wrapper.getStyleClass().add("comment-card");
+
+        HBox row = new HBox(10);
+        row.getStyleClass().add("comment-row");
+        Label avatar = new Label(initials(record.getTenLienKet()));
+        avatar.getStyleClass().add("comment-avatar");
+
+        VBox body = new VBox(2);
+        HBox.setHgrow(body, javafx.scene.layout.Priority.ALWAYS);
+        Label author = new Label(record.getTenLienKet() + "  ·  " + record.getNgay());
+        author.getStyleClass().add("comment-author");
+        Label content = new Label(record.getNoiDung());
+        content.setWrapText(true);
+        content.getStyleClass().add("comment-text");
+        Label status = new Label(record.getTrangThai());
+        status.getStyleClass().add("muted-text");
+
+        VBox replies = new VBox(6);
+        replies.getStyleClass().add("reply-list");
+        renderReplies(record, replies);
+
+        body.getChildren().addAll(author, content, status, replies);
+        row.getChildren().addAll(avatar, body);
+        wrapper.getChildren().add(row);
+        return wrapper;
+    }
+
+    private void renderReplies(SystemRecord parent, VBox replies) {
+        for (SystemRecord record : AppData.getContents()) {
+            if (!groupCode(record).contains("binhluan") || !isReplyTo(record, parent)) {
+                continue;
+            }
+            replies.getChildren().add(replyRow(record));
+        }
+    }
+
+    private HBox replyRow(SystemRecord reply) {
+        HBox row = new HBox(8);
+        row.getStyleClass().add("reply-row");
+
+        Label avatar = new Label(initials(reply.getTenLienKet()));
+        avatar.getStyleClass().add("reply-avatar");
+
+        VBox body = new VBox(2);
+        HBox.setHgrow(body, javafx.scene.layout.Priority.ALWAYS);
+        Label author = new Label(reply.getTenLienKet() + "  ·  " + reply.getNgay());
+        author.getStyleClass().add("comment-author");
+        Label content = new Label(reply.getNoiDung());
+        content.setWrapText(true);
+        content.getStyleClass().add("comment-text");
+        body.getChildren().addAll(author, content);
+
+        row.getChildren().addAll(avatar, body);
+        return row;
+    }
+
+    private boolean isReplyRecord(SystemRecord record) {
+        return replyParentId(record).length() > 0;
+    }
+
+    private boolean isReplyTo(SystemRecord reply, SystemRecord parent) {
+        return parent.getMaChinh().equalsIgnoreCase(replyParentId(reply));
+    }
+
+    private String replyParentId(SystemRecord record) {
+        String note = record.getGhiChu() == null ? "" : record.getGhiChu();
+        int start = note.indexOf(REPLY_MARKER);
+        if (start < 0) {
+            return "";
+        }
+        int idStart = start + REPLY_MARKER.length();
+        int idEnd = idStart;
+        while (idEnd < note.length() && Character.isLetterOrDigit(note.charAt(idEnd))) {
+            idEnd++;
+        }
+        return note.substring(idStart, idEnd);
+    }
+
+    private String campaignId(SystemRecord record) {
+        if (record.getMaChienDich() != null && !record.getMaChienDich().isBlank()) {
+            return record.getMaChienDich();
+        }
+        if (record.getMaLienKet() != null && record.getMaLienKet().toUpperCase().startsWith("CD")) {
+            return record.getMaLienKet();
+        }
+        return "";
+    }
+
+    private String groupCode(SystemRecord record) {
+        return record.getNhomBang() == null ? "" : normalized(record.getNhomBang());
+    }
+
+    private String initials(String value) {
+        if (value == null || value.isBlank()) {
+            return "?";
+        }
+        String[] parts = value.trim().split("\\s+");
+        String first = parts[0].substring(0, 1);
+        String last = parts.length == 1 ? "" : parts[parts.length - 1].substring(0, 1);
+        return (first + last).toUpperCase();
+    }
+
+    private String normalized(String value) {
+        if (value == null) {
+            return "";
+        }
+        return java.text.Normalizer.normalize(value.toLowerCase(), java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replace("đ", "d");
+    }
+
+    private String value(TextField textField) {
+        return textField == null || textField.getText() == null ? "" : textField.getText().trim();
+    }
+
+    private void setLabelText(Label label, String text) {
+        if (label != null) {
+            label.setText(text);
+        }
     }
 }

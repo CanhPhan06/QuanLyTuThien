@@ -71,10 +71,25 @@
                     </VBox>
                 </GridPane>
                 <HBox spacing="12" styleClass="action-bar">
-                    <Button text="Đăng ký chiến dịch" onAction="#handleRegisterCampaign" styleClass="primary-button"/>
+                    <Button text="Tham gia chiến dịch" onAction="#handleRegisterCampaign" styleClass="primary-button"/>
                     <Button text="Xem chi tiết chiến dịch" onAction="#handleViewCampaignDetail" styleClass="quick-button"/>
                     <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
                 </HBox>
+                <VBox spacing="10" styleClass="comment-panel">
+                    <VBox spacing="3">
+                        <Label text="Bình luận chiến dịch" styleClass="portal-section-title"/>
+                        <Label fx:id="lblSelectedCommentThread" text="Chọn chiến dịch để xem bình luận" styleClass="muted-text"/>
+                    </VBox>
+                    <ScrollPane fitToWidth="true" pannable="true" hbarPolicy="NEVER" prefHeight="220" styleClass="content-scroll comment-scroll">
+                        <content>
+                            <VBox fx:id="campaignCommentList" spacing="10"/>
+                        </content>
+                    </ScrollPane>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <TextField fx:id="txtCampaignComment" promptText="Nhập bình luận cho chiến dịch..." styleClass="input-field comment-input" HBox.hgrow="ALWAYS"/>
+                        <Button text="Gửi bình luận" onAction="#handleSendCampaignComment" styleClass="primary-button"/>
+                    </HBox>
+                </VBox>
                 <TableView fx:id="tableCampaigns" styleClass="activity-table" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colMaChienDich" text="Mã" prefWidth="90"/>
