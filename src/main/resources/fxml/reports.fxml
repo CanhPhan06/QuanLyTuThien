@@ -108,7 +108,7 @@
 
                 <VBox spacing="10" styleClass="chart-card" maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="0">
                     <Label text="Tình hình thu - chi" styleClass="section-title"/>
-                    <BarChart fx:id="chartFinance" animated="false" legendVisible="true" prefHeight="300" VBox.vgrow="ALWAYS">
+                    <BarChart fx:id="chartFinance" animated="false" legendVisible="true" prefHeight="340" VBox.vgrow="ALWAYS">
                         <xAxis>
                             <CategoryAxis label="Chiến dịch"/>
                         </xAxis>
@@ -120,12 +120,12 @@
 
                 <VBox spacing="10" styleClass="chart-card" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0">
                     <Label text="Cơ cấu tài chính" styleClass="section-title"/>
-                    <PieChart fx:id="chartFundingMix" labelsVisible="true" legendVisible="true" prefHeight="300" VBox.vgrow="ALWAYS"/>
+                    <PieChart fx:id="chartFundingMix" labelsVisible="false" legendVisible="true" prefHeight="360" VBox.vgrow="ALWAYS"/>
                 </VBox>
 
                 <VBox spacing="10" styleClass="chart-card" maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                    <Label text="Tình nguyện viên theo chiến dịch" styleClass="section-title"/>
-                    <BarChart fx:id="chartVolunteers" animated="false" legendVisible="false" prefHeight="280" VBox.vgrow="ALWAYS">
+                    <Label fx:id="lblVolunteerChartTitle" text="Tình nguyện viên theo chiến dịch" styleClass="section-title"/>
+                    <BarChart fx:id="chartVolunteers" animated="false" legendVisible="true" prefHeight="360" VBox.vgrow="ALWAYS">
                         <xAxis>
                             <CategoryAxis label="Chiến dịch"/>
                         </xAxis>
@@ -137,7 +137,7 @@
 
                 <VBox spacing="10" styleClass="chart-card" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <Label text="Trạng thái vận hành" styleClass="section-title"/>
-                    <PieChart fx:id="chartOperationStatus" labelsVisible="true" legendVisible="true" prefHeight="280" VBox.vgrow="ALWAYS"/>
+                    <PieChart fx:id="chartOperationStatus" labelsVisible="true" legendVisible="true" prefHeight="320" VBox.vgrow="ALWAYS"/>
                 </VBox>
             </GridPane>
 

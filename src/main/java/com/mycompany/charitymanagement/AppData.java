@@ -115,7 +115,8 @@ public final class AppData {
                 new SponsorModel("DT007", "Công ty Đại Phúc", "Tài chính", "0920000007", "ntt007@gmail.com", "Đồng Nai", "CD007", 15000000, "07/04/2026"),
                 new SponsorModel("DT008", "Nhóm Ánh Dương", "Xã hội", "0920000008", "ntt008@gmail.com", "Cần Thơ", "CD008", 4000000, "10/01/2026"),
                 new SponsorModel("DT009", "Công ty Hưng Thịnh", "Xây dựng", "0920000009", "ntt009@gmail.com", "TP.HCM", "CD009", 20000000, "08/04/2026"),
-                new SponsorModel("DT010", "Quỹ Cộng Đồng", "Cộng đồng", "0920000010", "ntt010@gmail.com", "Huế", "CD010", 3000000, "09/04/2026")
+                new SponsorModel("DT010", "Quỹ Cộng Đồng", "Cộng đồng", "0920000010", "ntt010@gmail.com", "Huế", "CD010", 3000000, "09/04/2026"),
+                new SponsorModel("DT011", "Câu lạc bộ Sách Trẻ", "Giáo dục", "0920000011", "sachtre@gmail.com", "TP.HCM", "CD006", 5500000, "16/04/2026")
         );
     }
 
@@ -128,6 +129,10 @@ public final class AppData {
                 new DonationModel("QG005", "Quỹ Vì Trẻ Em", "CD005", "13/04/2026", "Chuyển khoản", "Đồng hành cùng Mùa hè xanh", 4000000),
                 new DonationModel("QG006", "Câu lạc bộ Xanh", "CD010", "14/04/2026", "Tiền mặt", "Hỗ trợ truyền thông môi trường", 1500000),
                 new DonationModel("QG007", "Quỹ Cộng Đồng", "CD008", "15/01/2026", "Chuyển khoản", "Trao quà Tết cho hộ khó khăn", 3500000),
+                new DonationModel("QG008", "Nhóm cựu sinh viên UEL", "CD002", "18/04/2026", "Tiền mặt", "Đồng hành trao học bổng", 2200000),
+                new DonationModel("QG009", "Câu lạc bộ Sách Trẻ", "CD006", "19/04/2026", "Chuyển khoản", "Hỗ trợ phân loại và đóng gói sách", 1800000),
+                new DonationModel("QG010", "Công ty Đại Phúc", "CD007", "20/04/2026", "Chuyển khoản", "Bổ sung thiết bị lọc nước", 6000000),
+                new DonationModel("QG011", "Công ty Hưng Thịnh", "CD009", "21/04/2026", "Chuyển khoản", "Hỗ trợ kiểm tra máy tính cũ", 7000000),
                 new DonationModel("VP001", "Công ty Hoa Sen", "CD001", "05/04/2026", "Vật phẩm", "Áo ấm: 500 cái", 0),
                 new DonationModel("VP002", "Nhóm sinh viên UIT", "CD002", "07/04/2026", "Vật phẩm", "Sách vở: 800 bộ", 0),
                 new DonationModel("VP003", "Công ty Bình Minh", "CD003", "08/04/2026", "Vật phẩm", "Khẩu trang: 300 hộp; thuốc cơ bản: 120 hộp", 0),
@@ -142,12 +147,21 @@ public final class AppData {
                 new SystemRecord("Đăng ký TNV", "VH002", "CD002", "TNV002", "Duyệt đăng ký TNV", "Sinh viên UEL đăng ký tham gia chiến dịch CD002", "03/04/2026", "", "Chờ duyệt", "TNV002", "ADMIN003", "Bảng THAM_GIA_TNV"),
                 new SystemRecord("Công việc", "VH003", "CD001", "CV001", "Đóng gói quà tặng", "Cần 15 tình nguyện viên", "03/04/2026", "", "Đang phân công", "ADMIN002", "ADMIN004", "Bảng CONG_VIEC / PHAN_CONG"),
                 new SystemRecord("Điểm danh", "VH004", "CD001", "TNV001", "Điểm danh TNV", "Ghi nhận 4 giờ tham gia", "05/04/2026", "05/04/2026", "Có mặt", "TNV001", "ADMIN001", "Bảng DIEM_DANH"),
-                new SystemRecord("Chi tiêu", "VH005", "CD001", "CT001", "Mua áo ấm", "Có minh chứng chi tiêu", "06/04/2026", "06/04/2026", "Đã duyệt", "ADMIN003", "ADMIN005", "Bảng CHI_TIEU / MINH_CHUNG_CHI_TIEU"),
+                new SystemRecord("Chi tiêu", "VH005", "CD001", "CT001", "Mua áo ấm", "Có minh chứng chi tiêu", "06/04/2026", "06/04/2026", "Đã duyệt", "ADMIN003", "ADMIN005", "SO_TIEN_CHI=2500000; Bảng CHI_TIEU / MINH_CHUNG_CHI_TIEU"),
                 new SystemRecord("Minh chứng TNV", "VH006", "CD001", "MC001", "Minh chứng phát quà", "Tình nguyện viên gửi ảnh minh chứng", "08/04/2026", "08/04/2026", "Đã xác nhận", "TNV001", "ADMIN006", "Bảng MINH_CHUNG_TNV"),
                 new SystemRecord("Xuất vật phẩm", "VH007", "CD001", "PX001", "Xuất vật phẩm", "Xuất áo ấm cho điểm trường", "11/04/2026", "11/04/2026", "Đã xuất", "ADMIN004", "ADMIN007", "Bảng PHIEU_XUAT_VAT_PHAM / CHI_TIET_XUAT_VP"),
                 new SystemRecord("Quyên góp", "VH008", "CD001", "QG001", "Xác nhận quyên góp tiền", "Đã đối soát giao dịch của Công ty An Phát", "05/04/2026", "05/04/2026", "Đã xác nhận", "NTT001", "ADMIN001", "Bảng QUYEN_GOP_TIEN / THANH_TOAN"),
                 new SystemRecord("Quyên góp", "VH009", "CD001", "VP001", "Xác nhận quyên góp vật phẩm", "Áo ấm cho học sinh vùng cao", "05/04/2026", "05/04/2026", "Đã xác nhận", "NTT005", "ADMIN002", "Bảng PHIEU_QUYEN_GOP_VP / CHI_TIET_QUYEN_GOP_VP"),
-                new SystemRecord("Quyên góp", "VH010", "CD009", "VP004", "Xác nhận máy tính cũ", "Chờ kiểm tra chất lượng thiết bị", "15/04/2026", "", "Chờ xác nhận", "NTT009", "ADMIN003", "Bảng PHIEU_QUYEN_GOP_VP / CHI_TIET_QUYEN_GOP_VP")
+                new SystemRecord("Quyên góp", "VH010", "CD009", "VP004", "Xác nhận máy tính cũ", "Chờ kiểm tra chất lượng thiết bị", "15/04/2026", "", "Chờ xác nhận", "NTT009", "ADMIN003", "Bảng PHIEU_QUYEN_GOP_VP / CHI_TIET_QUYEN_GOP_VP"),
+                new SystemRecord("Chi tiêu", "VH011", "CD002", "CT004", "In tài liệu học bổng", "In tài liệu và hồ sơ học bổng", "18/04/2026", "18/04/2026", "Đã duyệt", "ADMIN002", "ADMIN002", "SO_TIEN_CHI=900000; Bảng CHI_TIEU"),
+                new SystemRecord("Chi tiêu", "VH012", "CD003", "CT005", "Mua vật tư y tế", "Mua thuốc và vật tư phục vụ khám bệnh", "19/04/2026", "19/04/2026", "Đã duyệt", "ADMIN003", "ADMIN003", "SO_TIEN_CHI=2400000; Bảng CHI_TIEU"),
+                new SystemRecord("Chi tiêu", "VH013", "CD004", "CT003", "Mua thực phẩm", "Mua thực phẩm nấu suất ăn thiện nguyện", "12/04/2026", "12/04/2026", "Đã duyệt", "ADMIN004", "ADMIN004", "SO_TIEN_CHI=1800000; Bảng CHI_TIEU"),
+                new SystemRecord("Chi tiêu", "VH014", "CD005", "CT006", "Thuê xe di chuyển", "Thuê xe cho đội tình nguyện viên", "20/04/2026", "20/04/2026", "Đã duyệt", "ADMIN005", "ADMIN005", "SO_TIEN_CHI=3200000; Bảng CHI_TIEU"),
+                new SystemRecord("Chi tiêu", "VH015", "CD006", "CT007", "Đóng gói sách", "Phân loại và đóng gói sách trước khi trao tặng", "21/04/2026", "21/04/2026", "Đã duyệt", "ADMIN006", "ADMIN006", "SO_TIEN_CHI=1100000; Bảng CHI_TIEU"),
+                new SystemRecord("Chi tiêu", "VH016", "CD007", "CT008", "Mua phụ kiện lọc nước", "Mua phụ kiện lắp đặt thiết bị lọc nước", "22/04/2026", "22/04/2026", "Đã duyệt", "ADMIN007", "ADMIN007", "SO_TIEN_CHI=4500000; Bảng CHI_TIEU"),
+                new SystemRecord("Chi tiêu", "VH017", "CD008", "CT009", "Mua quà Tết", "Mua quà Tết trao cho hộ khó khăn", "20/01/2026", "20/01/2026", "Đã duyệt", "ADMIN008", "ADMIN008", "SO_TIEN_CHI=2100000; Bảng CHI_TIEU"),
+                new SystemRecord("Chi tiêu", "VH018", "CD009", "CT010", "Nâng cấp máy tính", "Kiểm tra và nâng cấp máy tính cũ", "23/04/2026", "23/04/2026", "Đã duyệt", "ADMIN009", "ADMIN009", "SO_TIEN_CHI=5600000; Bảng CHI_TIEU"),
+                new SystemRecord("Chi tiêu", "VH019", "CD010", "CT011", "In poster truyền thông", "In poster truyền thông xanh", "24/04/2026", "24/04/2026", "Đã duyệt", "ADMIN010", "ADMIN010", "SO_TIEN_CHI=700000; Bảng CHI_TIEU")
         );
     }
 

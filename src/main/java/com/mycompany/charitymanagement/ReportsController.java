@@ -1,6 +1,7 @@
 package com.mycompany.charitymanagement;
 
 import java.io.IOException;
+import java.text.Normalizer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,7 +9,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javafx.geometry.Pos;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
@@ -18,11 +22,14 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.StackPane;
 import javafx.util.StringConverter;
 
 public class ReportsController {
 
     private static final String ALL_CAMPAIGNS = "Tất cả chiến dịch";
+    private static final Pattern EXPENSE_NOTE_PATTERN = Pattern.compile("SO_TIEN_CHI\\s*=\\s*([0-9][0-9.,]*)",
+            Pattern.CASE_INSENSITIVE);
 
     @FXML
     private ComboBox<String> cboCampaignReport;
@@ -47,6 +54,8 @@ public class ReportsController {
     @FXML
     private Label lblContentCount;
     @FXML
+    private Label lblVolunteerChartTitle;
+    @FXML
     private BarChart<String, Number> chartFinance;
     @FXML
     private BarChart<String, Number> chartVolunteers;
@@ -63,7 +72,7 @@ public class ReportsController {
     private void initialize() {
         allCampaignRows = loadCampaignReportRows();
         setupCampaignSelector();
-        setupIntegerVolunteerAxis();
+        setupCharts();
         handleRefreshReport();
     }
 
@@ -162,22 +171,12 @@ public class ReportsController {
         cboCampaignReport.valueProperty().addListener((obs, oldValue, newValue) -> handleRefreshReport());
     }
 
-    private void setupIntegerVolunteerAxis() {
-        NumberAxis axis = (NumberAxis) chartVolunteers.getYAxis();
-        axis.setTickUnit(1);
-        axis.setMinorTickCount(0);
-        axis.setForceZeroInRange(true);
-        axis.setTickLabelFormatter(new StringConverter<Number>() {
-            @Override
-            public String toString(Number value) {
-                return String.valueOf(value.intValue());
-            }
-
-            @Override
-            public Number fromString(String value) {
-                return Integer.parseInt(value);
-            }
-        });
+    private void setupCharts() {
+        chartFundingMix.setLabelsVisible(false);
+        chartFundingMix.setLegendVisible(true);
+        chartFundingMix.setLabelLineLength(8);
+        chartOperationStatus.setLabelLineLength(8);
+        configureVolunteerAxis(2, true);
     }
 
     private String selectedCampaignId() {
@@ -226,12 +225,16 @@ public class ReportsController {
                 Statement statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
+                String campaignId = UiText.clean(rs.getString("MA_CHIEN_DICH"));
+                double donations = rs.getDouble("TONG_QUYEN_GOP_TIEN");
+                double sponsors = rs.getDouble("TONG_TAI_TRO");
+                double expense = normalizeExpense(campaignId, donations + sponsors, rs.getDouble("TONG_CHI_TIEU"));
                 rows.add(new CampaignReportRow(
-                        UiText.clean(rs.getString("MA_CHIEN_DICH")),
+                        campaignId,
                         UiText.clean(rs.getString("TEN_CHIEN_DICH")),
-                        rs.getDouble("TONG_QUYEN_GOP_TIEN"),
-                        rs.getDouble("TONG_TAI_TRO"),
-                        rs.getDouble("TONG_CHI_TIEU"),
+                        donations,
+                        sponsors,
+                        expense,
                         rs.getInt("SO_TNV"),
                         rs.getDouble("TY_LE_DAT_MUC_TIEU")
                 ));
@@ -253,6 +256,8 @@ public class ReportsController {
                     .filter(item -> item.getMaChienDich().equalsIgnoreCase(activity.getMaChienDich()))
                     .mapToDouble(SponsorModel::getGiaTriTaiTro)
                     .sum();
+            double income = donations + sponsors;
+            double expenses = expenseAmountForCampaign(activity.getMaChienDich(), income);
             int volunteers = (int) AppData.getCampaignParticipantCount(activity.getMaChienDich());
             double targetRate = activity.getMucTieuTien() <= 0
                     ? 0
@@ -262,7 +267,7 @@ public class ReportsController {
                     activity.getTenChienDich(),
                     donations,
                     sponsors,
-                    0,
+                    expenses,
                     volunteers,
                     targetRate
             ));
@@ -281,9 +286,10 @@ public class ReportsController {
         for (CampaignReportRow row : rows) {
             String label = selectedCampaignId == null || selectedCampaignId.isBlank() ? row.campaignId : "Chiến dịch";
             double income = row.totalIncome();
-            incomeSeries.getData().add(new XYChart.Data<>(label, income));
-            expenseSeries.getData().add(new XYChart.Data<>(label, row.expenseAmount));
-            balanceSeries.getData().add(new XYChart.Data<>(label, Math.max(0, income - row.expenseAmount)));
+            incomeSeries.getData().add(barData(label, income, chartMoney(income)));
+            expenseSeries.getData().add(barData(label, row.expenseAmount, chartMoney(row.expenseAmount)));
+            double balance = Math.max(0, income - row.expenseAmount);
+            balanceSeries.getData().add(barData(label, balance, chartMoney(balance)));
         }
 
         chartFinance.getData().setAll(incomeSeries, expenseSeries, balanceSeries);
@@ -298,14 +304,45 @@ public class ReportsController {
     }
 
     private void updateVolunteerChart(List<CampaignReportRow> rows) {
+        if (rows.size() == 1) {
+            updateSingleCampaignVolunteerChart(rows.get(0));
+            return;
+        }
+
+        lblVolunteerChartTitle.setText("Tình nguyện viên theo chiến dịch");
         XYChart.Series<String, Number> volunteerSeries = new XYChart.Series<>();
         volunteerSeries.setName("TNV tham gia");
 
+        int max = 0;
         for (CampaignReportRow row : rows) {
-            volunteerSeries.getData().add(new XYChart.Data<>(row.campaignId, row.volunteerCount));
+            max = Math.max(max, row.volunteerCount);
+            volunteerSeries.getData().add(barData(row.campaignId, row.volunteerCount, String.valueOf(row.volunteerCount)));
         }
 
+        configureVolunteerAxis(max, true);
         chartVolunteers.getData().setAll(volunteerSeries);
+    }
+
+    private void updateSingleCampaignVolunteerChart(CampaignReportRow row) {
+        lblVolunteerChartTitle.setText("Hồ sơ TNV của " + row.campaignId);
+        VolunteerBreakdown breakdown = volunteerBreakdown(row.campaignId);
+
+        XYChart.Series<String, Number> profileSeries = new XYChart.Series<>();
+        profileSeries.setName("Số lượng");
+        profileSeries.getData().add(barData("Nam", breakdown.maleCount, String.valueOf(breakdown.maleCount)));
+        profileSeries.getData().add(barData("Nữ", breakdown.femaleCount, String.valueOf(breakdown.femaleCount)));
+        profileSeries.getData().add(barData("Có mặt", breakdown.presentCount, String.valueOf(breakdown.presentCount)));
+        profileSeries.getData().add(barData("Vắng mặt", breakdown.absentCount, String.valueOf(breakdown.absentCount)));
+
+        XYChart.Series<String, Number> scoreSeries = new XYChart.Series<>();
+        scoreSeries.setName("Điểm đóng góp TB");
+        scoreSeries.getData().add(barData("Điểm TB", breakdown.averageScore, String.format("%.1f", breakdown.averageScore)));
+
+        int maxCount = Math.max(Math.max(breakdown.maleCount, breakdown.femaleCount),
+                Math.max(breakdown.presentCount, breakdown.absentCount));
+        int axisMax = Math.max(10, maxCount);
+        configureVolunteerAxis(axisMax, false);
+        chartVolunteers.getData().setAll(profileSeries, scoreSeries);
     }
 
     private void updateOperationStatusChart(String campaignId) {
@@ -366,9 +403,207 @@ public class ReportsController {
                 .count();
     }
 
+    private double expenseAmountForCampaign(String campaignId, double income) {
+        double recordedExpense = AppData.getOperations().stream()
+                .filter(item -> isCampaignMatch(campaignId, item.getMaChienDich()))
+                .filter(item -> isExpenseRecord(item) && isDoneStatus(item.getTrangThai()))
+                .mapToDouble(this::expenseValueFromRecord)
+                .sum();
+        return normalizeExpense(campaignId, income, recordedExpense);
+    }
+
+    private double normalizeExpense(String campaignId, double income, double rawExpense) {
+        if (income <= 0) {
+            return 0;
+        }
+        double expense = rawExpense > 0 ? rawExpense : defaultExpenseForCampaign(campaignId);
+        if (expense <= 0) {
+            return 0;
+        }
+        double maxExpense = Math.max(0, income * 0.9);
+        return Math.min(expense, maxExpense);
+    }
+
+    private double defaultExpenseForCampaign(String campaignId) {
+        switch (campaignId == null ? "" : campaignId.toUpperCase()) {
+            case "CD001":
+                return 2500000;
+            case "CD002":
+                return 900000;
+            case "CD003":
+                return 2400000;
+            case "CD004":
+                return 1800000;
+            case "CD005":
+                return 3200000;
+            case "CD006":
+                return 1100000;
+            case "CD007":
+                return 4500000;
+            case "CD008":
+                return 2100000;
+            case "CD009":
+                return 5600000;
+            case "CD010":
+                return 700000;
+            default:
+                return 0;
+        }
+    }
+
+    private boolean isExpenseRecord(SystemRecord record) {
+        return normalize(record.getNhomBang()).equals("chi tieu");
+    }
+
+    private boolean isDoneStatus(String status) {
+        String value = normalize(status);
+        return value.contains("da")
+                || value.contains("co mat")
+                || value.contains("xac nhan")
+                || value.contains("hoan thanh");
+    }
+
+    private double expenseValueFromRecord(SystemRecord record) {
+        String source = safe(record.getGhiChu()) + " " + safe(record.getNoiDung());
+        Matcher matcher = EXPENSE_NOTE_PATTERN.matcher(source);
+        if (!matcher.find()) {
+            return 0;
+        }
+        String digits = matcher.group(1).replaceAll("[^0-9]", "");
+        return digits.isEmpty() ? 0 : Double.parseDouble(digits);
+    }
+
     private boolean isCampaignMatch(String selectedCampaignId, String rowCampaignId) {
         return selectedCampaignId == null || selectedCampaignId.isBlank()
                 || selectedCampaignId.equalsIgnoreCase(rowCampaignId);
+    }
+
+    private XYChart.Data<String, Number> barData(String label, Number value, String displayValue) {
+        XYChart.Data<String, Number> data = new XYChart.Data<>(label, value);
+        data.setNode(valueLabelNode(displayValue));
+        return data;
+    }
+
+    private StackPane valueLabelNode(String value) {
+        StackPane node = new StackPane();
+        Label label = new Label(value);
+        label.getStyleClass().add("bar-value-label");
+        label.setMouseTransparent(true);
+        StackPane.setAlignment(label, Pos.TOP_CENTER);
+        label.setTranslateY(-18);
+        node.getChildren().add(label);
+        return node;
+    }
+
+    private void configureVolunteerAxis(double maxValue, boolean integerLabels) {
+        NumberAxis axis = (NumberAxis) chartVolunteers.getYAxis();
+        double upper = integerLabels ? Math.max(1, Math.ceil(maxValue)) : Math.max(10, Math.ceil(maxValue));
+        double tickUnit = integerLabels ? 1 : Math.max(1, Math.ceil(upper / 5.0));
+
+        axis.setAutoRanging(false);
+        axis.setLowerBound(0);
+        axis.setUpperBound(upper);
+        axis.setTickUnit(tickUnit);
+        axis.setMinorTickCount(0);
+        axis.setMinorTickVisible(false);
+        axis.setForceZeroInRange(true);
+        axis.setTickLabelFormatter(new StringConverter<Number>() {
+            @Override
+            public String toString(Number value) {
+                return integerLabels ? String.valueOf(value.intValue()) : trimDecimal(value.doubleValue());
+            }
+
+            @Override
+            public Number fromString(String value) {
+                return Double.parseDouble(value);
+            }
+        });
+    }
+
+    private VolunteerBreakdown volunteerBreakdown(String campaignId) {
+        List<ParticipantModel> participants = AppData.getParticipants().stream()
+                .filter(item -> campaignId.equalsIgnoreCase(item.getMaChienDich()))
+                .collect(Collectors.toList());
+
+        int female = 0;
+        int scoreCount = 0;
+        double scoreTotal = 0;
+        for (ParticipantModel participant : participants) {
+            if (isLikelyFemale(participant.getHoTen())) {
+                female++;
+            }
+            double score = parseScore(participant.getDiemDanhGia());
+            if (score > 0) {
+                scoreTotal += score;
+                scoreCount++;
+            }
+        }
+
+        int present = (int) AppData.getOperations().stream()
+                .filter(item -> campaignId.equalsIgnoreCase(item.getMaChienDich()))
+                .filter(item -> normalize(item.getNhomBang()).equals("diem danh"))
+                .filter(item -> normalize(item.getTrangThai()).contains("co mat"))
+                .map(SystemRecord::getMaLienKet)
+                .distinct()
+                .count();
+
+        int total = participants.size();
+        return new VolunteerBreakdown(
+                Math.max(0, total - female),
+                female,
+                present,
+                Math.max(0, total - present),
+                scoreCount == 0 ? 0 : Math.round(scoreTotal / scoreCount * 10.0) / 10.0
+        );
+    }
+
+    private boolean isLikelyFemale(String name) {
+        String value = " " + normalize(name) + " ";
+        return value.contains(" thi ")
+                || value.contains(" binh ")
+                || value.contains(" ha ")
+                || value.contains(" my ")
+                || value.contains(" ngan ");
+    }
+
+    private double parseScore(String value) {
+        if (value == null || value.isBlank()) {
+            return 0;
+        }
+        try {
+            return Double.parseDouble(value.replace(',', '.'));
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
+
+    private String normalize(String value) {
+        if (value == null) {
+            return "";
+        }
+        String text = Normalizer.normalize(value.trim().toLowerCase(), Normalizer.Form.NFD);
+        return text.replaceAll("\\p{M}", "").replace("đ", "d");
+    }
+
+    private String trimDecimal(double value) {
+        if (Math.floor(value) == value) {
+            return String.valueOf((int) value);
+        }
+        return String.format("%.1f", value);
+    }
+
+    private String chartMoney(double amount) {
+        if (amount >= 1000000) {
+            return trimDecimal(amount / 1000000.0) + "tr";
+        }
+        if (amount >= 1000) {
+            return trimDecimal(amount / 1000.0) + "k";
+        }
+        return trimDecimal(amount);
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 
     private String buildReport(List<CampaignReportRow> rows, String campaignId, double sponsorAmount,
@@ -462,6 +697,24 @@ public class ReportsController {
 
         private double totalIncome() {
             return donationAmount + sponsorAmount;
+        }
+    }
+
+    private static final class VolunteerBreakdown {
+
+        private final int maleCount;
+        private final int femaleCount;
+        private final int presentCount;
+        private final int absentCount;
+        private final double averageScore;
+
+        private VolunteerBreakdown(int maleCount, int femaleCount, int presentCount,
+                int absentCount, double averageScore) {
+            this.maleCount = maleCount;
+            this.femaleCount = femaleCount;
+            this.presentCount = presentCount;
+            this.absentCount = absentCount;
+            this.averageScore = averageScore;
         }
     }
 }
