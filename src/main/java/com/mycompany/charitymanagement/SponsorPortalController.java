@@ -132,8 +132,8 @@ public class SponsorPortalController {
     }
 
     @FXML
-    private void handleCampaigns() throws IOException {
-        NavigationService.navigateTo(NavigationService.VIEW_ACTIVITIES);
+    private void handleCampaigns() {
+        tableCampaigns.requestFocus();
     }
 
     @FXML
