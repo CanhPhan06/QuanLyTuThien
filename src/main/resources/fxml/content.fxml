@@ -39,22 +39,6 @@
                     </VBox>
                 </HBox>
 
-                <VBox spacing="10" styleClass="comment-panel">
-                    <VBox spacing="3">
-                        <Label text="Bình luận chiến dịch đang chọn" styleClass="portal-section-title"/>
-                        <Label fx:id="lblSelectedCommentCampaign" text="Chọn chiến dịch để xem bình luận riêng" styleClass="muted-text"/>
-                    </VBox>
-                    <ScrollPane fitToWidth="true" pannable="true" hbarPolicy="NEVER" prefHeight="245" styleClass="content-scroll comment-scroll">
-                        <content>
-                            <VBox fx:id="commentList" spacing="10"/>
-                        </content>
-                    </ScrollPane>
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <TextField fx:id="txtQuickComment" promptText="Viết bình luận nhanh cho chiến dịch đang chọn..." styleClass="input-field comment-input" HBox.hgrow="ALWAYS"/>
-                        <Button text="Gửi" onAction="#handleSendQuickComment" styleClass="primary-button"/>
-                    </HBox>
-                </VBox>
-
                 <VBox spacing="10" styleClass="portal-section">
                     <HBox alignment="CENTER_LEFT">
                         <Label text="Hoạt động sắp diễn ra" styleClass="portal-section-title"/>

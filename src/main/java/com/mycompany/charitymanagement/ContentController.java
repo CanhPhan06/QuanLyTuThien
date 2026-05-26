@@ -1,15 +1,19 @@
 package com.mycompany.charitymanagement;
 
 import java.io.IOException;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -18,6 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -576,20 +581,129 @@ public class ContentController {
             DialogUtils.warning("Chưa có chiến dịch để xem chi tiết.");
             return;
         }
-        selectCampaign(activity, true);
+        selectCampaign(activity, false);
         String campaignId = activity.getMaChienDich();
-        DetailDialogUtils.showDetails(featuredCard, activity.getTenChienDich(), new String[][]{
-            {"Mã chiến dịch", campaignId},
-            {"Mô tả", activity.getMoTa()},
-            {"Thời gian", activity.getNgayBatDau() + " - " + activity.getNgayKetThuc()},
-            {"Địa điểm", activity.getDiaDiem()},
-            {"Mục tiêu quyên góp", FormatUtils.money(activity.getMucTieuTien())},
-            {"Đã ghi nhận", FormatUtils.money(AppData.getCampaignMoneyTotal(campaignId))},
-            {"Tình nguyện viên", AppData.getCampaignParticipantCount(campaignId) + " người"},
-            {"Trạng thái", activity.getTrangThai()},
-            {"Tin tức liên quan", campaignNewsLines(campaignId)},
-            {"Bình luận liên quan", campaignCommentLines(campaignId)}
+
+        Label title = new Label(activity.getTenChienDich());
+        title.getStyleClass().add("page-title");
+        title.setWrapText(true);
+
+        Label category = new Label(categoryForCampaign(activity) + "  ·  " + campaignId);
+        category.getStyleClass().add("content-category");
+
+        GridPane infoGrid = campaignInfoGrid(activity);
+        HBox metrics = new HBox(10,
+                detailMetricCard("TNV tham gia", AppData.getCampaignParticipantCount(campaignId) + " người"),
+                detailMetricCard("Bình luận", campaignCommentCount(campaignId) + " bình luận"),
+                detailMetricCard("Đã ghi nhận", FormatUtils.money(AppData.getCampaignMoneyTotal(campaignId)))
+        );
+        metrics.setFillHeight(true);
+
+        Label commentTitle = new Label("Bình luận của TNV và NTT");
+        commentTitle.getStyleClass().add("portal-section-title");
+
+        VBox campaignComments = new VBox(10);
+        renderCampaignDialogComments(activity, campaignComments);
+
+        ScrollPane commentScroll = new ScrollPane(campaignComments);
+        commentScroll.setFitToWidth(true);
+        commentScroll.setPrefHeight(310);
+        commentScroll.getStyleClass().addAll("content-scroll", "comment-scroll");
+
+        VBox body = new VBox(14, category, infoGrid, metrics, commentTitle, commentScroll);
+        body.setPadding(new Insets(2, 2, 2, 2));
+
+        ScrollPane scrollPane = new ScrollPane(body);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setMaxHeight(560);
+        scrollPane.getStyleClass().add("content-scroll");
+
+        Button closeButton = new Button("Đóng");
+        closeButton.getStyleClass().add("quick-button");
+        HBox actions = new HBox(closeButton);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox card = new VBox(14, title, scrollPane, actions);
+        card.getStyleClass().add("detail-card");
+        card.setMaxWidth(900);
+        card.setMaxHeight(690);
+
+        Scene scene = featuredCard == null ? App.getScene() : featuredCard.getScene();
+        final StackPane[] overlayRef = new StackPane[1];
+        closeButton.setOnAction(event -> {
+            if (overlayRef[0] != null) {
+                DetailDialogUtils.closeOverlay(overlayRef[0]);
+            }
         });
+        overlayRef[0] = DetailDialogUtils.showCard(scene, card);
+    }
+
+    private GridPane campaignInfoGrid(ActivityModel activity) {
+        GridPane grid = new GridPane();
+        grid.setHgap(18);
+        grid.setVgap(10);
+        grid.getStyleClass().add("form-card");
+
+        int row = 0;
+        row = addCampaignInfoRow(grid, row, "Mã chiến dịch", activity.getMaChienDich());
+        row = addCampaignInfoRow(grid, row, "Mô tả", activity.getMoTa());
+        row = addCampaignInfoRow(grid, row, "Thời gian", activity.getNgayBatDau() + " - " + activity.getNgayKetThuc());
+        row = addCampaignInfoRow(grid, row, "Địa điểm", activity.getDiaDiem());
+        row = addCampaignInfoRow(grid, row, "Mục tiêu quyên góp", FormatUtils.money(activity.getMucTieuTien()));
+        row = addCampaignInfoRow(grid, row, "Trạng thái", activity.getTrangThai());
+        addCampaignInfoRow(grid, row, "Tin tức liên quan", campaignNewsLines(activity.getMaChienDich()));
+        return grid;
+    }
+
+    private int addCampaignInfoRow(GridPane grid, int row, String keyText, String valueText) {
+        Label key = new Label(keyText);
+        key.getStyleClass().add("muted-text");
+        key.setMinWidth(150);
+
+        Label value = new Label(valueText == null || valueText.isBlank() ? "-" : valueText);
+        value.getStyleClass().add("dashboard-main-text");
+        value.setWrapText(true);
+        value.setMaxWidth(Double.MAX_VALUE);
+
+        grid.add(key, 0, row);
+        grid.add(value, 1, row);
+        GridPane.setHgrow(value, Priority.ALWAYS);
+        return row + 1;
+    }
+
+    private VBox detailMetricCard(String labelText, String valueText) {
+        VBox card = new VBox(3);
+        card.getStyleClass().addAll("stat-card", "wide-stat-card");
+        Label value = new Label(valueText);
+        value.getStyleClass().add("stat-number");
+        value.setWrapText(true);
+        Label label = new Label(labelText);
+        label.getStyleClass().add("muted-text");
+        label.setWrapText(true);
+        card.getChildren().addAll(value, label);
+        HBox.setHgrow(card, Priority.ALWAYS);
+        return card;
+    }
+
+    private void renderCampaignDialogComments(ActivityModel activity, VBox target) {
+        target.getChildren().clear();
+        String campaignId = activity.getMaChienDich();
+        int count = 0;
+        for (SystemRecord record : AppData.getContents()) {
+            if (!groupCode(record).contains("binhluan")
+                    || isReplyRecord(record)
+                    || !campaignId.equalsIgnoreCase(campaignId(record))) {
+                continue;
+            }
+            target.getChildren().add(commentCard(record, false,
+                    () -> renderCampaignDialogComments(activity, target), false));
+            count++;
+        }
+        if (count == 0) {
+            Label empty = new Label("Chưa có bình luận cho chiến dịch này.");
+            empty.getStyleClass().add("muted-text");
+            target.getChildren().add(empty);
+        }
     }
 
     private String[][] allCampaignRows() {
@@ -899,7 +1013,7 @@ public class ContentController {
             if (!groupCode(record).contains("binhluan") || isReplyRecord(record)) {
                 continue;
             }
-            allCommentList.getChildren().add(commentCard(record, true));
+            allCommentList.getChildren().add(commentCard(record, true, null, true));
             count++;
             if (count >= MAX_VISIBLE_ALL_COMMENTS) {
                 break;
@@ -913,17 +1027,19 @@ public class ContentController {
     }
 
     private VBox commentCard(SystemRecord record, boolean showCampaignContext) {
+        return commentCard(record, showCampaignContext, null, true);
+    }
+
+    private VBox commentCard(SystemRecord record, boolean showCampaignContext,
+            Runnable afterAction, boolean openDetailOnClick) {
         VBox wrapper = new VBox(8);
         wrapper.getStyleClass().add("comment-card");
 
         HBox row = new HBox(10);
         row.getStyleClass().add("comment-row");
-        row.setOnMouseClicked(event -> {
-            if (showCampaignContext) {
-                selectCampaignById(campaignId(record), true);
-            }
-            showRecordDetail(record);
-        });
+        if (openDetailOnClick) {
+            row.setOnMouseClicked(event -> showRecordDetail(record));
+        }
         Label avatar = new Label(initials(record.getTenLienKet()));
         avatar.getStyleClass().add("comment-avatar");
 
@@ -942,9 +1058,9 @@ public class ContentController {
         HBox reactions = new HBox(6);
         reactions.getStyleClass().add("reaction-row");
         reactions.getChildren().addAll(
-                reactionButton(record, "LIKE", "Like"),
-                reactionButton(record, "HEART", "Tym"),
-                reactionButton(record, "SMILE", "Vui")
+                reactionButton(record, "LIKE", "Like", afterAction),
+                reactionButton(record, "HEART", "Tym", afterAction),
+                reactionButton(record, "SMILE", "Vui", afterAction)
         );
 
         HBox replyBox = new HBox(8);
@@ -957,11 +1073,11 @@ public class ContentController {
         replyButton.getStyleClass().add("quick-button");
         replyButton.setOnAction(event -> {
             event.consume();
-            sendReply(record, replyInput);
+            sendReply(record, replyInput, afterAction);
         });
         replyInput.setOnAction(event -> {
             event.consume();
-            sendReply(record, replyInput);
+            sendReply(record, replyInput, afterAction);
         });
         replyBox.getChildren().addAll(replyInput, replyButton);
 
@@ -1015,16 +1131,24 @@ public class ContentController {
     }
 
     private Button reactionButton(SystemRecord record, String key, String label) {
+        return reactionButton(record, key, label, null);
+    }
+
+    private Button reactionButton(SystemRecord record, String key, String label, Runnable afterAction) {
         Button button = new Button(label + " " + reactionCount(record, key));
         button.getStyleClass().add("reaction-button");
         button.setOnAction(event -> {
             event.consume();
-            incrementReaction(record, key);
+            incrementReaction(record, key, afterAction);
         });
         return button;
     }
 
     private void sendReply(SystemRecord parent, TextField replyInput) {
+        sendReply(parent, replyInput, null);
+    }
+
+    private void sendReply(SystemRecord parent, TextField replyInput, Runnable afterAction) {
         String text = value(replyInput);
         if (text.isEmpty()) {
             DialogUtils.warning("Vui lòng nhập nội dung phản hồi.");
@@ -1055,12 +1179,22 @@ public class ContentController {
         ));
         replyInput.clear();
         selectCampaign(campaign, false);
+        if (afterAction != null) {
+            afterAction.run();
+        }
         DialogUtils.info("Đã gửi phản hồi bình luận.");
     }
 
     private void incrementReaction(SystemRecord record, String key) {
+        incrementReaction(record, key, null);
+    }
+
+    private void incrementReaction(SystemRecord record, String key, Runnable afterAction) {
         record.setGhiChu(bumpCounter(record.getGhiChu(), reactionMarker(key)));
         refreshContentView();
+        if (afterAction != null) {
+            afterAction.run();
+        }
     }
 
     private int reactionCount(SystemRecord record, String key) {
