@@ -139,4 +139,5 @@ insert into noi_dung values ('ThamSo', 'TS001', 'HE_THONG', N'Cấu hình quy đ
 commit;
 
 prompt CHARITY schema created and seeded.
+prompt Run oracle_business_logic.sql after this file to install triggers, procedures and functions.
 exit
