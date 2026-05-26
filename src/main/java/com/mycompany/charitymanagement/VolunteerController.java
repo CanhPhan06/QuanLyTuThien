@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -13,7 +14,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class VolunteerController {
@@ -48,6 +52,8 @@ public class VolunteerController {
     private TextField txtCampaignComment;
     @FXML
     private VBox campaignCommentList;
+    @FXML
+    private VBox campaignPortalBox;
     @FXML
     private VBox overviewSection;
     @FXML
@@ -95,6 +101,7 @@ public class VolunteerController {
     private final ObservableList<SystemRecord> volunteerTasks = FXCollections.observableArrayList();
     private final ObservableList<SystemRecord> volunteerNotifications = FXCollections.observableArrayList();
     private UserAccount currentUser;
+    private String selectedCampaignId;
 
     @FXML
     private void initialize() {
@@ -158,6 +165,7 @@ public class VolunteerController {
         AppData.getContents().addListener((ListChangeListener<SystemRecord>) change -> {
             refreshView();
             renderCampaignComments();
+            renderCampaignPortal();
         });
 
         if (!cboCampaign.getItems().isEmpty()) {
@@ -165,6 +173,7 @@ public class VolunteerController {
             updateSelectedCampaign(AppData.findCampaign(extractCampaignId(cboCampaign.getValue())));
         }
         refreshView();
+        renderCampaignPortal();
         showSection(overviewSection);
     }
 
@@ -175,6 +184,7 @@ public class VolunteerController {
 
     @FXML
     private void handleShowCampaigns() {
+        renderCampaignPortal();
         showSection(campaignsSection);
     }
 
@@ -208,6 +218,7 @@ public class VolunteerController {
             return;
         }
         refreshView();
+        renderCampaignPortal();
         DialogUtils.info("Đã gửi đăng ký tham gia chiến dịch.");
     }
 
@@ -295,6 +306,7 @@ public class VolunteerController {
     @FXML
     private void handleRefresh() {
         refreshView();
+        renderCampaignPortal();
     }
 
     @FXML
@@ -368,16 +380,25 @@ public class VolunteerController {
     }
 
     private void showCampaignDetail(ActivityModel campaign) {
-        DetailDialogUtils.showDetails(tableCampaigns, "Chi tiết chiến dịch - " + campaign.getMaChienDich(), new String[][]{
-            {"Tên chiến dịch", campaign.getTenChienDich()},
-            {"Mô tả", campaign.getMoTa()},
-            {"Địa điểm", campaign.getDiaDiem()},
-            {"Thời gian", campaign.getNgayBatDau() + " - " + campaign.getNgayKetThuc()},
-            {"Mục tiêu", FormatUtils.money(campaign.getMucTieuTien())},
-            {"Đã ghi nhận", FormatUtils.money(AppData.getCampaignMoneyTotal(campaign.getMaChienDich()))},
-            {"Số TNV tham gia", String.valueOf(AppData.getCampaignParticipantCount(campaign.getMaChienDich()))},
-            {"Trạng thái", campaign.getTrangThai()}
-        });
+        if (campaign == null) {
+            DialogUtils.warning("Vui lòng chọn chiến dịch cần xem.");
+            return;
+        }
+        cboCampaign.setValue(campaign.getMaChienDich() + " - " + campaign.getTenChienDich());
+        updateSelectedCampaign(campaign);
+        CampaignDialogUtils.showCampaignDialog(campaignsSection, campaign, currentUser,
+                "Tham gia chiến dịch",
+                selected -> {
+                    cboCampaign.setValue(selected.getMaChienDich() + " - " + selected.getTenChienDich());
+                    handleRegisterCampaign();
+                },
+                "Bình luận của tình nguyện viên",
+                "Tạo từ cổng tình nguyện viên",
+                () -> {
+                    refreshView();
+                    renderCampaignComments();
+                    renderCampaignPortal();
+                });
     }
 
     private ParticipantModel findParticipant() {
@@ -389,6 +410,185 @@ public class VolunteerController {
 
     private ActivityModel selectedCampaign() {
         return AppData.findCampaign(extractCampaignId(cboCampaign.getValue()));
+    }
+
+    private void renderCampaignPortal() {
+        if (campaignPortalBox == null) {
+            return;
+        }
+        campaignPortalBox.getChildren().clear();
+        if (AppData.getActivities().isEmpty()) {
+            Label empty = new Label("Chưa có chiến dịch nào.");
+            empty.getStyleClass().add("muted-text");
+            campaignPortalBox.getChildren().add(empty);
+            return;
+        }
+
+        ActivityModel featured = selectedCampaign();
+        if (featured == null) {
+            featured = AppData.getActivities().get(0);
+        }
+        campaignPortalBox.getChildren().add(featuredCampaignCard(featured));
+
+        HBox header = new HBox();
+        header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        Label title = new Label("Hoạt động sắp diễn ra");
+        title.getStyleClass().add("portal-section-title");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+        Button viewAll = new Button("Xem tất cả");
+        viewAll.getStyleClass().add("link-button");
+        header.getChildren().addAll(title, spacer, viewAll);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(12);
+        int index = 0;
+        for (ActivityModel activity : AppData.getActivities()) {
+            grid.add(campaignCard(activity), index % 2, index / 2);
+            index++;
+        }
+
+        VBox section = new VBox(12, header, grid);
+        section.getStyleClass().add("portal-section");
+        campaignPortalBox.getChildren().add(section);
+    }
+
+    private HBox featuredCampaignCard(ActivityModel campaign) {
+        HBox card = new HBox(18);
+        card.getStyleClass().add("featured-news-card");
+        card.setOnMouseClicked(event -> showCampaignDetail(campaign));
+
+        StackPane visual = campaignVisual("NỔI BẬT", "Tình nguyện kết nối", "featured-visual");
+        visual.setOnMouseClicked(event -> {
+            event.consume();
+            showCampaignDetail(campaign);
+        });
+
+        VBox body = new VBox(10);
+        HBox.setHgrow(body, javafx.scene.layout.Priority.ALWAYS);
+        Label category = new Label("CHIẾN DỊCH");
+        category.getStyleClass().add("content-category");
+        Label title = new Label(campaign.getTenChienDich());
+        title.getStyleClass().add("featured-title");
+        title.setWrapText(true);
+        Label summary = new Label(campaign.getMoTa());
+        summary.getStyleClass().add("featured-summary");
+        summary.setWrapText(true);
+        HBox meta = new HBox(18,
+                muted(campaign.getNgayBatDau() + " - " + campaign.getNgayKetThuc()),
+                muted(campaign.getDiaDiem()),
+                muted(AppData.getCampaignParticipantCount(campaign.getMaChienDich()) + " TNV")
+        );
+        HBox actions = new HBox(14);
+        Button joinButton = new Button("Tham gia");
+        joinButton.getStyleClass().add("primary-button");
+        joinButton.setOnAction(event -> {
+            event.consume();
+            cboCampaign.setValue(campaign.getMaChienDich() + " - " + campaign.getTenChienDich());
+            handleRegisterCampaign();
+        });
+        Button commentButton = new Button("Bình luận");
+        commentButton.getStyleClass().add("quick-button");
+        commentButton.setOnAction(event -> {
+            event.consume();
+            showCampaignDetail(campaign);
+        });
+        actions.getChildren().addAll(joinButton, commentButton,
+                muted(campaignCommentCount(campaign.getMaChienDich()) + " bình luận"));
+        body.getChildren().addAll(category, title, summary, meta, actions);
+        card.getChildren().addAll(visual, body);
+        return card;
+    }
+
+    private HBox campaignCard(ActivityModel campaign) {
+        HBox card = new HBox(12);
+        card.getStyleClass().add("upcoming-card");
+        card.setOnMouseClicked(event -> showCampaignDetail(campaign));
+
+        StackPane visual = campaignVisual("", iconForCampaign(campaign), "activity-thumb");
+        visual.setOnMouseClicked(event -> {
+            event.consume();
+            showCampaignDetail(campaign);
+        });
+
+        VBox body = new VBox(5);
+        HBox.setHgrow(body, javafx.scene.layout.Priority.ALWAYS);
+        Label category = new Label(categoryForCampaign(campaign));
+        category.getStyleClass().add("content-category");
+        Label title = new Label(campaign.getTenChienDich());
+        title.getStyleClass().add("card-title");
+        title.setWrapText(true);
+        Label summary = new Label(campaign.getMoTa());
+        summary.getStyleClass().add("card-summary");
+        summary.setWrapText(true);
+        Label meta = new Label(campaign.getNgayBatDau() + "     "
+                + AppData.getCampaignParticipantCount(campaign.getMaChienDich()) + " TNV");
+        meta.getStyleClass().add("muted-text");
+        body.getChildren().addAll(category, title, summary, meta);
+        card.getChildren().addAll(visual, body);
+        return card;
+    }
+
+    private StackPane campaignVisual(String badgeText, String text, String styleClass) {
+        StackPane visual = new StackPane();
+        visual.getStyleClass().add(styleClass);
+        VBox box = new VBox();
+        box.setAlignment(javafx.geometry.Pos.TOP_LEFT);
+        box.setSpacing("featured-visual".equals(styleClass) ? 90 : 0);
+        if (badgeText != null && !badgeText.isBlank()) {
+            Label badge = new Label(badgeText);
+            badge.getStyleClass().add("featured-badge");
+            box.getChildren().add(badge);
+        }
+        Label label = new Label(text);
+        label.getStyleClass().add("featured-visual".equals(styleClass)
+                ? "featured-image-title" : "activity-thumb-icon");
+        box.getChildren().add(label);
+        visual.getChildren().add(box);
+        return visual;
+    }
+
+    private long campaignCommentCount(String campaignId) {
+        return AppData.getContents().stream()
+                .filter(record -> groupCode(record).contains("binhluan"))
+                .filter(record -> !isReplyRecord(record))
+                .filter(record -> campaignId.equalsIgnoreCase(campaignId(record)))
+                .count();
+    }
+
+    private String categoryForCampaign(ActivityModel activity) {
+        String text = normalized(activity.getTenChienDich() + " " + activity.getMoTa());
+        if (text.contains("kham") || text.contains("benh") || text.contains("y te")) {
+            return "SỨC KHỎE";
+        }
+        if (text.contains("sach") || text.contains("truong") || text.contains("hoc")) {
+            return "GIÁO DỤC";
+        }
+        if (text.contains("moi truong") || text.contains("xanh") || text.contains("nuoc sach")) {
+            return "MÔI TRƯỜNG";
+        }
+        return "CỘNG ĐỒNG";
+    }
+
+    private String iconForCampaign(ActivityModel activity) {
+        String category = categoryForCampaign(activity);
+        if ("SỨC KHỎE".equals(category)) {
+            return "+";
+        }
+        if ("GIÁO DỤC".equals(category)) {
+            return "▤";
+        }
+        if ("MÔI TRƯỜNG".equals(category)) {
+            return "♧";
+        }
+        return "♥";
+    }
+
+    private Label muted(String text) {
+        Label label = new Label(text);
+        label.getStyleClass().add("muted-text");
+        return label;
     }
 
     private void renderCampaignComments() {

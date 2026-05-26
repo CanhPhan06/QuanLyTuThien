@@ -54,7 +54,12 @@
 
             <VBox fx:id="campaignsSection" spacing="14" visible="false" managed="false">
                 <Label text="CHIẾN DỊCH" styleClass="page-title"/>
-                <GridPane hgap="12" vgap="12" styleClass="form-card">
+                <ScrollPane fitToWidth="true" pannable="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox fx:id="campaignPortalBox" spacing="16"/>
+                    </content>
+                </ScrollPane>
+                <GridPane hgap="12" vgap="12" styleClass="form-card" visible="false" managed="false">
                     <ComboBox fx:id="cboCampaign" promptText="Chọn chiến dịch" styleClass="input-field" maxWidth="Infinity"
                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                     <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
@@ -70,12 +75,12 @@
                         <Label fx:id="lblSelectedPlace" text="-" styleClass="dashboard-main-text"/>
                     </VBox>
                 </GridPane>
-                <HBox spacing="12" styleClass="action-bar">
+                <HBox spacing="12" styleClass="action-bar" visible="false" managed="false">
                     <Button text="Tham gia chiến dịch" onAction="#handleRegisterCampaign" styleClass="primary-button"/>
                     <Button text="Xem chi tiết chiến dịch" onAction="#handleViewCampaignDetail" styleClass="quick-button"/>
                     <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
                 </HBox>
-                <VBox spacing="10" styleClass="comment-panel">
+                <VBox spacing="10" styleClass="comment-panel" visible="false" managed="false">
                     <VBox spacing="3">
                         <Label text="Bình luận chiến dịch" styleClass="portal-section-title"/>
                         <Label fx:id="lblSelectedCommentThread" text="Chọn chiến dịch để xem bình luận" styleClass="muted-text"/>
@@ -90,7 +95,7 @@
                         <Button text="Gửi bình luận" onAction="#handleSendCampaignComment" styleClass="primary-button"/>
                     </HBox>
                 </VBox>
-                <TableView fx:id="tableCampaigns" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tableCampaigns" styleClass="activity-table" VBox.vgrow="ALWAYS" visible="false" managed="false">
                     <columns>
                         <TableColumn fx:id="colMaChienDich" text="Mã" prefWidth="90"/>
                         <TableColumn fx:id="colTenChienDich" text="Tên chiến dịch" prefWidth="360"/>
