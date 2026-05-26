@@ -19,6 +19,7 @@ public final class AppData {
 
     static {
         seedFallbackData();
+        ensureReportSampleData();
         javafx.application.Platform.runLater(() -> {
             Thread loader = new Thread(() -> DatabaseDataLoader.loadIntoMemory());
             loader.start();
@@ -180,6 +181,119 @@ public final class AppData {
                 new SystemRecord("NhatKyHeThong", "ND011", "ADMIN004", "Cập nhật vận hành", "Phân công công việc cho chiến dịch Bữa cơm yêu thương.", "08/04/2026", "Đã ghi", "Bảng NHAT_KY_HE_THONG"),
                 new SystemRecord("ThamSo", "ND012", "HE_THONG", "Điểm quy đổi một giờ tham gia", "Một giờ tham gia tương ứng 10 điểm đóng góp.", "10/04/2026", "Đang dùng", "Bảng THAM_SO")
         );
+    }
+
+    public static void ensureReportSampleData() {
+        ensureSupplementalVolunteerAccounts();
+        ensureSupplementalParticipants();
+        ensureSupplementalOperations();
+    }
+
+    private static void ensureSupplementalVolunteerAccounts() {
+        for (int number = 11; number <= 50; number++) {
+            addAccountIfMissing(new UserAccount(
+                    String.format("TNV%03d", number),
+                    "123",
+                    UserAccount.ROLE_VOLUNTEER,
+                    String.format("Tình nguyện viên %03d", number),
+                    String.format("HS%03d", number)
+            ));
+        }
+    }
+
+    private static void ensureSupplementalParticipants() {
+        String[] campaignIds = {
+            "CD001", "CD002", "CD003", "CD004", "CD005",
+            "CD006", "CD007", "CD008", "CD009", "CD010"
+        };
+        String[] schools = {"UIT", "UEL", "HCMUS", "HCMUT", "HCMIU", "UHS", "HCMUSSH"};
+        String[] departments = {
+            "Khoa Công nghệ thông tin", "Khoa Kinh tế", "Khoa Y",
+            "Khoa Kỹ thuật", "Khoa Truyền thông"
+        };
+
+        int number = 11;
+        for (String campaignId : campaignIds) {
+            for (int slot = 0; slot < 4; slot++) {
+                String accountId = String.format("TNV%03d", number);
+                String profileId = String.format("HS%03d", number);
+                String score = slot == 3 ? "" : String.format("%.1f", 7.8 + (slot * 0.4));
+                String status = slot == 3 ? "Đang xét" : "Đã duyệt";
+                addParticipantIfMissing(new ParticipantModel(
+                        accountId,
+                        profileId,
+                        String.format("Tình nguyện viên %03d", number),
+                        String.format("23521%03d", number),
+                        String.format("0911%06d", number),
+                        departments[(number - 11) % departments.length],
+                        schools[(number - 11) % schools.length],
+                        campaignId,
+                        status,
+                        score
+                ));
+                number++;
+            }
+        }
+    }
+
+    private static void ensureSupplementalOperations() {
+        String[] campaignIds = {
+            "CD001", "CD002", "CD003", "CD004", "CD005",
+            "CD006", "CD007", "CD008", "CD009", "CD010"
+        };
+
+        for (int i = 0; i < campaignIds.length; i++) {
+            String campaignId = campaignIds[i];
+            int firstVolunteerNumber = 11 + (i * 4);
+            String firstVolunteer = String.format("TNV%03d", firstVolunteerNumber);
+            String secondVolunteer = String.format("TNV%03d", firstVolunteerNumber + 1);
+            int operationBase = 101 + (i * 5);
+
+            addOperationIfMissing(new SystemRecord("Công việc", String.format("VH%03d", operationBase),
+                    campaignId, String.format("CV%03d", i + 11), "Chuẩn bị hậu cần",
+                    "Phân công đội phụ trách hậu cần cho chiến dịch " + campaignId,
+                    "15/04/2026", "15/04/2026", "Đã phân công",
+                    "ADMIN001", "ADMIN002", "Bảng CONG_VIEC / PHAN_CONG"));
+            addOperationIfMissing(new SystemRecord("Điểm danh", String.format("VH%03d", operationBase + 1),
+                    campaignId, firstVolunteer, "Điểm danh TNV",
+                    "Ghi nhận tình nguyện viên có mặt tại chiến dịch " + campaignId,
+                    "16/04/2026", "16/04/2026", "Có mặt",
+                    firstVolunteer, "ADMIN003", "Bảng DIEM_DANH"));
+            addOperationIfMissing(new SystemRecord("Điểm danh", String.format("VH%03d", operationBase + 2),
+                    campaignId, secondVolunteer, "Điểm danh TNV",
+                    "Ghi nhận tình nguyện viên có mặt tại chiến dịch " + campaignId,
+                    "16/04/2026", "16/04/2026", "Có mặt",
+                    secondVolunteer, "ADMIN003", "Bảng DIEM_DANH"));
+            addOperationIfMissing(new SystemRecord("Minh chứng TNV", String.format("VH%03d", operationBase + 3),
+                    campaignId, firstVolunteer, "Minh chứng tham gia",
+                    "Tình nguyện viên gửi minh chứng sau hoạt động",
+                    "17/04/2026", "17/04/2026", "Đã xác nhận",
+                    firstVolunteer, "ADMIN004", "Bảng MINH_CHUNG_TNV"));
+            addOperationIfMissing(new SystemRecord("Đăng ký TNV", String.format("VH%03d", operationBase + 4),
+                    campaignId, String.format("TNV%03d", firstVolunteerNumber + 3),
+                    "Duyệt hồ sơ đăng ký",
+                    "Hồ sơ tình nguyện viên đang chờ quản lý kiểm tra",
+                    "18/04/2026", "", "Đang xét",
+                    String.format("TNV%03d", firstVolunteerNumber + 3), "ADMIN005", "Bảng THAM_GIA_TNV"));
+        }
+    }
+
+    private static void addAccountIfMissing(UserAccount account) {
+        if (!accountIdExists(account.getUsername())) {
+            accounts.add(account);
+        }
+    }
+
+    private static void addParticipantIfMissing(ParticipantModel participant) {
+        if (!profileIdExists(participant.getMaHoSo())) {
+            participants.add(participant);
+        }
+    }
+
+    private static void addOperationIfMissing(SystemRecord record) {
+        if (!operationIdExists(record.getMaChinh())) {
+            operations.add(record);
+        }
     }
 
     public static UserAccount authenticate(String username, String password) {
@@ -375,6 +489,15 @@ public final class AppData {
     private static boolean contentIdExists(String id) {
         for (SystemRecord item : contents) {
             if (item.getMaChinh().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean accountIdExists(String id) {
+        for (UserAccount item : accounts) {
+            if (item.getUsername().equalsIgnoreCase(id)) {
                 return true;
             }
         }

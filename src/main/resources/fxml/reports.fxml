@@ -56,27 +56,27 @@
 
                 <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="0">
                     <Label fx:id="lblTotalActivities" text="0" styleClass="stat-number"/>
-                    <Label text="Chiến dịch" wrapText="true"/>
+                    <Label text="Chiến dịch" wrapText="true" styleClass="report-card-label"/>
                 </VBox>
                 <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="1">
                     <Label fx:id="lblTotalParticipants" text="0" styleClass="stat-number red"/>
-                    <Label text="Sinh viên/TNV" wrapText="true"/>
+                    <Label text="Sinh viên/TNV" wrapText="true" styleClass="report-card-label"/>
                 </VBox>
                 <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="2">
                     <Label fx:id="lblTotalSponsors" text="0" styleClass="stat-number green"/>
-                    <Label text="Nhà tài trợ" wrapText="true"/>
+                    <Label text="Nhà tài trợ" wrapText="true" styleClass="report-card-label"/>
                 </VBox>
                 <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="3">
                     <Label fx:id="lblTotalDonations" text="0" styleClass="stat-number purple"/>
-                    <Label text="Quyên góp" wrapText="true"/>
+                    <Label text="Quyên góp" wrapText="true" styleClass="report-card-label"/>
                 </VBox>
                 <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="4">
                     <Label fx:id="lblOperationCount" text="0" styleClass="stat-number orange"/>
-                    <Label text="Vận hành" wrapText="true"/>
+                    <Label text="Vận hành" wrapText="true" styleClass="report-card-label"/>
                 </VBox>
                 <VBox styleClass="stat-card report-stat-card" maxWidth="Infinity" GridPane.columnIndex="5">
                     <Label fx:id="lblContentCount" text="0" styleClass="stat-number green"/>
-                    <Label text="Nội dung" wrapText="true"/>
+                    <Label text="Nội dung" wrapText="true" styleClass="report-card-label"/>
                 </VBox>
             </GridPane>
 
@@ -125,6 +125,25 @@
 
                 <VBox spacing="10" styleClass="chart-card" maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="1">
                     <Label fx:id="lblVolunteerChartTitle" text="Tình nguyện viên theo chiến dịch" styleClass="section-title"/>
+                    <GridPane fx:id="volunteerSummaryCards" hgap="12" vgap="12" visible="false" managed="false" maxWidth="Infinity">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="33.34" hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <VBox styleClass="stat-card report-mini-card" maxWidth="Infinity" GridPane.columnIndex="0">
+                            <Label fx:id="lblCampaignVolunteerTotal" text="0" styleClass="stat-number"/>
+                            <Label text="Số lượng TNV" wrapText="true" styleClass="report-card-label"/>
+                        </VBox>
+                        <VBox styleClass="stat-card report-mini-card" maxWidth="Infinity" GridPane.columnIndex="1">
+                            <Label fx:id="lblCampaignPresentTotal" text="0" styleClass="stat-number green"/>
+                            <Label text="Có mặt" wrapText="true" styleClass="report-card-label"/>
+                        </VBox>
+                        <VBox styleClass="stat-card report-mini-card" maxWidth="Infinity" GridPane.columnIndex="2">
+                            <Label fx:id="lblCampaignAbsentTotal" text="0" styleClass="stat-number orange"/>
+                            <Label text="Vắng mặt" wrapText="true" styleClass="report-card-label"/>
+                        </VBox>
+                    </GridPane>
                     <BarChart fx:id="chartVolunteers" animated="false" legendVisible="true" prefHeight="360" VBox.vgrow="ALWAYS">
                         <xAxis>
                             <CategoryAxis label="Chiến dịch"/>

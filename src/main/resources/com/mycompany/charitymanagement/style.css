@@ -823,12 +823,36 @@
     -fx-min-width: 0;
     -fx-pref-width: 120px;
     -fx-max-width: 100000px;
+    -fx-min-height: 78px;
+    -fx-alignment: CENTER;
+    -fx-spacing: 3px;
 }
 
 .report-money-card {
     -fx-min-width: 0;
     -fx-pref-width: 220px;
     -fx-max-width: 100000px;
+}
+
+.report-mini-card {
+    -fx-min-width: 0;
+    -fx-pref-width: 150px;
+    -fx-max-width: 100000px;
+    -fx-min-height: 118px;
+    -fx-alignment: CENTER;
+    -fx-spacing: 5px;
+}
+
+.report-card-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #2f3f52;
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+.report-stat-card .stat-number,
+.report-mini-card .stat-number {
+    -fx-font-size: 23px;
 }
 
 .chart {

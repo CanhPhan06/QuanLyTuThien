@@ -42,6 +42,7 @@ public final class DatabaseDataLoader {
                 replaceWhenDatabaseHasData(AppData.getDonations(), donations);
                 replaceWhenDatabaseHasData(AppData.getOperations(), operations);
                 replaceWhenDatabaseHasData(AppData.getContents(), contents);
+                AppData.ensureReportSampleData();
             });
             return true;
         } catch (SQLException ex) {
