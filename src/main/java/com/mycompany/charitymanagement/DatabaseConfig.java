@@ -17,7 +17,12 @@ public final class DatabaseConfig {
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        java.util.Properties props = new java.util.Properties();
+        props.setProperty("user", USER);
+        props.setProperty("password", PASSWORD);
+        props.setProperty("oracle.net.CONNECT_TIMEOUT", "5000");
+        props.setProperty("oracle.jdbc.ReadTimeout", "10000");
+        return DriverManager.getConnection(URL, props);
     }
 
     public static String connectionLabel() {

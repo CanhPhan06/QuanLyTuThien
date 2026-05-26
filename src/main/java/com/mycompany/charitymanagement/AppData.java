@@ -25,7 +25,9 @@ public final class AppData {
         addDonations();
         addOperations();
         addContents();
-        DatabaseDataLoader.loadIntoMemory();
+        Thread loader = new Thread(() -> DatabaseDataLoader.loadIntoMemory());
+        loader.setDaemon(true);
+        loader.start();
     }
 
     private AppData() {
