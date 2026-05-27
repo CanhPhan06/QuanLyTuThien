@@ -24,6 +24,10 @@
     </left>
 
     <center>
-        <StackPane fx:id="contentArea" styleClass="main-content"/>
+        <StackPane styleClass="main-content">
+            <StackPane fx:id="contentArea"/>
+            <Button fx:id="btnNotificationBell" text="🔔" onAction="#handleOpenNotificationBell"
+                    styleClass="notification-bell-button" StackPane.alignment="TOP_RIGHT"/>
+        </StackPane>
     </center>
 </BorderPane>

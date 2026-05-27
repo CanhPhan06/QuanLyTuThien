@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -35,6 +36,8 @@ public class MainLayoutController {
     private Button btnReports;
     @FXML
     private Button btnLogout;
+    @FXML
+    private Button btnNotificationBell;
 
     @FXML
     private StackPane contentArea;
@@ -49,6 +52,8 @@ public class MainLayoutController {
         }
         NavigationService.setMainLayoutController(this);
         configureRole();
+        AppData.getContents().addListener((ListChangeListener<SystemRecord>) change -> updateNotificationBell());
+        updateNotificationBell();
     }
 
     private void configureRole() {
@@ -154,11 +159,21 @@ public class MainLayoutController {
         NavigationService.navigateTo(NavigationService.VIEW_LOGIN);
     }
 
+    @FXML
+    private void handleOpenNotificationBell() {
+        NotificationCenter.show(btnNotificationBell, currentUser);
+        updateNotificationBell();
+    }
+
     private void setVisibleManaged(Node node, boolean visible) {
         if (node != null) {
             node.setVisible(visible);
             node.setManaged(visible);
         }
+    }
+
+    private void updateNotificationBell() {
+        NotificationCenter.updateBell(btnNotificationBell, currentUser);
     }
 
     private void loadViewSafely(String viewName) {

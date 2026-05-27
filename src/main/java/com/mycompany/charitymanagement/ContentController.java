@@ -1177,12 +1177,35 @@ public class ContentController {
                 parent.getNguoiTao(),
                 note
         ));
+        notifyReplyOwner(parent, campaign, user, text);
         replyInput.clear();
         selectCampaign(campaign, false);
         if (afterAction != null) {
             afterAction.run();
         }
         DialogUtils.info("Đã gửi phản hồi bình luận.");
+    }
+
+    private void notifyReplyOwner(SystemRecord parent, ActivityModel campaign, UserAccount responder, String replyText) {
+        String target = parent.getNguoiTao();
+        if (target == null || target.isBlank() || target.equalsIgnoreCase(responder.getUsername())) {
+            target = parent.getMaLienKet();
+        }
+        if (target == null || target.isBlank()
+                || target.equalsIgnoreCase(responder.getUsername())
+                || target.toUpperCase().startsWith("CD")) {
+            return;
+        }
+        BusinessService.notifyUser(target, "Admin đã phản hồi bình luận",
+                "Bình luận của bạn trong chiến dịch " + campaign.getTenChienDich()
+                + " có phản hồi mới: " + snippet(replyText));
+    }
+
+    private String snippet(String text) {
+        if (text == null) {
+            return "";
+        }
+        return text.length() <= 80 ? text : text.substring(0, 77) + "...";
     }
 
     private void incrementReaction(SystemRecord record, String key) {

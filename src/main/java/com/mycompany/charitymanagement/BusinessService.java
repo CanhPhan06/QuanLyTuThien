@@ -29,6 +29,7 @@ public final class BusinessService {
                 user.getDisplayName() + " đăng ký tham gia " + campaign.getTenChienDich(),
                 AppData.todayText(), "", "Chờ duyệt", user.getUsername(), defaultAdmin(), "Bảng ThamGiaTNV"));
         notifyUser(user.getUsername(), "Đã gửi đăng ký", "Hồ sơ tham gia " + campaign.getTenChienDich() + " đang chờ quản lý duyệt.");
+        notifyAdmins("Đăng ký TNV mới", user.getDisplayName() + " đăng ký tham gia chiến dịch " + campaign.getTenChienDich() + ".");
         audit(user.getUsername(), "Đăng ký chiến dịch", user.getDisplayName() + " đăng ký " + campaign.getMaChienDich());
         return null;
     }
@@ -40,6 +41,7 @@ public final class BusinessService {
         }
 
         SystemRecord record = findRegistrationOperation(participant.getMaTaiKhoan(), participant.getMaChienDich());
+        String previousStatus = record == null ? "" : record.getTrangThai();
         String owner = valueOrFallback(actor, participant.getMaTaiKhoan());
         String detail = participant.getHoTen() + " - " + participant.getTruong()
                 + " đăng ký tham gia chiến dịch " + participant.getMaChienDich();
@@ -66,7 +68,7 @@ public final class BusinessService {
             record.setGhiChu("Bảng ThamGiaTNV");
         }
 
-        if ("Đã duyệt".equals(participant.getTrangThaiDuyet())) {
+        if ("Đã duyệt".equals(participant.getTrangThaiDuyet()) && !"Đã duyệt".equals(previousStatus)) {
             notifyUser(participant.getMaTaiKhoan(), "Đăng ký đã được duyệt",
                     "Bạn đã được duyệt tham gia chiến dịch " + participant.getMaChienDich() + ".");
         }
@@ -85,6 +87,7 @@ public final class BusinessService {
                 "Ghi nhận điểm danh cho " + profile.getMaChienDich(), AppData.todayText(), "",
                 "Chờ duyệt", user.getUsername(), defaultAdmin(), "Bảng DiemDanh"));
         notifyUser(user.getUsername(), "Đã gửi điểm danh", "Điểm danh đang chờ quản lý xác nhận.");
+        notifyAdmins("Điểm danh chờ xác nhận", user.getDisplayName() + " vừa điểm danh chiến dịch " + profile.getMaChienDich() + ".");
         audit(user.getUsername(), "Điểm danh", user.getDisplayName() + " điểm danh " + profile.getMaChienDich());
         return null;
     }
@@ -100,6 +103,7 @@ public final class BusinessService {
                 proofType + " - " + note, AppData.todayText(), "",
                 "Chờ xác nhận", user.getUsername(), defaultAdmin(), "Bảng MinhChungTNV"));
         notifyUser(user.getUsername(), "Đã gửi minh chứng", "Minh chứng của bạn đang chờ quản lý xác nhận.");
+        notifyAdmins("Minh chứng TNV mới", user.getDisplayName() + " gửi minh chứng cho chiến dịch " + profile.getMaChienDich() + ".");
         audit(user.getUsername(), "Gửi minh chứng", user.getDisplayName() + " gửi minh chứng " + profile.getMaChienDich());
         return null;
     }
@@ -128,6 +132,8 @@ public final class BusinessService {
                 valueOrFallback(actor, donation.getNguoiQuyenGop()), defaultAdmin(), "Bảng QuyenGopTien/PhieuQuyenGopVP"));
         notifyUser(valueOrFallback(actor, donation.getNguoiQuyenGop()), "Đã gửi đề xuất tài trợ",
                 "Khoản tài trợ/quyên góp " + donation.getMaQuyenGop() + " đang chờ xác nhận.");
+        notifyAdmins("Quyên góp chờ xác nhận",
+                donation.getNguoiQuyenGop() + " gửi " + donation.getHinhThuc() + " cho chiến dịch " + donation.getHoatDong() + ".");
         audit(valueOrFallback(actor, donation.getNguoiQuyenGop()), "Gửi tài trợ/quyên góp",
                 donation.getNguoiQuyenGop() + " gửi " + donation.getMaQuyenGop());
         return null;
@@ -217,6 +223,10 @@ public final class BusinessService {
         }
         AppData.getContents().add(new SystemRecord("ThongBao", AppData.nextContentId("TB"),
                 accountId, title, message, AppData.todayText(), "Chưa đọc", "Bảng ThongBao"));
+    }
+
+    public static void notifyAdmins(String title, String message) {
+        notifyUser("ADMIN", title, message);
     }
 
     public static void audit(String actor, String action, String detail) {

@@ -106,6 +106,8 @@ public class VolunteerController {
     private Button btnProof;
     @FXML
     private Button btnNotifications;
+    @FXML
+    private Button btnNotificationBell;
 
     @FXML
     private TableView<ActivityModel> tableCampaigns;
@@ -250,6 +252,11 @@ public class VolunteerController {
             renderCampaignComments();
             renderCampaignPortal();
         });
+        AppData.getOperations().addListener((ListChangeListener<SystemRecord>) change -> refreshView());
+        AppData.getParticipants().addListener((ListChangeListener<ParticipantModel>) change -> {
+            refreshView();
+            renderCampaignPortal();
+        });
 
         if (!cboCampaign.getItems().isEmpty()) {
             cboCampaign.setValue(cboCampaign.getItems().get(0));
@@ -290,6 +297,12 @@ public class VolunteerController {
     @FXML
     private void handleShowNotifications() {
         showSection(notificationsSection, btnNotifications);
+    }
+
+    @FXML
+    private void handleOpenNotificationBell() {
+        NotificationCenter.show(btnNotificationBell, currentUser);
+        refreshView();
     }
 
     @FXML
@@ -338,6 +351,8 @@ public class VolunteerController {
                 "ADMIN",
                 "Tạo từ cổng tình nguyện viên"
         ));
+        BusinessService.notifyAdmins("Bình luận chiến dịch mới",
+                currentUser.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text));
         txtCampaignComment.clear();
         renderCampaignComments();
         DialogUtils.info("Đã gửi bình luận. Admin sẽ thấy trong phần Nội dung.");
@@ -417,13 +432,11 @@ public class VolunteerController {
                 record.getMaLienKet().equalsIgnoreCase(currentUser.getUsername())
                 || (!campaignId.isEmpty() && record.getMaChienDich().equalsIgnoreCase(campaignId))
         ));
-        volunteerNotifications.setAll(AppData.getContents().filtered(record ->
-                record.getMaLienKet().equalsIgnoreCase(currentUser.getUsername())
-                || (!campaignId.isEmpty() && record.getMaLienKet().equalsIgnoreCase(campaignId))
-        ));
+        volunteerNotifications.setAll(NotificationCenter.notificationsFor(currentUser));
         if (lblNotificationCount != null) {
-            lblNotificationCount.setText(String.valueOf(volunteerNotifications.size()));
+            lblNotificationCount.setText(String.valueOf(NotificationCenter.unreadCount(currentUser)));
         }
+        NotificationCenter.updateBell(btnNotificationBell, currentUser);
         refreshProfile();
     }
 
@@ -942,6 +955,10 @@ public class VolunteerController {
 
     private String value(TextField textField) {
         return textField == null || textField.getText() == null ? "" : textField.getText().trim();
+    }
+
+    private String snippet(String text) {
+        return text.length() <= 80 ? text : text.substring(0, 77) + "...";
     }
 
     private void setLabelText(Label label, String text) {

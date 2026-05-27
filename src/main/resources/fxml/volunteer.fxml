@@ -266,6 +266,8 @@
                     </columns>
                 </TableView>
             </VBox>
+            <Button fx:id="btnNotificationBell" text="🔔" onAction="#handleOpenNotificationBell"
+                    styleClass="notification-bell-button" StackPane.alignment="TOP_RIGHT"/>
         </StackPane>
     </center>
 </BorderPane>

@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -93,6 +94,13 @@ public final class CrudDialogUtils {
     }
 
     private static Control createInput(String label, String value) {
+        if (isDateLabel(label)) {
+            DatePicker picker = new DatePicker(UiFormOptions.parseDate(value));
+            UiFormOptions.configureDatePicker(picker);
+            picker.setMaxWidth(Double.MAX_VALUE);
+            return picker;
+        }
+
         String[] choices = choicesFor(label);
         if (choices.length > 0) {
             ComboBox<String> comboBox = new ComboBox<>();
@@ -109,6 +117,9 @@ public final class CrudDialogUtils {
 
     private static String[] choicesFor(String label) {
         String normalized = label.toLowerCase();
+        if (isLocationChoiceLabel(normalized)) {
+            return UiFormOptions.provinceOptions().toArray(String[]::new);
+        }
         if (normalized.contains("tài khoản tnv")) {
             return AppData.getAccounts().stream()
                     .filter(UserAccount::isVolunteer)
@@ -173,10 +184,28 @@ public final class CrudDialogUtils {
             Object value = ((ComboBox<?>) control).getValue();
             return value == null ? "" : String.valueOf(value).trim();
         }
+        if (control instanceof DatePicker) {
+            return UiFormOptions.formatDate(((DatePicker) control).getValue());
+        }
         return "";
     }
 
     private static String valueAt(String[] values, int index) {
         return values != null && index < values.length && values[index] != null ? values[index] : "";
+    }
+
+    private static boolean isDateLabel(String label) {
+        return label != null && label.toLowerCase().contains("ngày");
+    }
+
+    private static boolean isLocationChoiceLabel(String normalizedLabel) {
+        if (normalizedLabel == null) {
+            return false;
+        }
+        return normalizedLabel.contains("địa điểm")
+                || normalizedLabel.contains("địa chỉ")
+                || normalizedLabel.contains("tỉnh")
+                || normalizedLabel.contains("thành phố")
+                || normalizedLabel.contains("khu vực");
     }
 }

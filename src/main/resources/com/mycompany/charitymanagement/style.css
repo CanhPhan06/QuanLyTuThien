@@ -1119,3 +1119,22 @@
     -fx-background-color: #eef5ff;
     -fx-border-color: #0b63ce;
 }
+
+.notification-bell-button {
+    -fx-background-color: white;
+    -fx-border-color: #c9d8ee;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0b63ce;
+    -fx-effect: dropshadow(gaussian, rgba(15, 35, 65, 0.12), 10, 0, 0, 3);
+    -fx-translate-x: -10px;
+    -fx-translate-y: 10px;
+}
+
+.notification-bell-button:hover {
+    -fx-background-color: #eef5ff;
+    -fx-border-color: #0b63ce;
+}

@@ -88,6 +88,8 @@ public class SponsorPortalController {
     private Button btnProfile;
     @FXML
     private Button btnCampaigns;
+    @FXML
+    private Button btnNotificationBell;
 
     @FXML
     private TableView<ActivityModel> tableCampaigns;
@@ -219,6 +221,7 @@ public class SponsorPortalController {
         cboCampaign.valueProperty().addListener((observable, oldValue, value) ->
                 updateCampaignSummary(AppData.findCampaign(extractCampaignId(value))));
         AppData.getContents().addListener((ListChangeListener<SystemRecord>) change -> {
+            refreshView();
             renderCampaignComments();
             renderCampaignPortal();
         });
@@ -226,6 +229,7 @@ public class SponsorPortalController {
             refreshCampaignChoices();
             renderCampaignPortal();
         });
+        AppData.getDonations().addListener((ListChangeListener<DonationModel>) change -> refreshView());
 
         if (!cboCampaign.getItems().isEmpty()) {
             cboCampaign.setValue(cboCampaign.getItems().get(0));
@@ -258,6 +262,12 @@ public class SponsorPortalController {
         } else {
             tableCampaigns.requestFocus();
         }
+    }
+
+    @FXML
+    private void handleOpenNotificationBell() {
+        NotificationCenter.show(btnNotificationBell, currentUser);
+        refreshView();
     }
 
     @FXML
@@ -360,6 +370,8 @@ public class SponsorPortalController {
                 "ADMIN",
                 "Tạo từ cổng nhà tài trợ"
         ));
+        BusinessService.notifyAdmins("Bình luận chiến dịch mới",
+                currentUser.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text));
         txtCampaignComment.clear();
         renderCampaignComments();
         DialogUtils.info("Đã gửi bình luận. Admin sẽ thấy trong phần Nội dung.");
@@ -402,6 +414,7 @@ public class SponsorPortalController {
         refreshProfile();
         double total = totalSponsorCash();
         lblSupportTotal.setText(FormatUtils.money(total));
+        NotificationCenter.updateBell(btnNotificationBell, currentUser);
     }
 
     private void showSection(VBox activeSection, Button activeButton) {
@@ -933,5 +946,9 @@ public class SponsorPortalController {
         if (label != null) {
             label.setText(text);
         }
+    }
+
+    private String snippet(String text) {
+        return text.length() <= 80 ? text : text.substring(0, 77) + "...";
     }
 }

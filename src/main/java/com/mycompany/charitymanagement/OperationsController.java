@@ -3,6 +3,7 @@ package com.mycompany.charitymanagement;
 import java.io.IOException;
 import java.text.Normalizer;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -151,6 +152,22 @@ public class OperationsController {
         filteredDoneRecords = new FilteredList<>(doneRecords, item -> true);
         tablePendingRecords.setItems(filteredPendingRecords);
         tableDoneRecords.setItems(filteredDoneRecords);
+        syncMissingOperationRecords();
+        AppData.getOperations().addListener((ListChangeListener<SystemRecord>) change -> {
+            refreshTables();
+            updateLinkedObjects();
+        });
+        AppData.getParticipants().addListener((ListChangeListener<ParticipantModel>) change -> {
+            syncMissingOperationRecords();
+            updateLinkedObjects();
+            refreshTables();
+        });
+        AppData.getDonations().addListener((ListChangeListener<DonationModel>) change -> {
+            syncMissingOperationRecords();
+            updateLinkedObjects();
+            refreshTables();
+        });
+        AppData.getActivities().addListener((ListChangeListener<ActivityModel>) change -> refreshOperationChoices());
 
         tablePendingRecords.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, selected) -> {
@@ -433,6 +450,57 @@ public class OperationsController {
         applyOperationFilters();
         tablePendingRecords.refresh();
         tableDoneRecords.refresh();
+    }
+
+    private void syncMissingOperationRecords() {
+        for (ParticipantModel participant : AppData.getParticipants()) {
+            if (!operationExists(TYPE_REGISTRATION, participant.getMaTaiKhoan(), participant.getMaChienDich())) {
+                BusinessService.syncVolunteerRegistration(participant, participant.getMaTaiKhoan());
+            }
+        }
+        for (DonationModel donation : AppData.getDonations()) {
+            if (!operationExists(TYPE_DONATION, donation.getMaQuyenGop(), donation.getHoatDong())) {
+                BusinessService.syncDonationOperation(donation, donationActor(donation));
+            }
+        }
+    }
+
+    private boolean operationExists(String type, String linkId, String campaignId) {
+        return AppData.getOperations().stream()
+                .anyMatch(record -> sameType(record.getNhomBang(), type)
+                && record.getMaLienKet().equalsIgnoreCase(linkId)
+                && record.getMaChienDich().equalsIgnoreCase(campaignId));
+    }
+
+    private String donationActor(DonationModel donation) {
+        for (UserAccount account : AppData.getAccounts()) {
+            if (account.getDisplayName().equalsIgnoreCase(donation.getNguoiQuyenGop())) {
+                return account.getUsername();
+            }
+        }
+        return donation.getNguoiQuyenGop();
+    }
+
+    private void refreshOperationChoices() {
+        String selectedCampaign = extractCode(cboChienDich.getValue());
+        cboChienDich.setItems(buildCampaignOptions());
+        String campaignOption = findOption(cboChienDich.getItems(), selectedCampaign);
+        if (campaignOption != null) {
+            cboChienDich.setValue(campaignOption);
+        } else if (!cboChienDich.getItems().isEmpty()) {
+            cboChienDich.setValue(cboChienDich.getItems().get(0));
+        }
+
+        String selectedFilter = extractCode(cboOperationCampaignFilter.getValue());
+        cboOperationCampaignFilter.setItems(buildCampaignFilterOptions());
+        String filterOption = findOption(cboOperationCampaignFilter.getItems(), selectedFilter);
+        if (filterOption != null) {
+            cboOperationCampaignFilter.setValue(filterOption);
+        } else {
+            cboOperationCampaignFilter.setValue("Tất cả chiến dịch");
+        }
+        updateLinkedObjects();
+        applyOperationFilters();
     }
 
     private void setupOperationFilters() {

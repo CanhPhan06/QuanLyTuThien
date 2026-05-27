@@ -276,12 +276,21 @@ final class CampaignDialogUtils {
                 "ADMIN",
                 noteSource
         ));
+        BusinessService.notifyAdmins("Bình luận chiến dịch mới",
+                actor.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text));
         input.clear();
         renderComments(campaign, commentsBox);
         if (afterChange != null) {
             afterChange.run();
         }
         DialogUtils.info("Đã gửi bình luận. Admin sẽ thấy trong phần Nội dung.");
+    }
+
+    private static String snippet(String text) {
+        if (text == null) {
+            return "";
+        }
+        return text.length() <= 80 ? text : text.substring(0, 77) + "...";
     }
 
     private static Label muted(String text) {
