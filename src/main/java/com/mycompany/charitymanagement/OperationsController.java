@@ -337,6 +337,7 @@ public class OperationsController {
         syncRelatedData(record);
         refreshTables();
         handleClearForm();
+        focusOperationRecord(record);
         DialogUtils.info("Đã thêm bản ghi vận hành.");
     }
 
@@ -366,6 +367,7 @@ public class OperationsController {
         syncRelatedData(selected);
         refreshTables();
         handleClearForm();
+        focusOperationRecord(selected);
         DialogUtils.info("Đã cập nhật bản ghi vận hành.");
     }
 
@@ -451,6 +453,36 @@ public class OperationsController {
         applyOperationFilters();
         tablePendingRecords.refresh();
         tableDoneRecords.refresh();
+    }
+
+    private void focusOperationRecord(SystemRecord record) {
+        if (record == null) {
+            return;
+        }
+        if (cboOperationTypeFilter.getItems().contains(record.getNhomBang())) {
+            cboOperationTypeFilter.setValue(record.getNhomBang());
+        }
+        String campaignOption = findOption(cboOperationCampaignFilter.getItems(), record.getMaChienDich());
+        if (campaignOption != null) {
+            cboOperationCampaignFilter.setValue(campaignOption);
+        }
+        if (cboOperationStatusFilter.getItems().contains(record.getTrangThai())) {
+            cboOperationStatusFilter.setValue(record.getTrangThai());
+        } else {
+            cboOperationStatusFilter.setValue("Tất cả trạng thái");
+        }
+        txtOperationSearch.clear();
+        applyOperationFilters();
+
+        if (isDoneStatus(record.getTrangThai())) {
+            tablePendingRecords.getSelectionModel().clearSelection();
+            tableDoneRecords.getSelectionModel().select(record);
+            tableDoneRecords.scrollTo(record);
+        } else {
+            tableDoneRecords.getSelectionModel().clearSelection();
+            tablePendingRecords.getSelectionModel().select(record);
+            tablePendingRecords.scrollTo(record);
+        }
     }
 
     private void syncMissingOperationRecords() {

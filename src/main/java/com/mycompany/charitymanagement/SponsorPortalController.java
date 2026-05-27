@@ -254,6 +254,53 @@ public class SponsorPortalController {
     }
 
     @FXML
+    private void handleEditProfile() {
+        SponsorModel sponsor = findSponsorProfile();
+        if (sponsor == null) {
+            DialogUtils.warning("Bạn chưa có hồ sơ nhà tài trợ để chỉnh sửa.");
+            return;
+        }
+        String[] result = CrudDialogUtils.showForm("Chỉnh sửa hồ sơ nhà tài trợ",
+                new String[]{"Tên tổ chức", "Lĩnh vực", "Số điện thoại", "Email", "Địa chỉ"},
+                new String[]{
+                    sponsor.getTenDoiTac(),
+                    sponsor.getLinhVuc(),
+                    sponsor.getSoDienThoai(),
+                    sponsor.getEmail(),
+                    sponsor.getDiaChi()
+                });
+        if (result == null) {
+            return;
+        }
+        if (result[0].isBlank() || result[1].isBlank() || result[2].isBlank() || result[3].isBlank()) {
+            DialogUtils.warning("Vui lòng nhập tên tổ chức, lĩnh vực, số điện thoại và email.");
+            return;
+        }
+        if (!BusinessRules.isPhone(result[2])) {
+            DialogUtils.warning("Số điện thoại phải bắt đầu bằng 09 và có 10 chữ số.");
+            return;
+        }
+        if (!BusinessRules.isGmail(result[3])) {
+            DialogUtils.warning("Email nhà tài trợ phải có dạng @gmail.com.");
+            return;
+        }
+        for (SponsorModel item : AppData.getSponsors()) {
+            if (item.getMaDoiTac().equalsIgnoreCase(sponsor.getMaDoiTac())
+                    || item.getTenDoiTac().equalsIgnoreCase(currentUser.getDisplayName())) {
+                item.setTenDoiTac(result[0]);
+                item.setLinhVuc(result[1]);
+                item.setSoDienThoai(result[2]);
+                item.setEmail(result[3]);
+                item.setDiaChi(result[4]);
+            }
+        }
+        tableSponsorPartnerHistory.refresh();
+        refreshView();
+        BusinessService.audit(currentUser.getUsername(), "Cập nhật hồ sơ", "Nhà tài trợ cập nhật hồ sơ tổ chức");
+        DialogUtils.info("Đã cập nhật hồ sơ nhà tài trợ.");
+    }
+
+    @FXML
     private void handleCampaigns() {
         showSection(overviewSection, btnCampaigns);
         renderCampaignPortal();

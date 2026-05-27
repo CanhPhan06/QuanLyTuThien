@@ -25,6 +25,20 @@ final class CampaignDialogUtils {
     static void showCampaignDialog(Node ownerNode, ActivityModel campaign, UserAccount user,
             String joinButtonText, Consumer<ActivityModel> joinHandler,
             String commentTitle, String noteSource, Runnable afterChange) {
+        showCampaignDialogInternal(ownerNode, campaign, user, joinButtonText, joinHandler,
+                commentTitle, noteSource, afterChange, false);
+    }
+
+    static void showNotificationCampaignDialog(Node ownerNode, ActivityModel campaign, UserAccount user,
+            Runnable afterChange) {
+        showCampaignDialogInternal(ownerNode, campaign, user, "", null,
+                user != null && user.isAdmin() ? "Bình luận của quản trị viên" : "Bình luận của tôi",
+                "Tạo từ chuông thông báo", afterChange, true);
+    }
+
+    private static void showCampaignDialogInternal(Node ownerNode, ActivityModel campaign, UserAccount user,
+            String joinButtonText, Consumer<ActivityModel> joinHandler,
+            String commentTitle, String noteSource, Runnable afterChange, boolean notificationMode) {
         if (campaign == null) {
             DialogUtils.warning("Vui lòng chọn chiến dịch cần xem.");
             return;
@@ -40,15 +54,18 @@ final class CampaignDialogUtils {
 
         VBox commentsBox = new VBox(8);
         commentsBox.getStyleClass().add("campaign-dialog-comments");
-        renderComments(campaign, commentsBox);
+        boolean ownOnly = notificationMode && user != null && !user.isAdmin();
+        renderComments(campaign, commentsBox, user, ownOnly, afterChange);
 
         TextField commentInput = new TextField();
         commentInput.setPromptText("Nhập bình luận cho chiến dịch...");
         commentInput.getStyleClass().addAll("input-field", "campaign-dialog-comment-input");
         Button sendButton = new Button("Gửi bình luận");
         sendButton.getStyleClass().add("primary-button");
-        sendButton.setOnAction(event -> sendComment(campaign, user, commentInput, commentTitle, noteSource, commentsBox, afterChange));
-        commentInput.setOnAction(event -> sendComment(campaign, user, commentInput, commentTitle, noteSource, commentsBox, afterChange));
+        sendButton.setOnAction(event -> sendComment(campaign, user, commentInput, commentTitle, noteSource,
+                commentsBox, afterChange, ownOnly));
+        commentInput.setOnAction(event -> sendComment(campaign, user, commentInput, commentTitle, noteSource,
+                commentsBox, afterChange, ownOnly));
 
         HBox commentComposer = new HBox(10, commentInput, sendButton);
         commentComposer.setAlignment(Pos.CENTER_LEFT);
@@ -79,15 +96,17 @@ final class CampaignDialogUtils {
 
         Button closeButton = new Button("Đóng");
         closeButton.getStyleClass().add("quick-button");
-        Button joinButton = new Button(joinButtonText);
-        joinButton.getStyleClass().add("primary-button");
-        joinButton.setOnAction(event -> {
-            if (joinHandler != null) {
-                joinHandler.accept(campaign);
-            }
-        });
-
-        HBox actions = new HBox(12, closeButton, joinButton);
+        HBox actions = new HBox(12, closeButton);
+        if (!notificationMode) {
+            Button joinButton = new Button(joinButtonText);
+            joinButton.getStyleClass().add("primary-button");
+            joinButton.setOnAction(event -> {
+                if (joinHandler != null) {
+                    joinHandler.accept(campaign);
+                }
+            });
+            actions.getChildren().add(joinButton);
+        }
         actions.setAlignment(Pos.CENTER_RIGHT);
 
         VBox card = new VBox(16, scrollPane, actions);
@@ -176,16 +195,18 @@ final class CampaignDialogUtils {
         return row;
     }
 
-    private static void renderComments(ActivityModel campaign, VBox target) {
+    private static void renderComments(ActivityModel campaign, VBox target, UserAccount viewer,
+            boolean ownOnly, Runnable afterChange) {
         target.getChildren().clear();
         int count = 0;
         for (SystemRecord record : AppData.getContents()) {
             if (!groupCode(record).contains("binhluan")
                     || isReplyRecord(record)
-                    || !campaign.getMaChienDich().equalsIgnoreCase(campaignId(record))) {
+                    || !campaign.getMaChienDich().equalsIgnoreCase(campaignId(record))
+                    || !isVisibleComment(record, viewer, ownOnly)) {
                 continue;
             }
-            target.getChildren().add(commentCard(record));
+            target.getChildren().add(commentCard(record, campaign, viewer, target, ownOnly, afterChange));
             count++;
         }
         if (count == 0) {
@@ -195,7 +216,8 @@ final class CampaignDialogUtils {
         }
     }
 
-    private static VBox commentCard(SystemRecord record) {
+    private static VBox commentCard(SystemRecord record, ActivityModel campaign, UserAccount viewer,
+            VBox commentsBox, boolean ownOnly, Runnable afterChange) {
         VBox wrapper = new VBox(6);
         wrapper.getStyleClass().add("comment-card");
 
@@ -219,9 +241,27 @@ final class CampaignDialogUtils {
         renderReplies(record, replies);
 
         body.getChildren().addAll(author, content, status, replies);
+        if (viewer != null && viewer.isAdmin()) {
+            body.getChildren().add(adminReplyComposer(record, campaign, viewer, commentsBox, ownOnly, afterChange));
+        }
         row.getChildren().addAll(avatar, body);
         wrapper.getChildren().add(row);
         return wrapper;
+    }
+
+    private static HBox adminReplyComposer(SystemRecord parent, ActivityModel campaign, UserAccount viewer,
+            VBox commentsBox, boolean ownOnly, Runnable afterChange) {
+        TextField input = new TextField();
+        input.setPromptText("Nhập phản hồi cho bình luận...");
+        input.getStyleClass().add("input-field");
+        Button button = new Button("Phản hồi");
+        button.getStyleClass().add("quick-button");
+        button.setOnAction(event -> sendReply(parent, campaign, viewer, input, commentsBox, ownOnly, afterChange));
+        input.setOnAction(event -> sendReply(parent, campaign, viewer, input, commentsBox, ownOnly, afterChange));
+        HBox row = new HBox(8, input, button);
+        row.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(input, Priority.ALWAYS);
+        return row;
     }
 
     private static void renderReplies(SystemRecord parent, VBox replies) {
@@ -253,7 +293,7 @@ final class CampaignDialogUtils {
     }
 
     private static void sendComment(ActivityModel campaign, UserAccount user, TextField input,
-            String title, String noteSource, VBox commentsBox, Runnable afterChange) {
+            String title, String noteSource, VBox commentsBox, Runnable afterChange, boolean ownOnly) {
         String text = input == null || input.getText() == null ? "" : input.getText().trim();
         if (text.isEmpty()) {
             DialogUtils.warning("Vui lòng nhập nội dung bình luận.");
@@ -280,11 +320,61 @@ final class CampaignDialogUtils {
                 actor.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text),
                 campaign.getMaChienDich(), "ACTION=CONTENT_COMMENTS");
         input.clear();
-        renderComments(campaign, commentsBox);
+        renderComments(campaign, commentsBox, actor, ownOnly, afterChange);
         if (afterChange != null) {
             afterChange.run();
         }
         DialogUtils.info("Đã gửi bình luận. Admin sẽ thấy trong phần Nội dung.");
+    }
+
+    private static void sendReply(SystemRecord parent, ActivityModel campaign, UserAccount viewer, TextField input,
+            VBox commentsBox, boolean ownOnly, Runnable afterChange) {
+        String text = input == null || input.getText() == null ? "" : input.getText().trim();
+        if (text.isEmpty()) {
+            DialogUtils.warning("Vui lòng nhập nội dung phản hồi.");
+            return;
+        }
+
+        AppData.getContents().add(new SystemRecord(
+                "BinhLuan",
+                AppData.nextContentId("BL"),
+                campaign.getMaChienDich(),
+                viewer.getUsername(),
+                "Phản hồi bình luận",
+                text,
+                AppData.todayText(),
+                "",
+                "Hiển thị",
+                viewer.getUsername(),
+                parent.getNguoiTao(),
+                "Phản hồi cho " + parent.getMaChinh() + "; " + REPLY_MARKER + parent.getMaChinh()
+        ));
+        String target = parent.getNguoiTao();
+        if (target == null || target.isBlank() || target.equalsIgnoreCase(viewer.getUsername())) {
+            target = parent.getMaLienKet();
+        }
+        if (target != null && !target.isBlank()
+                && !target.equalsIgnoreCase(viewer.getUsername())
+                && !target.toUpperCase().startsWith("CD")) {
+            BusinessService.notifyUser(target, "Admin đã phản hồi bình luận",
+                    "Bình luận của bạn trong chiến dịch " + campaign.getTenChienDich()
+                    + " có phản hồi mới: " + snippet(text),
+                    campaign.getMaChienDich(), "ACTION=CONTENT_COMMENTS");
+        }
+        input.clear();
+        renderComments(campaign, commentsBox, viewer, ownOnly, afterChange);
+        if (afterChange != null) {
+            afterChange.run();
+        }
+        DialogUtils.info("Đã gửi phản hồi bình luận.");
+    }
+
+    private static boolean isVisibleComment(SystemRecord record, UserAccount viewer, boolean ownOnly) {
+        if (!ownOnly || viewer == null) {
+            return true;
+        }
+        return record.getNguoiTao().equalsIgnoreCase(viewer.getUsername())
+                || record.getMaLienKet().equalsIgnoreCase(viewer.getUsername());
     }
 
     private static String snippet(String text) {

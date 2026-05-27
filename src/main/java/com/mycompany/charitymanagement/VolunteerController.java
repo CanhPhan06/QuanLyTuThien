@@ -279,6 +279,48 @@ public class VolunteerController {
     }
 
     @FXML
+    private void handleEditProfile() {
+        ParticipantModel profile = findParticipant();
+        if (profile == null) {
+            DialogUtils.warning("Bạn chưa có hồ sơ tham gia để chỉnh sửa.");
+            return;
+        }
+        String[] result = CrudDialogUtils.showForm("Chỉnh sửa hồ sơ cá nhân",
+                new String[]{"Họ và tên", "Số điện thoại", "MSSV/Email", "Khoa", "Trường"},
+                new String[]{
+                    emptyAsDash(profile.getHoTen()).equals("-") ? currentUser.getDisplayName() : profile.getHoTen(),
+                    profile.getSoDienThoai(),
+                    profile.getMssv(),
+                    profile.getKhoa(),
+                    profile.getTruong()
+                });
+        if (result == null) {
+            return;
+        }
+        if (result[0].isBlank() || result[3].isBlank() || result[4].isBlank()) {
+            DialogUtils.warning("Vui lòng nhập họ tên, khoa và trường.");
+            return;
+        }
+        if (!result[1].isBlank() && !BusinessRules.isPhone(result[1])) {
+            DialogUtils.warning("Số điện thoại phải bắt đầu bằng 09 và có 10 chữ số.");
+            return;
+        }
+        for (ParticipantModel item : AppData.getParticipants()) {
+            if (item.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername())) {
+                item.setHoTen(result[0]);
+                item.setSoDienThoai(result[1]);
+                item.setMssv(result[2]);
+                item.setKhoa(result[3]);
+                item.setTruong(result[4]);
+            }
+        }
+        tableParticipationHistory.refresh();
+        refreshView();
+        BusinessService.audit(currentUser.getUsername(), "Cập nhật hồ sơ", "Tình nguyện viên cập nhật hồ sơ cá nhân");
+        DialogUtils.info("Đã cập nhật hồ sơ cá nhân.");
+    }
+
+    @FXML
     private void handleShowCampaigns() {
         renderCampaignPortal();
         showSection(campaignsSection, btnCampaigns);

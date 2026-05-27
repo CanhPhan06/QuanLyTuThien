@@ -125,12 +125,16 @@ final class NotificationCenter {
         record.setTrangThai("Đã đọc");
         updateBell(owner instanceof Button ? (Button) owner : null, user);
 
-        if (user != null && user.isAdmin() && shouldOpenContent(record)) {
-            navigateToContent(record);
+        if (shouldOpenContent(record)) {
+            showCampaignPopup(owner, user, record);
             return;
         }
         if (user != null && user.isAdmin() && shouldOpenOperations(record)) {
             navigateToOperations(record);
+            return;
+        }
+        if (record.getMaChienDich() != null && !record.getMaChienDich().isBlank()) {
+            showCampaignPopup(owner, user, record);
             return;
         }
 
@@ -143,15 +147,19 @@ final class NotificationCenter {
         });
     }
 
-    private static void navigateToContent(SystemRecord record) {
-        try {
-            DetailDialogUtils.closeActiveOverlay();
-            NavigationIntent.focusContentComments(record.getMaChienDich());
-            NavigationService.invalidateContent(NavigationService.VIEW_CONTENT);
-            NavigationService.loadContentInLayout(NavigationService.VIEW_CONTENT);
-        } catch (IOException ex) {
-            DialogUtils.warning("Không mở được màn hình Nội dung.");
+    private static void showCampaignPopup(Node owner, UserAccount user, SystemRecord record) {
+        ActivityModel campaign = AppData.findCampaign(record.getMaChienDich());
+        if (campaign == null) {
+            DetailDialogUtils.showDetails(owner, record.getTieuDe(), new String[][]{
+                {"Ngày", record.getNgay()},
+                {"Nội dung", record.getNoiDung()},
+                {"Trạng thái", record.getTrangThai()}
+            });
+            return;
         }
+        DetailDialogUtils.closeActiveOverlay();
+        CampaignDialogUtils.showNotificationCampaignDialog(owner, campaign, user,
+                () -> updateBell(owner instanceof Button ? (Button) owner : null, user));
     }
 
     private static void navigateToOperations(SystemRecord record) {
