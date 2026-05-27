@@ -82,6 +82,12 @@ public class SponsorPortalController {
     private VBox overviewSection;
     @FXML
     private VBox profileSection;
+    @FXML
+    private Button btnOverview;
+    @FXML
+    private Button btnProfile;
+    @FXML
+    private Button btnCampaigns;
 
     @FXML
     private TableView<ActivityModel> tableCampaigns;
@@ -227,25 +233,25 @@ public class SponsorPortalController {
         }
         refreshView();
         renderCampaignPortal();
-        showSection(overviewSection);
+        showSection(overviewSection, btnOverview);
     }
 
     @FXML
     private void handleOverview() {
         refreshView();
         renderCampaignPortal();
-        showSection(overviewSection);
+        showSection(overviewSection, btnOverview);
     }
 
     @FXML
     private void handleShowProfile() {
         refreshView();
-        showSection(profileSection);
+        showSection(profileSection, btnProfile);
     }
 
     @FXML
     private void handleCampaigns() {
-        showSection(overviewSection);
+        showSection(overviewSection, btnCampaigns);
         renderCampaignPortal();
         if (campaignPortalBox != null) {
             campaignPortalBox.requestFocus();
@@ -398,13 +404,33 @@ public class SponsorPortalController {
         lblSupportTotal.setText(FormatUtils.money(total));
     }
 
-    private void showSection(VBox activeSection) {
+    private void showSection(VBox activeSection, Button activeButton) {
         VBox[] sections = {overviewSection, profileSection};
         for (VBox section : sections) {
             if (section != null) {
                 boolean active = section == activeSection;
                 section.setVisible(active);
                 section.setManaged(active);
+            }
+        }
+        setActiveMenu(activeButton);
+    }
+
+    private void setActiveMenu(Button activeButton) {
+        Button[] buttons = {btnOverview, btnProfile, btnCampaigns};
+        for (Button button : buttons) {
+            if (button == null) {
+                continue;
+            }
+            button.getStyleClass().remove("menu-button-active");
+            if (!button.getStyleClass().contains("menu-button")) {
+                button.getStyleClass().add("menu-button");
+            }
+            if (button == activeButton) {
+                button.getStyleClass().remove("menu-button");
+                if (!button.getStyleClass().contains("menu-button-active")) {
+                    button.getStyleClass().add("menu-button-active");
+                }
             }
         }
     }

@@ -94,6 +94,18 @@ public class VolunteerController {
     private VBox proofSection;
     @FXML
     private VBox notificationsSection;
+    @FXML
+    private Button btnOverview;
+    @FXML
+    private Button btnProfile;
+    @FXML
+    private Button btnCampaigns;
+    @FXML
+    private Button btnTasks;
+    @FXML
+    private Button btnProof;
+    @FXML
+    private Button btnNotifications;
 
     @FXML
     private TableView<ActivityModel> tableCampaigns;
@@ -245,39 +257,39 @@ public class VolunteerController {
         }
         refreshView();
         renderCampaignPortal();
-        showSection(overviewSection);
+        showSection(overviewSection, btnOverview);
     }
 
     @FXML
     private void handleShowOverview() {
-        showSection(overviewSection);
+        showSection(overviewSection, btnOverview);
     }
 
     @FXML
     private void handleShowProfile() {
         refreshView();
-        showSection(profileSection);
+        showSection(profileSection, btnProfile);
     }
 
     @FXML
     private void handleShowCampaigns() {
         renderCampaignPortal();
-        showSection(campaignsSection);
+        showSection(campaignsSection, btnCampaigns);
     }
 
     @FXML
     private void handleShowTasks() {
-        showSection(tasksSection);
+        showSection(tasksSection, btnTasks);
     }
 
     @FXML
     private void handleShowProof() {
-        showSection(proofSection);
+        showSection(proofSection, btnProof);
     }
 
     @FXML
     private void handleShowNotifications() {
-        showSection(notificationsSection);
+        showSection(notificationsSection, btnNotifications);
     }
 
     @FXML
@@ -415,13 +427,33 @@ public class VolunteerController {
         refreshProfile();
     }
 
-    private void showSection(VBox activeSection) {
+    private void showSection(VBox activeSection, Button activeButton) {
         VBox[] sections = {overviewSection, profileSection, campaignsSection, tasksSection, proofSection, notificationsSection};
         for (VBox section : sections) {
             if (section != null) {
                 boolean active = section == activeSection;
                 section.setVisible(active);
                 section.setManaged(active);
+            }
+        }
+        setActiveMenu(activeButton);
+    }
+
+    private void setActiveMenu(Button activeButton) {
+        Button[] buttons = {btnOverview, btnProfile, btnCampaigns, btnTasks, btnProof, btnNotifications};
+        for (Button button : buttons) {
+            if (button == null) {
+                continue;
+            }
+            button.getStyleClass().remove("menu-button-active");
+            if (!button.getStyleClass().contains("menu-button")) {
+                button.getStyleClass().add("menu-button");
+            }
+            if (button == activeButton) {
+                button.getStyleClass().remove("menu-button");
+                if (!button.getStyleClass().contains("menu-button-active")) {
+                    button.getStyleClass().add("menu-button-active");
+                }
             }
         }
     }
