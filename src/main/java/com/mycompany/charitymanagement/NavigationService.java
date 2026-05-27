@@ -52,6 +52,12 @@ public final class NavigationService {
         contentCache.clear();
     }
 
+    public static void invalidateContent(String viewName) {
+        if (viewName != null) {
+            contentCache.remove(viewName);
+        }
+    }
+
     public static void navigateTo(String viewName) throws IOException {
         if (VIEW_LOGIN.equals(viewName)) {
             UserSession.clear();

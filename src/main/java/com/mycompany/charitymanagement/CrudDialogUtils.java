@@ -144,10 +144,10 @@ public final class CrudDialogUtils {
             return new String[]{"Chờ duyệt", "Đang xét", "Đã duyệt", "Đang thực hiện", "Hoàn thành", "Đã hủy"};
         }
         if (normalized.contains("trạng thái duyệt")) {
-            return new String[]{"Chờ duyệt", "Đang xét", "Đã duyệt"};
+            return new String[]{"Chờ duyệt", "Đang xét", "Đã duyệt", "Từ chối"};
         }
         if (normalized.contains("trạng thái")) {
-            return new String[]{"Chờ duyệt", "Đang xét", "Chờ xác nhận", "Đã duyệt", "Có mặt", "Đã xác nhận"};
+            return new String[]{"Chờ duyệt", "Đang xét", "Chờ xác nhận", "Đã duyệt", "Có mặt", "Đã xác nhận", "Từ chối"};
         }
         if (normalized.contains("chiến dịch")) {
             return AppData.getActivities().stream()

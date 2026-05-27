@@ -371,7 +371,8 @@ public class SponsorPortalController {
                 "Tạo từ cổng nhà tài trợ"
         ));
         BusinessService.notifyAdmins("Bình luận chiến dịch mới",
-                currentUser.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text));
+                currentUser.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text),
+                campaign.getMaChienDich(), "ACTION=CONTENT_COMMENTS");
         txtCampaignComment.clear();
         renderCampaignComments();
         DialogUtils.info("Đã gửi bình luận. Admin sẽ thấy trong phần Nội dung.");

@@ -20,7 +20,7 @@ public final class BusinessRules {
             "Tiền", "Vật phẩm", "Vật tư", "Vật dụng", "Tài trợ tiền", "Tài trợ vật phẩm", "Chuyển khoản"
     ));
     private static final Set<String> VALID_PARTICIPANT_STATUSES = new HashSet<>(Arrays.asList(
-            "Chờ duyệt", "Đang xét", "Đã duyệt"
+            "Chờ duyệt", "Đang xét", "Đã duyệt", "Từ chối"
     ));
     private static final Set<String> VNU_HCM_SCHOOLS = new HashSet<>(Arrays.asList(
             "UIT", "UEL", "HCMUS", "HCMUT", "HCMIU", "UHS", "HCMUSSH"
@@ -365,7 +365,7 @@ public final class BusinessRules {
             return new HashSet<>(Arrays.asList("Đang phân công", "Đã phân công"));
         }
         if ("Đăng ký TNV".equals(operationType) || "Chiến dịch".equals(operationType)) {
-            return new HashSet<>(Arrays.asList("Chờ duyệt", "Đang xét", "Đã duyệt"));
+            return new HashSet<>(Arrays.asList("Chờ duyệt", "Đang xét", "Đã duyệt", "Từ chối"));
         }
         if ("Chi tiêu".equals(operationType)) {
             return new HashSet<>(Arrays.asList("Chờ duyệt", "Đã duyệt"));

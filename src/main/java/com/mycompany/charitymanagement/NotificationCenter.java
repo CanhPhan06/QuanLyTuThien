@@ -1,11 +1,20 @@
 package com.mycompany.charitymanagement;
 
+import java.io.IOException;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 final class NotificationCenter {
 
@@ -47,18 +56,113 @@ final class NotificationCenter {
             return;
         }
 
-        String[][] rows = new String[Math.min(notifications.size(), 15)][2];
-        for (int i = 0; i < rows.length; i++) {
-            SystemRecord record = notifications.get(i);
-            String campaign = record.getMaChienDich() == null || record.getMaChienDich().isBlank()
-                    ? ""
-                    : " • " + record.getTenChienDich();
-            rows[i][0] = record.getNgay() + " • " + record.getTieuDe();
-            rows[i][1] = record.getNoiDung() + campaign + " • " + record.getTrangThai();
+        Scene scene = owner == null ? App.getScene() : owner.getScene();
+        if (scene == null) {
+            scene = App.getScene();
         }
-        DetailDialogUtils.showDetails(owner, "Thông báo", rows);
-        markRead(notifications);
+        if (scene == null) {
+            return;
+        }
+
+        Label title = new Label("Thông báo");
+        title.getStyleClass().add("page-title");
+
+        VBox list = new VBox(10);
+        int count = Math.min(notifications.size(), 15);
+        for (int i = 0; i < count; i++) {
+            list.getChildren().add(notificationRow(owner, user, notifications.get(i)));
+        }
+
+        ScrollPane scrollPane = new ScrollPane(list);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setMaxHeight(440);
+        scrollPane.getStyleClass().add("content-scroll");
+
+        Button closeButton = new Button("Đóng");
+        closeButton.getStyleClass().add("quick-button");
+        HBox actions = new HBox(closeButton);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox card = new VBox(16, title, scrollPane, actions);
+        card.getStyleClass().add("detail-card");
+        card.setMaxWidth(760);
+        card.setMaxHeight(620);
+
+        StackPane overlay = DetailDialogUtils.showCard(scene, card);
+        if (overlay != null) {
+            closeButton.setOnAction(event -> DetailDialogUtils.closeOverlay(overlay));
+        }
+    }
+
+    private static HBox notificationRow(Node owner, UserAccount user, SystemRecord record) {
+        VBox body = new VBox(4);
+        HBox.setHgrow(body, Priority.ALWAYS);
+
+        Label title = new Label(record.getNgay() + " • " + record.getTieuDe());
+        title.getStyleClass().add("comment-author");
+        Label content = new Label(notificationSummary(record));
+        content.getStyleClass().add("comment-text");
+        content.setWrapText(true);
+        Label status = new Label(record.getTrangThai());
+        status.getStyleClass().add("muted-text");
+        body.getChildren().addAll(title, content, status);
+
+        Button openButton = new Button(actionLabel(record, user));
+        openButton.getStyleClass().add("primary-button");
+        openButton.setOnAction(event -> {
+            event.consume();
+            openNotification(owner, user, record);
+        });
+
+        HBox row = new HBox(12, body, openButton);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.getStyleClass().add("comment-card");
+        row.setOnMouseClicked(event -> openNotification(owner, user, record));
+        return row;
+    }
+
+    private static void openNotification(Node owner, UserAccount user, SystemRecord record) {
+        record.setTrangThai("Đã đọc");
         updateBell(owner instanceof Button ? (Button) owner : null, user);
+
+        if (user != null && user.isAdmin() && shouldOpenContent(record)) {
+            navigateToContent(record);
+            return;
+        }
+        if (user != null && user.isAdmin() && shouldOpenOperations(record)) {
+            navigateToOperations(record);
+            return;
+        }
+
+        DetailDialogUtils.closeActiveOverlay();
+        DetailDialogUtils.showDetails(owner, record.getTieuDe(), new String[][]{
+            {"Ngày", record.getNgay()},
+            {"Nội dung", record.getNoiDung()},
+            {"Chiến dịch", record.getMaChienDich().isBlank() ? "-" : record.getTenChienDich()},
+            {"Trạng thái", record.getTrangThai()}
+        });
+    }
+
+    private static void navigateToContent(SystemRecord record) {
+        try {
+            DetailDialogUtils.closeActiveOverlay();
+            NavigationIntent.focusContentComments(record.getMaChienDich());
+            NavigationService.invalidateContent(NavigationService.VIEW_CONTENT);
+            NavigationService.loadContentInLayout(NavigationService.VIEW_CONTENT);
+        } catch (IOException ex) {
+            DialogUtils.warning("Không mở được màn hình Nội dung.");
+        }
+    }
+
+    private static void navigateToOperations(SystemRecord record) {
+        try {
+            DetailDialogUtils.closeActiveOverlay();
+            NavigationIntent.focusOperations(operationType(record), record.getMaChienDich(), operationStatus(record), "");
+            NavigationService.invalidateContent(NavigationService.VIEW_OPERATIONS);
+            NavigationService.loadContentInLayout(NavigationService.VIEW_OPERATIONS);
+        } catch (IOException ex) {
+            DialogUtils.warning("Không mở được màn hình Vận hành.");
+        }
     }
 
     private static void markRead(List<SystemRecord> notifications) {
@@ -71,6 +175,85 @@ final class NotificationCenter {
 
     private static boolean isNotification(SystemRecord record) {
         return normalize(record.getNhomBang()).contains("thongbao");
+    }
+
+    private static boolean shouldOpenContent(SystemRecord record) {
+        return "CONTENT_COMMENTS".equals(marker(record, "ACTION"))
+                || normalize(record.getTieuDe() + " " + record.getNoiDung()).contains("binh luan");
+    }
+
+    private static boolean shouldOpenOperations(SystemRecord record) {
+        String action = marker(record, "ACTION");
+        if ("OPERATIONS".equals(action)) {
+            return true;
+        }
+        String text = normalize(record.getTieuDe() + " " + record.getNoiDung());
+        return text.contains("dang ky")
+                || text.contains("diem danh")
+                || text.contains("minh chung")
+                || text.contains("quyen gop")
+                || text.contains("cho duyet")
+                || text.contains("cho xac nhan")
+                || text.contains("can duyet");
+    }
+
+    private static String operationType(SystemRecord record) {
+        String type = marker(record, "TYPE");
+        if (!type.isBlank()) {
+            return type;
+        }
+        String text = normalize(record.getTieuDe() + " " + record.getNoiDung());
+        if (text.contains("diem danh")) {
+            return "Điểm danh";
+        }
+        if (text.contains("minh chung")) {
+            return "Minh chứng TNV";
+        }
+        if (text.contains("quyen gop") || text.contains("tai tro")) {
+            return "Quyên góp";
+        }
+        return "Đăng ký TNV";
+    }
+
+    private static String operationStatus(SystemRecord record) {
+        String status = marker(record, "STATUS");
+        if (!status.isBlank()) {
+            return status;
+        }
+        String text = normalize(record.getTieuDe() + " " + record.getNoiDung());
+        return text.contains("xac nhan") ? "Chờ xác nhận" : "Chờ duyệt";
+    }
+
+    private static String actionLabel(SystemRecord record, UserAccount user) {
+        if (user != null && user.isAdmin() && shouldOpenContent(record)) {
+            return "Mở nội dung";
+        }
+        if (user != null && user.isAdmin() && shouldOpenOperations(record)) {
+            return "Mở vận hành";
+        }
+        return "Chi tiết";
+    }
+
+    private static String notificationSummary(SystemRecord record) {
+        String campaign = record.getMaChienDich() == null || record.getMaChienDich().isBlank()
+                ? ""
+                : " • " + record.getTenChienDich();
+        return record.getNoiDung() + campaign;
+    }
+
+    private static String marker(SystemRecord record, String key) {
+        String note = record.getGhiChu() == null ? "" : record.getGhiChu();
+        String marker = key + "=";
+        int start = note.indexOf(marker);
+        if (start < 0) {
+            return "";
+        }
+        int valueStart = start + marker.length();
+        int valueEnd = note.indexOf(';', valueStart);
+        if (valueEnd < 0) {
+            valueEnd = note.length();
+        }
+        return note.substring(valueStart, valueEnd).trim();
     }
 
     private static boolean isForUser(SystemRecord record, UserAccount user) {

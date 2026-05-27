@@ -277,7 +277,8 @@ final class CampaignDialogUtils {
                 noteSource
         ));
         BusinessService.notifyAdmins("Bình luận chiến dịch mới",
-                actor.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text));
+                actor.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text),
+                campaign.getMaChienDich(), "ACTION=CONTENT_COMMENTS");
         input.clear();
         renderComments(campaign, commentsBox);
         if (afterChange != null) {

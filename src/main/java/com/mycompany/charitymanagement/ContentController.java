@@ -224,6 +224,7 @@ public class ContentController {
         updateContentDashboard();
         renderPortal();
         applyContentFilters();
+        applyPendingNavigationFocus();
     }
 
     private void configureCampaignContentTable() {
@@ -375,6 +376,29 @@ public class ContentController {
             tabContentArea.getSelectionModel().select(1);
         }
         DetailDialogUtils.showDetails(quickStatsBox, "Thông báo hệ thống", notificationRows());
+    }
+
+    private void applyPendingNavigationFocus() {
+        NavigationIntent.ContentFocus focus = NavigationIntent.consumeContentFocus();
+        if (focus == null) {
+            return;
+        }
+        if (tabContentArea != null) {
+            tabContentArea.getSelectionModel().select(0);
+        }
+        cboContentTypeFilter.setValue("Bình luận");
+        if (!focus.campaignId().isBlank()) {
+            ActivityModel campaign = AppData.findCampaign(focus.campaignId());
+            if (campaign != null) {
+                cboCampaignFilter.setValue(campaignOption(campaign));
+                selectCampaignById(campaign.getMaChienDich(), false);
+            }
+        }
+        applyContentFilters();
+        renderComments();
+        if (allCommentList != null) {
+            allCommentList.requestFocus();
+        }
     }
 
     @FXML
@@ -1198,7 +1222,8 @@ public class ContentController {
         }
         BusinessService.notifyUser(target, "Admin đã phản hồi bình luận",
                 "Bình luận của bạn trong chiến dịch " + campaign.getTenChienDich()
-                + " có phản hồi mới: " + snippet(replyText));
+                + " có phản hồi mới: " + snippet(replyText),
+                campaign.getMaChienDich(), "ACTION=CONTENT_COMMENTS");
     }
 
     private String snippet(String text) {

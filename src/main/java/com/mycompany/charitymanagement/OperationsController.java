@@ -189,6 +189,7 @@ public class OperationsController {
         refreshTables();
         resetForm();
         hideForm();
+        applyPendingNavigationFocus();
     }
 
     @FXML
@@ -602,7 +603,7 @@ public class OperationsController {
             return FXCollections.observableArrayList("Đang phân công", "Đã phân công");
         }
         if (sameType(type, TYPE_REGISTRATION)) {
-            return FXCollections.observableArrayList("Chờ duyệt", "Đang xét", "Đã duyệt");
+            return FXCollections.observableArrayList("Chờ duyệt", "Đang xét", "Đã duyệt", "Từ chối");
         }
         if (sameType(type, TYPE_CAMPAIGN)) {
             return FXCollections.observableArrayList("Chờ duyệt", "Đang xét", "Đã duyệt");
@@ -771,6 +772,29 @@ public class OperationsController {
                 }
             }
         }
+    }
+
+    private void applyPendingNavigationFocus() {
+        NavigationIntent.OperationFocus focus = NavigationIntent.consumeOperationFocus();
+        if (focus == null) {
+            return;
+        }
+        if (!focus.type().isBlank() && cboOperationTypeFilter.getItems().contains(focus.type())) {
+            cboOperationTypeFilter.setValue(focus.type());
+        }
+        if (!focus.campaignId().isBlank()) {
+            String option = findOption(cboOperationCampaignFilter.getItems(), focus.campaignId());
+            if (option != null) {
+                cboOperationCampaignFilter.setValue(option);
+            }
+        }
+        if (!focus.status().isBlank() && cboOperationStatusFilter.getItems().contains(focus.status())) {
+            cboOperationStatusFilter.setValue(focus.status());
+        }
+        if (!focus.query().isBlank()) {
+            txtOperationSearch.setText(focus.query());
+        }
+        applyOperationFilters();
     }
 
     private SystemRecord getSelectedRecord() {

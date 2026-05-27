@@ -28,8 +28,10 @@ public final class BusinessService {
                 campaign.getMaChienDich(), user.getUsername(), "Đăng ký tham gia chiến dịch",
                 user.getDisplayName() + " đăng ký tham gia " + campaign.getTenChienDich(),
                 AppData.todayText(), "", "Chờ duyệt", user.getUsername(), defaultAdmin(), "Bảng ThamGiaTNV"));
-        notifyUser(user.getUsername(), "Đã gửi đăng ký", "Hồ sơ tham gia " + campaign.getTenChienDich() + " đang chờ quản lý duyệt.");
-        notifyAdmins("Đăng ký TNV mới", user.getDisplayName() + " đăng ký tham gia chiến dịch " + campaign.getTenChienDich() + ".");
+        notifyUser(user.getUsername(), "Đã gửi đăng ký", "Hồ sơ tham gia " + campaign.getTenChienDich() + " đang chờ quản lý duyệt.",
+                campaign.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Đăng ký TNV;STATUS=Chờ duyệt");
+        notifyAdmins("Đăng ký TNV mới", user.getDisplayName() + " đăng ký tham gia chiến dịch " + campaign.getTenChienDich() + ".",
+                campaign.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Đăng ký TNV;STATUS=Chờ duyệt");
         audit(user.getUsername(), "Đăng ký chiến dịch", user.getDisplayName() + " đăng ký " + campaign.getMaChienDich());
         return null;
     }
@@ -70,7 +72,8 @@ public final class BusinessService {
 
         if ("Đã duyệt".equals(participant.getTrangThaiDuyet()) && !"Đã duyệt".equals(previousStatus)) {
             notifyUser(participant.getMaTaiKhoan(), "Đăng ký đã được duyệt",
-                    "Bạn đã được duyệt tham gia chiến dịch " + participant.getMaChienDich() + ".");
+                    "Bạn đã được duyệt tham gia chiến dịch " + participant.getMaChienDich() + ".",
+                    participant.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Đăng ký TNV;STATUS=Đã duyệt");
         }
         audit(owner, "Cập nhật hồ sơ TNV", participant.getMaTaiKhoan() + " - " + participant.getMaChienDich());
         return null;
@@ -86,8 +89,10 @@ public final class BusinessService {
                 profile.getMaChienDich(), user.getUsername(), "Tình nguyện viên tự điểm danh",
                 "Ghi nhận điểm danh cho " + profile.getMaChienDich(), AppData.todayText(), "",
                 "Chờ duyệt", user.getUsername(), defaultAdmin(), "Bảng DiemDanh"));
-        notifyUser(user.getUsername(), "Đã gửi điểm danh", "Điểm danh đang chờ quản lý xác nhận.");
-        notifyAdmins("Điểm danh chờ xác nhận", user.getDisplayName() + " vừa điểm danh chiến dịch " + profile.getMaChienDich() + ".");
+        notifyUser(user.getUsername(), "Đã gửi điểm danh", "Điểm danh đang chờ quản lý xác nhận.",
+                profile.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Điểm danh;STATUS=Chờ duyệt");
+        notifyAdmins("Điểm danh chờ xác nhận", user.getDisplayName() + " vừa điểm danh chiến dịch " + profile.getMaChienDich() + ".",
+                profile.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Điểm danh;STATUS=Chờ duyệt");
         audit(user.getUsername(), "Điểm danh", user.getDisplayName() + " điểm danh " + profile.getMaChienDich());
         return null;
     }
@@ -102,8 +107,10 @@ public final class BusinessService {
                 profile.getMaChienDich(), user.getUsername(), "Gửi minh chứng TNV",
                 proofType + " - " + note, AppData.todayText(), "",
                 "Chờ xác nhận", user.getUsername(), defaultAdmin(), "Bảng MinhChungTNV"));
-        notifyUser(user.getUsername(), "Đã gửi minh chứng", "Minh chứng của bạn đang chờ quản lý xác nhận.");
-        notifyAdmins("Minh chứng TNV mới", user.getDisplayName() + " gửi minh chứng cho chiến dịch " + profile.getMaChienDich() + ".");
+        notifyUser(user.getUsername(), "Đã gửi minh chứng", "Minh chứng của bạn đang chờ quản lý xác nhận.",
+                profile.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Minh chứng TNV;STATUS=Chờ xác nhận");
+        notifyAdmins("Minh chứng TNV mới", user.getDisplayName() + " gửi minh chứng cho chiến dịch " + profile.getMaChienDich() + ".",
+                profile.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Minh chứng TNV;STATUS=Chờ xác nhận");
         audit(user.getUsername(), "Gửi minh chứng", user.getDisplayName() + " gửi minh chứng " + profile.getMaChienDich());
         return null;
     }
@@ -131,9 +138,11 @@ public final class BusinessService {
                 donation.getNgayQuyenGop(), "", "Chờ xác nhận",
                 valueOrFallback(actor, donation.getNguoiQuyenGop()), defaultAdmin(), "Bảng QuyenGopTien/PhieuQuyenGopVP"));
         notifyUser(valueOrFallback(actor, donation.getNguoiQuyenGop()), "Đã gửi đề xuất tài trợ",
-                "Khoản tài trợ/quyên góp " + donation.getMaQuyenGop() + " đang chờ xác nhận.");
+                "Khoản tài trợ/quyên góp " + donation.getMaQuyenGop() + " đang chờ xác nhận.",
+                donation.getHoatDong(), "ACTION=OPERATIONS;TYPE=Quyên góp;STATUS=Chờ xác nhận");
         notifyAdmins("Quyên góp chờ xác nhận",
-                donation.getNguoiQuyenGop() + " gửi " + donation.getHinhThuc() + " cho chiến dịch " + donation.getHoatDong() + ".");
+                donation.getNguoiQuyenGop() + " gửi " + donation.getHinhThuc() + " cho chiến dịch " + donation.getHoatDong() + ".",
+                donation.getHoatDong(), "ACTION=OPERATIONS;TYPE=Quyên góp;STATUS=Chờ xác nhận");
         audit(valueOrFallback(actor, donation.getNguoiQuyenGop()), "Gửi tài trợ/quyên góp",
                 donation.getNguoiQuyenGop() + " gửi " + donation.getMaQuyenGop());
         return null;
@@ -192,41 +201,60 @@ public final class BusinessService {
         AppData.getContents().add(new SystemRecord("TheoDoi", followId, campaign.getMaChienDich(), "Theo dõi chiến dịch",
                 user.getDisplayName() + " theo dõi " + campaign.getTenChienDich(),
                 AppData.todayText(), "Đang theo dõi", "Bảng TheoDoi"));
-        notifyUser(user.getUsername(), "Đã theo dõi chiến dịch", "Bạn sẽ nhận thông báo liên quan đến " + campaign.getTenChienDich() + ".");
+        notifyUser(user.getUsername(), "Đã theo dõi chiến dịch", "Bạn sẽ nhận thông báo liên quan đến " + campaign.getTenChienDich() + ".",
+                campaign.getMaChienDich(), "ACTION=CONTENT_COMMENTS");
         return null;
     }
 
     public static void applyOperation(SystemRecord record) {
         BusinessRules.applyOperation(record);
         if ("Đăng ký TNV".equals(record.getNhomBang()) && "Đã duyệt".equals(record.getTrangThai())) {
-            notifyUser(record.getMaLienKet(), "Đăng ký đã được duyệt", "Bạn đã được duyệt tham gia chiến dịch " + record.getMaChienDich() + ".");
+            notifyUser(record.getMaLienKet(), "Đăng ký đã được duyệt", "Bạn đã được duyệt tham gia chiến dịch " + record.getMaChienDich() + ".",
+                    record.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Đăng ký TNV;STATUS=Đã duyệt");
+        }
+        if ("Đăng ký TNV".equals(record.getNhomBang()) && "Từ chối".equals(record.getTrangThai())) {
+            notifyUser(record.getMaLienKet(), "Đăng ký bị từ chối", "Hồ sơ tham gia chiến dịch " + record.getMaChienDich() + " chưa được duyệt.",
+                    record.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Đăng ký TNV;STATUS=Từ chối");
         }
         if ("Điểm danh".equals(record.getNhomBang()) && "Có mặt".equals(record.getTrangThai())) {
-            notifyUser(record.getMaLienKet(), "Điểm danh đã xác nhận", "Bạn đã được ghi nhận có mặt tại chiến dịch " + record.getMaChienDich() + ".");
+            notifyUser(record.getMaLienKet(), "Điểm danh đã xác nhận", "Bạn đã được ghi nhận có mặt tại chiến dịch " + record.getMaChienDich() + ".",
+                    record.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Điểm danh;STATUS=Có mặt");
         }
         if ("Minh chứng TNV".equals(record.getNhomBang()) && "Xác nhận".equals(record.getTrangThai())) {
-            notifyUser(record.getMaLienKet(), "Minh chứng đã xác nhận", "Minh chứng của bạn đã được quản lý xác nhận.");
+            notifyUser(record.getMaLienKet(), "Minh chứng đã xác nhận", "Minh chứng của bạn đã được quản lý xác nhận.",
+                    record.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Minh chứng TNV;STATUS=Xác nhận");
         }
         if ("Quyên góp".equals(record.getNhomBang())) {
             if ("Đã xác nhận".equals(record.getTrangThai())) {
-                notifyUser(record.getNguoiTao(), "Quyên góp đã xác nhận", "Khoản quyên góp " + record.getMaLienKet() + " đã được quản lý xác nhận.");
+                notifyUser(record.getNguoiTao(), "Quyên góp đã xác nhận", "Khoản quyên góp " + record.getMaLienKet() + " đã được quản lý xác nhận.",
+                        record.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Quyên góp;STATUS=Đã xác nhận");
             } else if ("Từ chối".equals(record.getTrangThai())) {
-                notifyUser(record.getNguoiTao(), "Quyên góp bị từ chối", "Khoản quyên góp " + record.getMaLienKet() + " cần kiểm tra lại thông tin.");
+                notifyUser(record.getNguoiTao(), "Quyên góp bị từ chối", "Khoản quyên góp " + record.getMaLienKet() + " cần kiểm tra lại thông tin.",
+                        record.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Quyên góp;STATUS=Từ chối");
             }
         }
         audit(record.getNguoiXuLy(), "Xử lý vận hành", record.getNhomBang() + " - " + record.getMaChinh() + " - " + record.getTrangThai());
     }
 
     public static void notifyUser(String accountId, String title, String message) {
+        notifyUser(accountId, title, message, "", "Bảng ThongBao");
+    }
+
+    public static void notifyUser(String accountId, String title, String message, String campaignId, String note) {
         if (accountId == null || accountId.trim().isEmpty()) {
             return;
         }
         AppData.getContents().add(new SystemRecord("ThongBao", AppData.nextContentId("TB"),
-                accountId, title, message, AppData.todayText(), "Chưa đọc", "Bảng ThongBao"));
+                campaignId, accountId, title, message, AppData.todayText(), "",
+                "Chưa đọc", "HE_THONG", accountId, note));
     }
 
     public static void notifyAdmins(String title, String message) {
-        notifyUser("ADMIN", title, message);
+        notifyAdmins(title, message, "", "Bảng ThongBao");
+    }
+
+    public static void notifyAdmins(String title, String message, String campaignId, String note) {
+        notifyUser("ADMIN", title, message, campaignId, note);
     }
 
     public static void audit(String actor, String action, String detail) {
