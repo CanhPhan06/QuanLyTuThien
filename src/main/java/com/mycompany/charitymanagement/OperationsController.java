@@ -244,6 +244,7 @@ public class OperationsController {
         }
 
         AppData.getOperations().remove(selected);
+        DatabaseRepository.deleteOperation(selected);
         refreshTables();
         handleClearForm();
         DialogUtils.info("Đã xóa bản ghi vận hành.");

@@ -302,7 +302,7 @@ final class CampaignDialogUtils {
         UserAccount actor = user == null
                 ? new UserAccount("GUEST", "", UserAccount.ROLE_VOLUNTEER, "Người dùng", "")
                 : user;
-        AppData.getContents().add(new SystemRecord(
+        SystemRecord comment = new SystemRecord(
                 "BinhLuan",
                 AppData.nextContentId("BL"),
                 campaign.getMaChienDich(),
@@ -315,7 +315,9 @@ final class CampaignDialogUtils {
                 actor.getUsername(),
                 "ADMIN",
                 noteSource
-        ));
+        );
+        AppData.getContents().add(comment);
+        DatabaseRepository.saveContent(comment);
         BusinessService.notifyAdmins("Bình luận chiến dịch mới",
                 actor.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text),
                 campaign.getMaChienDich(), "ACTION=CONTENT_COMMENTS");
@@ -335,7 +337,7 @@ final class CampaignDialogUtils {
             return;
         }
 
-        AppData.getContents().add(new SystemRecord(
+        SystemRecord reply = new SystemRecord(
                 "BinhLuan",
                 AppData.nextContentId("BL"),
                 campaign.getMaChienDich(),
@@ -348,7 +350,9 @@ final class CampaignDialogUtils {
                 viewer.getUsername(),
                 parent.getNguoiTao(),
                 "Phản hồi cho " + parent.getMaChinh() + "; " + REPLY_MARKER + parent.getMaChinh()
-        ));
+        );
+        AppData.getContents().add(reply);
+        DatabaseRepository.saveContent(reply);
         String target = parent.getNguoiTao();
         if (target == null || target.isBlank() || target.equalsIgnoreCase(viewer.getUsername())) {
             target = parent.getMaLienKet();

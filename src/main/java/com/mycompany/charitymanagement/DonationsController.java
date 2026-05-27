@@ -144,6 +144,7 @@ public class DonationsController {
         selected.setHinhThuc(form.getHinhThuc());
         selected.setNoiDungQuyenGop(form.getNoiDungQuyenGop());
         selected.setSoTien(form.getSoTien());
+        DatabaseRepository.saveDonation(selected);
         tableDonations.refresh();
         tableDonations.getSelectionModel().clearSelection();
         refreshDonationView();
@@ -167,6 +168,7 @@ public class DonationsController {
         }
 
         AppData.getDonations().remove(selected);
+        DatabaseRepository.deleteDonation(selected);
         tableDonations.getSelectionModel().clearSelection();
         refreshDonationView();
         DialogUtils.info("Đã xóa ghi nhận đóng góp.");

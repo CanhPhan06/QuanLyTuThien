@@ -104,6 +104,7 @@ public class ParticipantsController {
         }
 
         AppData.getParticipants().add(participant);
+        DatabaseRepository.saveParticipant(participant);
         tableParticipants.getSelectionModel().clearSelection();
         refreshParticipantView();
         DialogUtils.info("Đã thêm sinh viên/TNV.");
@@ -141,6 +142,7 @@ public class ParticipantsController {
         selected.setMaChienDich(form.getMaChienDich());
         selected.setTrangThaiDuyet(form.getTrangThaiDuyet());
         selected.setDiemDanhGia(form.getDiemDanhGia());
+        DatabaseRepository.saveParticipant(selected);
         tableParticipants.refresh();
         tableParticipants.getSelectionModel().clearSelection();
         refreshParticipantView();
@@ -164,6 +166,7 @@ public class ParticipantsController {
         }
 
         AppData.getParticipants().remove(selected);
+        DatabaseRepository.deleteParticipant(selected);
         tableParticipants.getSelectionModel().clearSelection();
         refreshParticipantView();
         DialogUtils.info("Đã xóa sinh viên/TNV.");

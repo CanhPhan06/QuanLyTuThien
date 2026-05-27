@@ -12,7 +12,7 @@ public final class BusinessService {
         }
 
         ParticipantModel existingProfile = findLatestProfile(user.getUsername());
-        AppData.getParticipants().add(new ParticipantModel(
+        ParticipantModel participant = new ParticipantModel(
                 user.getUsername(),
                 valueOrFallback(user.getLinkedId(), existingProfile == null ? "" : existingProfile.getMaHoSo()),
                 valueOrFallback(user.getDisplayName(), existingProfile == null ? "" : existingProfile.getHoTen()),
@@ -23,11 +23,15 @@ public final class BusinessService {
                 campaign.getMaChienDich(),
                 "Chờ duyệt",
                 ""
-        ));
-        AppData.getOperations().add(new SystemRecord("Đăng ký TNV", AppData.nextOperationId("VH"),
+        );
+        AppData.getParticipants().add(participant);
+        DatabaseRepository.saveParticipant(participant);
+        SystemRecord operation = new SystemRecord("Đăng ký TNV", AppData.nextOperationId("VH"),
                 campaign.getMaChienDich(), user.getUsername(), "Đăng ký tham gia chiến dịch",
                 user.getDisplayName() + " đăng ký tham gia " + campaign.getTenChienDich(),
-                AppData.todayText(), "", "Chờ duyệt", user.getUsername(), defaultAdmin(), "Bảng ThamGiaTNV"));
+                AppData.todayText(), "", "Chờ duyệt", user.getUsername(), defaultAdmin(), "Bảng ThamGiaTNV");
+        AppData.getOperations().add(operation);
+        DatabaseRepository.saveOperation(operation);
         notifyUser(user.getUsername(), "Đã gửi đăng ký", "Hồ sơ tham gia " + campaign.getTenChienDich() + " đang chờ quản lý duyệt.",
                 campaign.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Đăng ký TNV;STATUS=Chờ duyệt");
         notifyAdmins("Đăng ký TNV mới", user.getDisplayName() + " đăng ký tham gia chiến dịch " + campaign.getTenChienDich() + ".",
@@ -50,11 +54,12 @@ public final class BusinessService {
         String processedDate = "Đã duyệt".equals(participant.getTrangThaiDuyet()) ? AppData.todayText() : "";
 
         if (record == null) {
-            AppData.getOperations().add(new SystemRecord("Đăng ký TNV", AppData.nextOperationId("VH"),
+            record = new SystemRecord("Đăng ký TNV", AppData.nextOperationId("VH"),
                     participant.getMaChienDich(), participant.getMaTaiKhoan(),
                     "Đăng ký tham gia chiến dịch", detail,
                     AppData.todayText(), processedDate, participant.getTrangThaiDuyet(),
-                    owner, defaultAdmin(), "Bảng ThamGiaTNV"));
+                    owner, defaultAdmin(), "Bảng ThamGiaTNV");
+            AppData.getOperations().add(record);
         } else {
             record.setNhomBang("Đăng ký TNV");
             record.setMaChienDich(participant.getMaChienDich());
@@ -69,6 +74,8 @@ public final class BusinessService {
             }
             record.setGhiChu("Bảng ThamGiaTNV");
         }
+        DatabaseRepository.saveParticipant(participant);
+        DatabaseRepository.saveOperation(record);
 
         if ("Đã duyệt".equals(participant.getTrangThaiDuyet()) && !"Đã duyệt".equals(previousStatus)) {
             notifyUser(participant.getMaTaiKhoan(), "Đăng ký đã được duyệt",
@@ -85,10 +92,12 @@ public final class BusinessService {
             return error;
         }
 
-        AppData.getOperations().add(new SystemRecord("Điểm danh", AppData.nextOperationId("VH"),
+        SystemRecord operation = new SystemRecord("Điểm danh", AppData.nextOperationId("VH"),
                 profile.getMaChienDich(), user.getUsername(), "Tình nguyện viên tự điểm danh",
                 "Ghi nhận điểm danh cho " + profile.getMaChienDich(), AppData.todayText(), "",
-                "Chờ duyệt", user.getUsername(), defaultAdmin(), "Bảng DiemDanh"));
+                "Chờ duyệt", user.getUsername(), defaultAdmin(), "Bảng DiemDanh");
+        AppData.getOperations().add(operation);
+        DatabaseRepository.saveOperation(operation);
         notifyUser(user.getUsername(), "Đã gửi điểm danh", "Điểm danh đang chờ quản lý xác nhận.",
                 profile.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Điểm danh;STATUS=Chờ duyệt");
         notifyAdmins("Điểm danh chờ xác nhận", user.getDisplayName() + " vừa điểm danh chiến dịch " + profile.getMaChienDich() + ".",
@@ -103,10 +112,12 @@ public final class BusinessService {
             return error;
         }
 
-        AppData.getOperations().add(new SystemRecord("Minh chứng TNV", AppData.nextOperationId("VH"),
+        SystemRecord operation = new SystemRecord("Minh chứng TNV", AppData.nextOperationId("VH"),
                 profile.getMaChienDich(), user.getUsername(), "Gửi minh chứng TNV",
                 proofType + " - " + note, AppData.todayText(), "",
-                "Chờ xác nhận", user.getUsername(), defaultAdmin(), "Bảng MinhChungTNV"));
+                "Chờ xác nhận", user.getUsername(), defaultAdmin(), "Bảng MinhChungTNV");
+        AppData.getOperations().add(operation);
+        DatabaseRepository.saveOperation(operation);
         notifyUser(user.getUsername(), "Đã gửi minh chứng", "Minh chứng của bạn đang chờ quản lý xác nhận.",
                 profile.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Minh chứng TNV;STATUS=Chờ xác nhận");
         notifyAdmins("Minh chứng TNV mới", user.getDisplayName() + " gửi minh chứng cho chiến dịch " + profile.getMaChienDich() + ".",
@@ -132,11 +143,14 @@ public final class BusinessService {
         }
 
         AppData.getDonations().add(donation);
-        AppData.getOperations().add(new SystemRecord("Quyên góp", AppData.nextOperationId("VH"),
+        SystemRecord operation = new SystemRecord("Quyên góp", AppData.nextOperationId("VH"),
                 donation.getHoatDong(), donation.getMaQuyenGop(), "Xác nhận quyên góp",
                 donation.getNguoiQuyenGop() + " gửi " + donation.getHinhThuc() + " cho chiến dịch " + donation.getHoatDong(),
                 donation.getNgayQuyenGop(), "", "Chờ xác nhận",
-                valueOrFallback(actor, donation.getNguoiQuyenGop()), defaultAdmin(), "Bảng QuyenGopTien/PhieuQuyenGopVP"));
+                valueOrFallback(actor, donation.getNguoiQuyenGop()), defaultAdmin(), "Bảng QuyenGopTien/PhieuQuyenGopVP");
+        AppData.getOperations().add(operation);
+        DatabaseRepository.saveDonation(donation);
+        DatabaseRepository.saveOperation(operation);
         notifyUser(valueOrFallback(actor, donation.getNguoiQuyenGop()), "Đã gửi đề xuất tài trợ",
                 "Khoản tài trợ/quyên góp " + donation.getMaQuyenGop() + " đang chờ xác nhận.",
                 donation.getHoatDong(), "ACTION=OPERATIONS;TYPE=Quyên góp;STATUS=Chờ xác nhận");
@@ -160,10 +174,11 @@ public final class BusinessService {
                 + " cho chiến dịch " + donation.getHoatDong();
 
         if (record == null) {
-            AppData.getOperations().add(new SystemRecord("Quyên góp", AppData.nextOperationId("VH"),
+            record = new SystemRecord("Quyên góp", AppData.nextOperationId("VH"),
                     donation.getHoatDong(), donation.getMaQuyenGop(), "Xác nhận quyên góp",
                     detail, donation.getNgayQuyenGop(), "", "Chờ xác nhận",
-                    owner, defaultAdmin(), "Bảng QuyenGopTien/PhieuQuyenGopVP"));
+                    owner, defaultAdmin(), "Bảng QuyenGopTien/PhieuQuyenGopVP");
+            AppData.getOperations().add(record);
         } else {
             record.setNhomBang("Quyên góp");
             record.setMaChienDich(donation.getHoatDong());
@@ -180,6 +195,8 @@ public final class BusinessService {
             }
             record.setGhiChu("Bảng QuyenGopTien/PhieuQuyenGopVP");
         }
+        DatabaseRepository.saveDonation(donation);
+        DatabaseRepository.saveOperation(record);
 
         audit(owner, "Cập nhật thông tin quyên góp", donation.getMaQuyenGop() + " - " + donation.getHinhThuc());
         return null;
@@ -198,9 +215,11 @@ public final class BusinessService {
         if (existed) {
             return "Bạn đã theo dõi chiến dịch này.";
         }
-        AppData.getContents().add(new SystemRecord("TheoDoi", followId, campaign.getMaChienDich(), "Theo dõi chiến dịch",
+        SystemRecord follow = new SystemRecord("TheoDoi", followId, campaign.getMaChienDich(), "Theo dõi chiến dịch",
                 user.getDisplayName() + " theo dõi " + campaign.getTenChienDich(),
-                AppData.todayText(), "Đang theo dõi", "Bảng TheoDoi"));
+                AppData.todayText(), "Đang theo dõi", "Bảng TheoDoi");
+        AppData.getContents().add(follow);
+        DatabaseRepository.saveContent(follow);
         notifyUser(user.getUsername(), "Đã theo dõi chiến dịch", "Bạn sẽ nhận thông báo liên quan đến " + campaign.getTenChienDich() + ".",
                 campaign.getMaChienDich(), "ACTION=CONTENT_COMMENTS");
         return null;
@@ -208,6 +227,23 @@ public final class BusinessService {
 
     public static void applyOperation(SystemRecord record) {
         BusinessRules.applyOperation(record);
+        DatabaseRepository.saveOperation(record);
+        if ("Chiến dịch".equals(record.getNhomBang())) {
+            ActivityModel campaign = AppData.findCampaign(record.getMaLienKet());
+            if (campaign == null) {
+                campaign = AppData.findCampaign(record.getMaChienDich());
+            }
+            DatabaseRepository.saveActivity(campaign);
+        }
+        if ("Đăng ký TNV".equals(record.getNhomBang())) {
+            saveParticipantState(record);
+        }
+        if ("Điểm danh".equals(record.getNhomBang()) && "Có mặt".equals(record.getTrangThai())) {
+            saveParticipantState(record);
+        }
+        if ("Quyên góp".equals(record.getNhomBang())) {
+            DatabaseRepository.updateDonationStatus(record.getMaLienKet(), record.getTrangThai());
+        }
         if ("Đăng ký TNV".equals(record.getNhomBang()) && "Đã duyệt".equals(record.getTrangThai())) {
             notifyUser(record.getMaLienKet(), "Đăng ký đã được duyệt", "Bạn đã được duyệt tham gia chiến dịch " + record.getMaChienDich() + ".",
                     record.getMaChienDich(), "ACTION=OPERATIONS;TYPE=Đăng ký TNV;STATUS=Đã duyệt");
@@ -244,9 +280,11 @@ public final class BusinessService {
         if (accountId == null || accountId.trim().isEmpty()) {
             return;
         }
-        AppData.getContents().add(new SystemRecord("ThongBao", AppData.nextContentId("TB"),
+        SystemRecord notification = new SystemRecord("ThongBao", AppData.nextContentId("TB"),
                 campaignId, accountId, title, message, AppData.todayText(), "",
-                "Chưa đọc", "HE_THONG", accountId, note));
+                "Chưa đọc", "HE_THONG", accountId, note);
+        AppData.getContents().add(notification);
+        DatabaseRepository.saveContent(notification);
     }
 
     public static void notifyAdmins(String title, String message) {
@@ -258,9 +296,20 @@ public final class BusinessService {
     }
 
     public static void audit(String actor, String action, String detail) {
-        AppData.getContents().add(new SystemRecord("NhatKyHeThong", AppData.nextContentId("NK"),
+        SystemRecord log = new SystemRecord("NhatKyHeThong", AppData.nextContentId("NK"),
                 actor == null || actor.trim().isEmpty() ? "HE_THONG" : actor,
-                action, detail, AppData.todayText(), "Đã ghi", "Bảng NhatKyHeThong"));
+                action, detail, AppData.todayText(), "Đã ghi", "Bảng NhatKyHeThong");
+        AppData.getContents().add(log);
+        DatabaseRepository.saveContent(log);
+    }
+
+    private static void saveParticipantState(SystemRecord record) {
+        for (ParticipantModel participant : AppData.getParticipants()) {
+            if (participant.getMaTaiKhoan().equalsIgnoreCase(record.getMaLienKet())
+                    && participant.getMaChienDich().equalsIgnoreCase(record.getMaChienDich())) {
+                DatabaseRepository.saveParticipant(participant);
+            }
+        }
     }
 
     private static String defaultAdmin() {

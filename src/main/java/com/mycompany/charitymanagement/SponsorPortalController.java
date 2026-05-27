@@ -292,6 +292,7 @@ public class SponsorPortalController {
                 item.setSoDienThoai(result[2]);
                 item.setEmail(result[3]);
                 item.setDiaChi(result[4]);
+                DatabaseRepository.saveSponsor(item);
             }
         }
         tableSponsorPartnerHistory.refresh();
@@ -403,7 +404,7 @@ public class SponsorPortalController {
             return;
         }
 
-        AppData.getContents().add(new SystemRecord(
+        SystemRecord comment = new SystemRecord(
                 "BinhLuan",
                 AppData.nextContentId("BL"),
                 campaign.getMaChienDich(),
@@ -416,7 +417,9 @@ public class SponsorPortalController {
                 currentUser.getUsername(),
                 "ADMIN",
                 "Tạo từ cổng nhà tài trợ"
-        ));
+        );
+        AppData.getContents().add(comment);
+        DatabaseRepository.saveContent(comment);
         BusinessService.notifyAdmins("Bình luận chiến dịch mới",
                 currentUser.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text),
                 campaign.getMaChienDich(), "ACTION=CONTENT_COMMENTS");

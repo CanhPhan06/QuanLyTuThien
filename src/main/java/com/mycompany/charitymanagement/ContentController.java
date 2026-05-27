@@ -295,6 +295,7 @@ public class ContentController {
         }
 
         AppData.getContents().add(record);
+        DatabaseRepository.saveContent(record);
         clearAllSelections();
         DialogUtils.info("Đã tạo nội dung mới.");
     }
@@ -325,6 +326,7 @@ public class ContentController {
         selected.setNgay(form.getNgay());
         selected.setTrangThai(form.getTrangThai());
         selected.setGhiChu(form.getGhiChu());
+        DatabaseRepository.saveContent(selected);
         refreshContentView();
         clearAllSelections();
         DialogUtils.info("Đã chỉnh sửa nội dung.");
@@ -342,6 +344,7 @@ public class ContentController {
         }
 
         AppData.getContents().remove(selected);
+        DatabaseRepository.deleteContent(selected);
         clearAllSelections();
         DialogUtils.info("Đã xóa nội dung.");
     }
@@ -415,7 +418,7 @@ public class ContentController {
         }
         UserAccount user = currentUser();
         String note = "Gửi nhanh từ Trung tâm nội dung";
-        AppData.getContents().add(new SystemRecord(
+        SystemRecord comment = new SystemRecord(
                 "BinhLuan",
                 AppData.nextContentId("BL"),
                 campaign.getMaChienDich(),
@@ -428,7 +431,9 @@ public class ContentController {
                 user.getUsername(),
                 "ADMIN",
                 note
-        ));
+        );
+        AppData.getContents().add(comment);
+        DatabaseRepository.saveContent(comment);
         txtQuickComment.clear();
         if (tabContentArea != null) {
             tabContentArea.getSelectionModel().select(0);
@@ -447,7 +452,7 @@ public class ContentController {
             DialogUtils.warning("Email cần có dạng @gmail.com hoặc số điện thoại bắt đầu bằng 09/08/07/03.");
             return;
         }
-        AppData.getContents().add(new SystemRecord(
+        SystemRecord notification = new SystemRecord(
                 "ThongBao",
                 AppData.nextContentId("TB"),
                 "",
@@ -460,7 +465,9 @@ public class ContentController {
                 "HE_THONG",
                 "ADMIN",
                 "Tạo từ khung Đăng ký tham gia"
-        ));
+        );
+        AppData.getContents().add(notification);
+        DatabaseRepository.saveContent(notification);
         txtRegisterContact.clear();
         if (tabContentArea != null) {
             tabContentArea.getSelectionModel().select(1);
@@ -475,7 +482,7 @@ public class ContentController {
             return;
         }
         UserAccount user = currentUser();
-        AppData.getContents().add(new SystemRecord(
+        SystemRecord notification = new SystemRecord(
                 "ThongBao",
                 AppData.nextContentId("TB"),
                 "",
@@ -488,7 +495,9 @@ public class ContentController {
                 user.getUsername(),
                 "ADMIN",
                 "Tạo từ nút Lưu tin"
-        ));
+        );
+        AppData.getContents().add(notification);
+        DatabaseRepository.saveContent(notification);
         DialogUtils.info("Đã lưu chiến dịch nổi bật vào thông báo của bạn.");
     }
 
@@ -1187,7 +1196,7 @@ public class ContentController {
 
         UserAccount user = currentUser();
         String note = appendNote("Phản hồi cho " + parent.getMaChinh(), REPLY_MARKER + parent.getMaChinh());
-        AppData.getContents().add(new SystemRecord(
+        SystemRecord reply = new SystemRecord(
                 "BinhLuan",
                 AppData.nextContentId("BL"),
                 campaignId,
@@ -1200,7 +1209,9 @@ public class ContentController {
                 user.getUsername(),
                 parent.getNguoiTao(),
                 note
-        ));
+        );
+        AppData.getContents().add(reply);
+        DatabaseRepository.saveContent(reply);
         notifyReplyOwner(parent, campaign, user, text);
         replyInput.clear();
         selectCampaign(campaign, false);
@@ -1239,6 +1250,7 @@ public class ContentController {
 
     private void incrementReaction(SystemRecord record, String key, Runnable afterAction) {
         record.setGhiChu(bumpCounter(record.getGhiChu(), reactionMarker(key)));
+        DatabaseRepository.saveContent(record);
         refreshContentView();
         if (afterAction != null) {
             afterAction.run();

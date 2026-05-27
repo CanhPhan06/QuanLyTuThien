@@ -200,19 +200,27 @@ public final class DatabaseDataLoader {
                         + "TO_CHAR(nd.ngay_tao, 'DD/MM/YYYY') AS ngay_tao, nd.trang_thai, nd.ghi_chu "
                         + "FROM noi_dung nd ORDER BY nd.ma_chinh")) {
             while (rs.next()) {
+                String note = text(rs, "ghi_chu");
+                String campaignId = text(rs, "ma_chien_dich");
+                String metaCampaignId = DatabaseRepository.metadataValue(note, "CAMPAIGN");
+                if (!metaCampaignId.isBlank()) {
+                    campaignId = metaCampaignId;
+                }
+                String author = DatabaseRepository.metadataValue(note, "AUTHOR");
+                String targetUser = DatabaseRepository.metadataValue(note, "TARGET");
                 target.add(new SystemRecord(
                         text(rs, "nhom_bang"),
                         text(rs, "ma_chinh"),
-                        text(rs, "ma_chien_dich"),
+                        campaignId,
                         text(rs, "ma_lien_ket"),
                         text(rs, "tieu_de"),
                         text(rs, "noi_dung"),
                         text(rs, "ngay_tao"),
                         "",
                         text(rs, "trang_thai"),
-                        "ADMIN",
-                        "",
-                        text(rs, "ghi_chu")
+                        author.isBlank() ? "ADMIN" : author,
+                        targetUser,
+                        DatabaseRepository.stripMetadata(note)
                 ));
             }
         }

@@ -123,6 +123,7 @@ final class NotificationCenter {
 
     private static void openNotification(Node owner, UserAccount user, SystemRecord record) {
         record.setTrangThai("Đã đọc");
+        DatabaseRepository.saveContent(record);
         updateBell(owner instanceof Button ? (Button) owner : null, user);
 
         if (shouldOpenContent(record)) {
@@ -177,6 +178,7 @@ final class NotificationCenter {
         for (SystemRecord record : notifications) {
             if (isUnread(record)) {
                 record.setTrangThai("Đã đọc");
+                DatabaseRepository.saveContent(record);
             }
         }
     }

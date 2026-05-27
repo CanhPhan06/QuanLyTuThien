@@ -114,6 +114,7 @@ public class ActivitiesController {
         }
 
         AppData.getActivities().add(activity);
+        DatabaseRepository.saveActivity(activity);
         tableActivities.getSelectionModel().clearSelection();
         refreshActivityView();
         DialogUtils.info("Đã thêm chiến dịch mới.");
@@ -149,6 +150,7 @@ public class ActivitiesController {
         selected.setMucTieuTien(form.getMucTieuTien());
         selected.setTrangThai(form.getTrangThai());
         selected.setMaNguoiTao(form.getMaNguoiTao());
+        DatabaseRepository.saveActivity(selected);
         tableActivities.refresh();
         closeCampaignDetailWindow();
         tableActivities.getSelectionModel().clearSelection();
@@ -177,6 +179,7 @@ public class ActivitiesController {
         }
 
         AppData.getActivities().remove(selected);
+        DatabaseRepository.deleteActivity(selected);
         tableActivities.getSelectionModel().clearSelection();
         closeCampaignDetailWindow();
         refreshActivityView();

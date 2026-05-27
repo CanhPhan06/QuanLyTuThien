@@ -312,6 +312,7 @@ public class VolunteerController {
                 item.setMssv(result[2]);
                 item.setKhoa(result[3]);
                 item.setTruong(result[4]);
+                DatabaseRepository.saveParticipant(item);
             }
         }
         tableParticipationHistory.refresh();
@@ -379,7 +380,7 @@ public class VolunteerController {
             return;
         }
 
-        AppData.getContents().add(new SystemRecord(
+        SystemRecord comment = new SystemRecord(
                 "BinhLuan",
                 AppData.nextContentId("BL"),
                 campaign.getMaChienDich(),
@@ -392,7 +393,9 @@ public class VolunteerController {
                 currentUser.getUsername(),
                 "ADMIN",
                 "Tạo từ cổng tình nguyện viên"
-        ));
+        );
+        AppData.getContents().add(comment);
+        DatabaseRepository.saveContent(comment);
         BusinessService.notifyAdmins("Bình luận chiến dịch mới",
                 currentUser.getDisplayName() + " bình luận trong " + campaign.getTenChienDich() + ": " + snippet(text),
                 campaign.getMaChienDich(), "ACTION=CONTENT_COMMENTS");

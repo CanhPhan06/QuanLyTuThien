@@ -101,6 +101,7 @@ public class SponsorsController {
         }
 
         AppData.getSponsors().add(sponsor);
+        DatabaseRepository.saveSponsor(sponsor);
         tableSponsors.getSelectionModel().clearSelection();
         refreshSponsorView();
         DialogUtils.info("Đã thêm đối tác/tài trợ.");
@@ -132,6 +133,7 @@ public class SponsorsController {
         selected.setMaChienDich(form.getMaChienDich());
         selected.setGiaTriTaiTro(form.getGiaTriTaiTro());
         selected.setNgayKyKet(form.getNgayKyKet());
+        DatabaseRepository.saveSponsor(selected);
         tableSponsors.refresh();
         tableSponsors.getSelectionModel().clearSelection();
         refreshSponsorView();
@@ -150,6 +152,7 @@ public class SponsorsController {
         }
 
         AppData.getSponsors().remove(selected);
+        DatabaseRepository.deleteSponsor(selected);
         tableSponsors.getSelectionModel().clearSelection();
         refreshSponsorView();
         DialogUtils.info("Đã xóa đối tác/tài trợ.");
