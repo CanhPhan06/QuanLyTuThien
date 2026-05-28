@@ -36,12 +36,20 @@
         </HBox>
     </HBox>
 
-    <HBox spacing="12" styleClass="filter-card">
-        <ComboBox fx:id="cboSponsorCampaignFilter" promptText="Lọc theo chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <ComboBox fx:id="cboSponsorFieldFilter" promptText="Lọc lĩnh vực" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <TextField fx:id="txtSponsorSearch" promptText="Tìm tên, email, số điện thoại, địa chỉ..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
-        <Button text="Bỏ lọc" onAction="#handleClearSponsorFilters" styleClass="quick-button"/>
-    </HBox>
+    <VBox spacing="10" styleClass="filter-card">
+        <HBox spacing="12">
+            <ComboBox fx:id="cboSponsorCampaignFilter" promptText="Lọc theo chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="cboSponsorFieldFilter" promptText="Lọc lĩnh vực" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtSponsorSearch" promptText="Tìm tên, email, số điện thoại, địa chỉ..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+            <Button text="Bỏ lọc" onAction="#handleClearSponsorFilters" styleClass="quick-button"/>
+        </HBox>
+        <HBox spacing="12">
+            <DatePicker fx:id="dtpSponsorDateMin" promptText="Ký từ ngày" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <DatePicker fx:id="dtpSponsorDateMax" promptText="Ký đến ngày" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtSponsorAmountMin" promptText="Tài trợ min" styleClass="input-field" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtSponsorAmountMax" promptText="Tài trợ max" styleClass="input-field" HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </VBox>
 
     <HBox spacing="12" styleClass="action-bar">
         <Button text="+  Thêm" onAction="#handleAddSponsor" styleClass="primary-button"/>

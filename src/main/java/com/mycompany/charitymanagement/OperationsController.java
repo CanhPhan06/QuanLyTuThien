@@ -914,11 +914,17 @@ public class OperationsController {
         }
         Label titleLabel = new Label(title);
         titleLabel.getStyleClass().add("page-title");
-        ImageView imageView = new ImageView(new Image(file.toURI().toString(), 760, 460, true, true));
+        ImageView imageView = new ImageView(new Image(file.toURI().toString()));
+        imageView.setFitWidth(760);
+        imageView.setFitHeight(460);
         imageView.setPreserveRatio(true);
         imageView.setSmooth(true);
         StackPane imageWrap = new StackPane(imageView);
         imageWrap.getStyleClass().add("proof-image-preview");
+        imageWrap.setAlignment(Pos.CENTER);
+        imageWrap.setMinSize(760, 460);
+        imageWrap.setPrefSize(760, 460);
+        imageWrap.setMaxSize(760, 460);
         Label pathLabel = new Label(path);
         pathLabel.getStyleClass().add("muted-text");
         pathLabel.setWrapText(true);
@@ -926,7 +932,7 @@ public class OperationsController {
         closeButton.getStyleClass().add("quick-button");
         VBox card = new VBox(14, titleLabel, imageWrap, pathLabel, closeButton);
         card.getStyleClass().add("detail-card");
-        card.setMaxWidth(840);
+        card.setMaxWidth(820);
         card.setMaxHeight(620);
         StackPane overlay = DetailDialogUtils.showCard(scene, card);
         closeButton.setOnAction(event -> DetailDialogUtils.closeOverlay(overlay));

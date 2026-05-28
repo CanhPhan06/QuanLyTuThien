@@ -294,7 +294,7 @@ public class ReportsController {
         balanceSeries.setName("Còn lại");
 
         for (CampaignReportRow row : rows) {
-            String label = selectedCampaignId == null || selectedCampaignId.isBlank() ? row.campaignId : "Chiến dịch";
+            String label = row.campaignId;
             double income = row.totalIncome();
             incomeSeries.getData().add(barData(label, income, chartMoney(income)));
             expenseSeries.getData().add(barData(label, row.expenseAmount, chartMoney(row.expenseAmount)));

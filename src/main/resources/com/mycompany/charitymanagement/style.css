@@ -1188,8 +1188,9 @@
 
 .proof-image-preview {
     -fx-background-color: #0f172a;
-    -fx-background-radius: 10px;
-    -fx-padding: 12px;
-    -fx-min-height: 360px;
+    -fx-background-radius: 8px;
+    -fx-padding: 0;
+    -fx-min-height: 460px;
+    -fx-pref-height: 460px;
     -fx-alignment: CENTER;
 }

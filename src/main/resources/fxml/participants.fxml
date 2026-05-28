@@ -9,13 +9,19 @@
 
     <Label text="SINH VIÊN / TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
 
-    <HBox spacing="12" styleClass="filter-card">
-        <ComboBox fx:id="cboParticipantCampaignFilter" promptText="Lọc chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <ComboBox fx:id="cboParticipantSchoolFilter" promptText="Lọc trường" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <ComboBox fx:id="cboParticipantStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <TextField fx:id="txtParticipantSearch" promptText="Tìm họ tên, MSSV, SĐT, khoa..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
-        <Button text="Bỏ lọc" onAction="#handleClearParticipantFilters" styleClass="quick-button"/>
-    </HBox>
+    <VBox spacing="10" styleClass="filter-card">
+        <HBox spacing="12">
+            <ComboBox fx:id="cboParticipantCampaignFilter" promptText="Lọc chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="cboParticipantSchoolFilter" promptText="Lọc trường" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <ComboBox fx:id="cboParticipantStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtParticipantSearch" promptText="Tìm họ tên, MSSV, SĐT, khoa..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+            <Button text="Bỏ lọc" onAction="#handleClearParticipantFilters" styleClass="quick-button"/>
+        </HBox>
+        <HBox spacing="12">
+            <TextField fx:id="txtParticipantScoreMin" promptText="Điểm min" styleClass="input-field" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="txtParticipantScoreMax" promptText="Điểm max" styleClass="input-field" HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </VBox>
 
     <HBox spacing="12" styleClass="action-bar">
         <Button text="+  Thêm" onAction="#handleAddParticipant" styleClass="primary-button"/>

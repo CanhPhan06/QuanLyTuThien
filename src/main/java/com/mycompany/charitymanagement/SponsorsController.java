@@ -1,11 +1,13 @@
 package com.mycompany.charitymanagement;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -33,6 +35,14 @@ public class SponsorsController {
     private ComboBox<String> cboSponsorFieldFilter;
     @FXML
     private TextField txtSponsorSearch;
+    @FXML
+    private DatePicker dtpSponsorDateMin;
+    @FXML
+    private DatePicker dtpSponsorDateMax;
+    @FXML
+    private TextField txtSponsorAmountMin;
+    @FXML
+    private TextField txtSponsorAmountMax;
 
     @FXML
     private TableView<SponsorModel> tableSponsors;
@@ -163,6 +173,10 @@ public class SponsorsController {
         cboSponsorCampaignFilter.setValue("Tất cả chiến dịch");
         cboSponsorFieldFilter.setValue("Tất cả lĩnh vực");
         txtSponsorSearch.clear();
+        dtpSponsorDateMin.setValue(null);
+        dtpSponsorDateMax.setValue(null);
+        txtSponsorAmountMin.clear();
+        txtSponsorAmountMax.clear();
         applySponsorFilters();
     }
 
@@ -287,9 +301,15 @@ public class SponsorsController {
         cboSponsorFieldFilter.setItems(buildFieldFilterChoices());
         cboSponsorCampaignFilter.setValue("Tất cả chiến dịch");
         cboSponsorFieldFilter.setValue("Tất cả lĩnh vực");
+        UiFormOptions.configureDatePicker(dtpSponsorDateMin);
+        UiFormOptions.configureDatePicker(dtpSponsorDateMax);
         cboSponsorCampaignFilter.valueProperty().addListener((observable, oldValue, newValue) -> applySponsorFilters());
         cboSponsorFieldFilter.valueProperty().addListener((observable, oldValue, newValue) -> applySponsorFilters());
         txtSponsorSearch.textProperty().addListener((observable, oldValue, newValue) -> applySponsorFilters());
+        dtpSponsorDateMin.valueProperty().addListener((observable, oldValue, newValue) -> applySponsorFilters());
+        dtpSponsorDateMax.valueProperty().addListener((observable, oldValue, newValue) -> applySponsorFilters());
+        txtSponsorAmountMin.textProperty().addListener((observable, oldValue, newValue) -> applySponsorFilters());
+        txtSponsorAmountMax.textProperty().addListener((observable, oldValue, newValue) -> applySponsorFilters());
     }
 
     private void refreshSponsorView() {
@@ -319,12 +339,18 @@ public class SponsorsController {
         String campaignId = codeOf(cboSponsorCampaignFilter.getValue());
         String field = cboSponsorFieldFilter.getValue() == null ? "" : cboSponsorFieldFilter.getValue();
         String query = normalized(value(txtSponsorSearch));
+        LocalDate dateMin = dateValue(dtpSponsorDateMin);
+        LocalDate dateMax = dateValue(dtpSponsorDateMax);
+        Double amountMin = numberValue(txtSponsorAmountMin);
+        Double amountMax = numberValue(txtSponsorAmountMax);
         boolean allCampaigns = campaignId.isEmpty() || "Tất cả chiến dịch".equals(cboSponsorCampaignFilter.getValue());
         boolean allFields = field.isEmpty() || "Tất cả lĩnh vực".equals(field);
 
         filteredSponsors.setPredicate(sponsor
                 -> (allCampaigns || sponsor.getMaChienDich().equalsIgnoreCase(campaignId))
                 && (allFields || safe(sponsor.getLinhVuc()).equalsIgnoreCase(field))
+                && inDateRange(sponsor.getNgayKyKet(), dateMin, dateMax)
+                && inNumberRange(sponsor.getGiaTriTaiTro(), amountMin, amountMax)
                 && (query.isEmpty() || normalized(sponsor.getTenDoiTac() + " "
                 + sponsor.getLinhVuc() + " " + sponsor.getSoDienThoai() + " "
                 + sponsor.getEmail() + " " + sponsor.getDiaChi() + " "
@@ -371,6 +397,37 @@ public class SponsorsController {
 
     private String value(TextField textField) {
         return textField == null || textField.getText() == null ? "" : textField.getText().trim();
+    }
+
+    private LocalDate dateValue(DatePicker picker) {
+        return picker == null ? null : picker.getValue();
+    }
+
+    private Double numberValue(TextField textField) {
+        String raw = value(textField);
+        if (raw.isEmpty()) {
+            return null;
+        }
+        try {
+            return FormatUtils.parseMoney(raw);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    private boolean inDateRange(String dateText, LocalDate min, LocalDate max) {
+        if (min == null && max == null) {
+            return true;
+        }
+        LocalDate date = UiFormOptions.parseDate(dateText);
+        if (date == null) {
+            return false;
+        }
+        return (min == null || !date.isBefore(min)) && (max == null || !date.isAfter(max));
+    }
+
+    private boolean inNumberRange(double value, Double min, Double max) {
+        return (min == null || value >= min) && (max == null || value <= max);
     }
 
     private String normalized(String value) {

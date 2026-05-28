@@ -32,13 +32,6 @@
                 maxWidth="280"
                 styleClass="primary-button"/>
 
-        <VBox alignment="CENTER" spacing="4">
-            <Label text="ADMIN001 - ADMIN010 / 123" styleClass="muted-text"/>
-            <Label text="TNV001 - TNV010 / 123" styleClass="muted-text"/>
-            <Label text="NTT001 - NTT010 / 123" styleClass="muted-text"/>
-            <Label text="ADMIN / 123 vẫn dùng được" styleClass="muted-text"/>
-        </VBox>
-
         <Label fx:id="lblMessage" styleClass="error-text"/>
 
     </VBox>

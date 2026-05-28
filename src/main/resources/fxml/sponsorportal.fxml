@@ -14,6 +14,7 @@
             <Button fx:id="btnOverview" text="⌂  Tổng quan" onAction="#handleOverview" styleClass="menu-button-active"/>
             <Button fx:id="btnProfile" text="☷  Hồ sơ" onAction="#handleShowProfile" styleClass="menu-button"/>
             <Button fx:id="btnCampaigns" text="▣  Chiến dịch" onAction="#handleCampaigns" styleClass="menu-button"/>
+            <Region VBox.vgrow="ALWAYS"/>
             <Button text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
         </VBox>
     </left>

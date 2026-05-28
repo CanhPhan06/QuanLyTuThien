@@ -1,11 +1,13 @@
 package com.mycompany.charitymanagement;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -35,6 +37,14 @@ public class DonationsController {
     private ComboBox<String> cboTypeFilter;
     @FXML
     private TextField txtDonationSearch;
+    @FXML
+    private DatePicker dtpDonationDateMin;
+    @FXML
+    private DatePicker dtpDonationDateMax;
+    @FXML
+    private TextField txtDonationAmountMin;
+    @FXML
+    private TextField txtDonationAmountMax;
 
     @FXML
     private TableView<DonationModel> tableDonations;
@@ -78,9 +88,15 @@ public class DonationsController {
         cboTypeFilter.setItems(buildTypeFilterChoices());
         cboCampaignFilter.setValue("Tất cả chiến dịch");
         cboTypeFilter.setValue("Tất cả hình thức");
+        UiFormOptions.configureDatePicker(dtpDonationDateMin);
+        UiFormOptions.configureDatePicker(dtpDonationDateMax);
         cboCampaignFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyDonationFilters());
         cboTypeFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyDonationFilters());
         txtDonationSearch.textProperty().addListener((observable, oldValue, newValue) -> applyDonationFilters());
+        dtpDonationDateMin.valueProperty().addListener((observable, oldValue, newValue) -> applyDonationFilters());
+        dtpDonationDateMax.valueProperty().addListener((observable, oldValue, newValue) -> applyDonationFilters());
+        txtDonationAmountMin.textProperty().addListener((observable, oldValue, newValue) -> applyDonationFilters());
+        txtDonationAmountMax.textProperty().addListener((observable, oldValue, newValue) -> applyDonationFilters());
         tableDonations.setRowFactory(table -> {
             TableRow<DonationModel> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -179,6 +195,10 @@ public class DonationsController {
         cboCampaignFilter.setValue("Tất cả chiến dịch");
         cboTypeFilter.setValue("Tất cả hình thức");
         txtDonationSearch.clear();
+        dtpDonationDateMin.setValue(null);
+        dtpDonationDateMax.setValue(null);
+        txtDonationAmountMin.clear();
+        txtDonationAmountMax.clear();
         applyDonationFilters();
     }
 
@@ -322,12 +342,18 @@ public class DonationsController {
         String campaignId = codeOf(cboCampaignFilter.getValue());
         String type = cboTypeFilter.getValue() == null ? "" : cboTypeFilter.getValue();
         String query = normalized(value(txtDonationSearch));
+        LocalDate dateMin = dateValue(dtpDonationDateMin);
+        LocalDate dateMax = dateValue(dtpDonationDateMax);
+        Double amountMin = numberValue(txtDonationAmountMin);
+        Double amountMax = numberValue(txtDonationAmountMax);
         boolean allCampaigns = campaignId.isEmpty() || "Tất cả chiến dịch".equals(cboCampaignFilter.getValue());
         boolean allTypes = type.isEmpty() || "Tất cả hình thức".equals(type);
 
         filteredDonations.setPredicate(donation
                 -> (allCampaigns || donation.getHoatDong().equalsIgnoreCase(campaignId))
                 && (allTypes || donation.getHinhThuc().equalsIgnoreCase(type))
+                && inDateRange(donation.getNgayQuyenGop(), dateMin, dateMax)
+                && inNumberRange(donation.getSoTien(), amountMin, amountMax)
                 && (query.isEmpty() || normalized(donation.getNguoiQuyenGop() + " "
                 + donation.getTenChienDich() + " " + donation.getHinhThuc() + " "
                 + donation.getNoiDungQuyenGop() + " " + donation.getTrangThaiXuLy()).contains(query)));
@@ -377,6 +403,37 @@ public class DonationsController {
 
     private String value(TextField textField) {
         return textField == null || textField.getText() == null ? "" : textField.getText().trim();
+    }
+
+    private LocalDate dateValue(DatePicker picker) {
+        return picker == null ? null : picker.getValue();
+    }
+
+    private Double numberValue(TextField textField) {
+        String raw = value(textField);
+        if (raw.isEmpty()) {
+            return null;
+        }
+        try {
+            return FormatUtils.parseMoney(raw);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    private boolean inDateRange(String dateText, LocalDate min, LocalDate max) {
+        if (min == null && max == null) {
+            return true;
+        }
+        LocalDate date = UiFormOptions.parseDate(dateText);
+        if (date == null) {
+            return false;
+        }
+        return (min == null || !date.isBefore(min)) && (max == null || !date.isAfter(max));
+    }
+
+    private boolean inNumberRange(double value, Double min, Double max) {
+        return (min == null || value >= min) && (max == null || value <= max);
     }
 
     private String normalized(String value) {

@@ -51,6 +51,10 @@ public class ParticipantsController {
     private ComboBox<String> cboParticipantStatusFilter;
     @FXML
     private TextField txtParticipantSearch;
+    @FXML
+    private TextField txtParticipantScoreMin;
+    @FXML
+    private TextField txtParticipantScoreMax;
 
     private FilteredList<ParticipantModel> filteredParticipants;
 
@@ -178,6 +182,8 @@ public class ParticipantsController {
         cboParticipantSchoolFilter.setValue("Tất cả trường");
         cboParticipantStatusFilter.setValue("Tất cả trạng thái");
         txtParticipantSearch.clear();
+        txtParticipantScoreMin.clear();
+        txtParticipantScoreMax.clear();
         applyParticipantFilters();
     }
 
@@ -310,6 +316,8 @@ public class ParticipantsController {
         cboParticipantSchoolFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyParticipantFilters());
         cboParticipantStatusFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyParticipantFilters());
         txtParticipantSearch.textProperty().addListener((observable, oldValue, newValue) -> applyParticipantFilters());
+        txtParticipantScoreMin.textProperty().addListener((observable, oldValue, newValue) -> applyParticipantFilters());
+        txtParticipantScoreMax.textProperty().addListener((observable, oldValue, newValue) -> applyParticipantFilters());
     }
 
     private void refreshParticipantView() {
@@ -334,6 +342,8 @@ public class ParticipantsController {
         String school = cboParticipantSchoolFilter.getValue() == null ? "" : cboParticipantSchoolFilter.getValue();
         String status = cboParticipantStatusFilter.getValue() == null ? "" : cboParticipantStatusFilter.getValue();
         String query = normalize(value(txtParticipantSearch));
+        Double scoreMin = doubleValue(txtParticipantScoreMin);
+        Double scoreMax = doubleValue(txtParticipantScoreMax);
         boolean allCampaigns = campaignId.isEmpty() || "Tất cả chiến dịch".equals(cboParticipantCampaignFilter.getValue());
         boolean allSchools = school.isEmpty() || "Tất cả trường".equals(school);
         boolean allStatuses = status.isEmpty() || "Tất cả trạng thái".equals(status);
@@ -341,6 +351,7 @@ public class ParticipantsController {
                 -> (allCampaigns || participant.getMaChienDich().equalsIgnoreCase(campaignId))
                 && (allSchools || safe(participant.getTruong()).equalsIgnoreCase(school))
                 && (allStatuses || safe(participant.getTrangThaiDuyet()).equalsIgnoreCase(status))
+                && inScoreRange(participant.getDiemDanhGia(), scoreMin, scoreMax)
                 && (query.isEmpty() || normalize(safe(participant.getHoTen()) + " "
                 + safe(participant.getMssv()) + " " + safe(participant.getSoDienThoai()) + " "
                 + safe(participant.getKhoa()) + " " + safe(participant.getTruong()) + " "
@@ -409,6 +420,31 @@ public class ParticipantsController {
 
     private String value(TextField textField) {
         return textField == null || textField.getText() == null ? "" : textField.getText().trim();
+    }
+
+    private Double doubleValue(TextField textField) {
+        String raw = value(textField).replace(',', '.');
+        if (raw.isEmpty()) {
+            return null;
+        }
+        try {
+            return Double.parseDouble(raw);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
+    private boolean inScoreRange(String scoreText, Double min, Double max) {
+        if (min == null && max == null) {
+            return true;
+        }
+        double score;
+        try {
+            score = scoreText == null || scoreText.trim().isEmpty() ? 0 : Double.parseDouble(scoreText.trim().replace(',', '.'));
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+        return (min == null || score >= min) && (max == null || score <= max);
     }
 
     private String safe(String value) {

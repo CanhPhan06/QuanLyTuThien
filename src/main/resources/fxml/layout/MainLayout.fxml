@@ -19,6 +19,7 @@
             <Button fx:id="btnOperations" text="⚙  Vận hành" onAction="#handleOperations" styleClass="menu-button"/>
             <Button fx:id="btnContent" text="✎  Nội dung" onAction="#handleContent" styleClass="menu-button"/>
             <Button fx:id="btnReports" text="▥  Thống kê - Báo cáo" onAction="#handleReports" styleClass="menu-button"/>
+            <Region VBox.vgrow="ALWAYS"/>
             <Button fx:id="btnLogout" text="▯  Đăng xuất" onAction="#handleLogout" styleClass="logout-button"/>
         </VBox>
     </left>
