@@ -107,15 +107,22 @@ public final class BusinessService {
     }
 
     public static String submitProof(UserAccount user, ParticipantModel profile, String proofType, String note) {
+        return submitProof(user, profile, proofType, note, "");
+    }
+
+    public static String submitProof(UserAccount user, ParticipantModel profile, String proofType, String note, String imagePath) {
         String error = BusinessRules.validateProof(user, profile, proofType, note);
         if (error != null) {
             return error;
         }
 
+        String imageNote = imagePath == null || imagePath.trim().isEmpty()
+                ? "Bảng MinhChungTNV"
+                : "IMAGE_PATH=" + imagePath.trim() + "; Bảng MinhChungTNV";
         SystemRecord operation = new SystemRecord("Minh chứng TNV", AppData.nextOperationId("VH"),
                 profile.getMaChienDich(), user.getUsername(), "Gửi minh chứng TNV",
                 proofType + " - " + note, AppData.todayText(), "",
-                "Chờ xác nhận", user.getUsername(), defaultAdmin(), "Bảng MinhChungTNV");
+                "Chờ xác nhận", user.getUsername(), defaultAdmin(), imageNote);
         AppData.getOperations().add(operation);
         DatabaseRepository.saveOperation(operation);
         notifyUser(user.getUsername(), "Đã gửi minh chứng", "Minh chứng của bạn đang chờ quản lý xác nhận.",

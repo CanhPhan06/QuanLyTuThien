@@ -227,12 +227,18 @@
             </VBox>
 
             <VBox fx:id="tasksSection" spacing="14" visible="false" managed="false">
-                <Label text="CÔNG VIỆC - ĐIỂM DANH" styleClass="page-title"/>
+                <Label text="CÔNG VIỆC CỦA TÔI" styleClass="page-title"/>
                 <HBox spacing="12" styleClass="action-bar">
                     <Button text="Điểm danh" onAction="#handleCheckIn" styleClass="primary-button"/>
+                    <Button text="Gửi minh chứng" onAction="#handleShowProof" styleClass="quick-button"/>
                     <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
                 </HBox>
-                <TableView fx:id="tableTasks" styleClass="activity-table" VBox.vgrow="ALWAYS">
+                <ScrollPane fitToWidth="true" pannable="true" hbarPolicy="NEVER" styleClass="content-scroll" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox fx:id="taskBoard" spacing="12"/>
+                    </content>
+                </ScrollPane>
+                <TableView fx:id="tableTasks" styleClass="activity-table" VBox.vgrow="ALWAYS" visible="false" managed="false">
                     <columns>
                         <TableColumn fx:id="colTaskType" text="Nhóm" prefWidth="150"/>
                         <TableColumn fx:id="colTaskTitle" text="Nội dung" prefWidth="420"/>
@@ -244,12 +250,25 @@
 
             <VBox fx:id="proofSection" spacing="14" visible="false" managed="false">
                 <Label text="MINH CHỨNG TÌNH NGUYỆN VIÊN" styleClass="page-title"/>
-                <GridPane hgap="12" vgap="12" styleClass="form-card">
-                    <ComboBox fx:id="cboProofType" promptText="Chọn loại minh chứng" styleClass="input-field" maxWidth="Infinity"
+                <VBox spacing="12" styleClass="proof-panel">
+                    <Label text="Gửi minh chứng theo chiến dịch" styleClass="portal-section-title"/>
+                    <GridPane hgap="12" vgap="12">
+                        <ComboBox fx:id="cboProofCampaign" promptText="Chọn chiến dịch đã tham gia" styleClass="input-field" maxWidth="Infinity"
                               GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <TextField fx:id="txtProofNote" promptText="Nội dung/ghi chú minh chứng" styleClass="input-field"
+                        <ComboBox fx:id="cboProofType" promptText="Chọn loại minh chứng" styleClass="input-field" maxWidth="Infinity"
                                GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                </GridPane>
+                        <TextField fx:id="txtProofNote" promptText="Nội dung/ghi chú minh chứng" styleClass="input-field"
+                                   GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtProofImage" promptText="Chưa chọn ảnh minh chứng" styleClass="input-field"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    </GridPane>
+                    <Label fx:id="lblProofCampaignStatus" text="Chọn chiến dịch để gửi minh chứng." styleClass="muted-text"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button text="Chọn ảnh" onAction="#handleChooseProofImage" styleClass="quick-button"/>
+                        <Button text="Xem ảnh" onAction="#handlePreviewProofImage" styleClass="quick-button"/>
+                        <Button text="Bỏ ảnh" onAction="#handleClearProofImage" styleClass="quick-button"/>
+                    </HBox>
+                </VBox>
                 <HBox spacing="12" styleClass="action-bar">
                     <Button text="Gửi minh chứng" onAction="#handleSubmitProof" styleClass="primary-button"/>
                     <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>

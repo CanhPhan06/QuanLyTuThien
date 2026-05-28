@@ -1138,3 +1138,58 @@
     -fx-background-color: #eef5ff;
     -fx-border-color: #0b63ce;
 }
+
+.proof-panel,
+.volunteer-task-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(15,35,65,0.08), 10, 0, 0, 3);
+}
+
+.volunteer-task-card {
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10px;
+}
+
+.volunteer-task-card:hover {
+    -fx-background-color: #fbfdff;
+    -fx-border-color: #bfdbfe;
+}
+
+.task-type-chip {
+    -fx-background-color: #eef5ff;
+    -fx-text-fill: #1768d1;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5px 10px;
+    -fx-background-radius: 14px;
+}
+
+.task-status-chip {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #334155;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5px 10px;
+    -fx-background-radius: 14px;
+}
+
+.task-card-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102a43;
+}
+
+.task-card-detail {
+    -fx-font-size: 14px;
+    -fx-text-fill: #475569;
+}
+
+.proof-image-preview {
+    -fx-background-color: #0f172a;
+    -fx-background-radius: 10px;
+    -fx-padding: 12px;
+    -fx-min-height: 360px;
+    -fx-alignment: CENTER;
+}

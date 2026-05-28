@@ -1,7 +1,9 @@
 package com.mycompany.charitymanagement;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.Normalizer;
+import javafx.geometry.Pos;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -9,10 +11,21 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class OperationsController {
@@ -152,6 +165,8 @@ public class OperationsController {
         filteredDoneRecords = new FilteredList<>(doneRecords, item -> true);
         tablePendingRecords.setItems(filteredPendingRecords);
         tableDoneRecords.setItems(filteredDoneRecords);
+        setupRecordRowFactory(tablePendingRecords);
+        setupRecordRowFactory(tableDoneRecords);
         syncMissingOperationRecords();
         AppData.getOperations().addListener((ListChangeListener<SystemRecord>) change -> {
             refreshTables();
@@ -393,6 +408,19 @@ public class OperationsController {
         colNgayTao.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayTao()));
         colNgayXuLy.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayXuLy()));
         colTrangThai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
+    }
+
+    private void setupRecordRowFactory(TableView<SystemRecord> table) {
+        table.setRowFactory(view -> {
+            TableRow<SystemRecord> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+                    table.getSelectionModel().select(row.getItem());
+                    showOperationDetail(row.getItem());
+                }
+            });
+            return row;
+        });
     }
 
     private void resetForm() {
@@ -805,6 +833,136 @@ public class OperationsController {
                 }
             }
         }
+    }
+
+    private void showOperationDetail(SystemRecord record) {
+        if (record == null) {
+            return;
+        }
+        Scene scene = tablePendingRecords == null ? App.getScene() : tablePendingRecords.getScene();
+        if (scene == null) {
+            return;
+        }
+        String imagePath = noteValue(record.getGhiChu(), "IMAGE_PATH");
+
+        Label titleLabel = new Label(record.getNhomBang() + " - " + record.getTieuDe());
+        titleLabel.getStyleClass().add("page-title");
+        titleLabel.setWrapText(true);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(18);
+        grid.setVgap(12);
+        grid.getStyleClass().add("form-card");
+        addDetailRow(grid, 0, "Chiến dịch", record.getTenChienDich());
+        addDetailRow(grid, 1, "Đối tượng", record.getTenLienKet());
+        addDetailRow(grid, 2, "Nội dung", record.getNoiDung());
+        addDetailRow(grid, 3, "Ngày tạo", record.getNgayTao());
+        addDetailRow(grid, 4, "Ngày xử lý", record.getNgayXuLy());
+        addDetailRow(grid, 5, "Trạng thái", record.getTrangThai());
+        addDetailRow(grid, 6, "Người xử lý", record.getNguoiXuLy());
+        addDetailRow(grid, 7, "Ảnh minh chứng", imagePath.isBlank() ? "-" : imagePath);
+        addDetailRow(grid, 8, "Ghi chú", removeNoteValue(record.getGhiChu(), "IMAGE_PATH"));
+
+        ScrollPane scrollPane = new ScrollPane(grid);
+        scrollPane.setFitToWidth(true);
+        scrollPane.getStyleClass().add("content-scroll");
+        scrollPane.setMaxHeight(420);
+
+        Button imageButton = new Button("Xem ảnh minh chứng");
+        imageButton.getStyleClass().add("primary-button");
+        imageButton.setDisable(imagePath.isBlank());
+        imageButton.setOnAction(event -> showImagePreview(imagePath, "Ảnh minh chứng - " + record.getMaChinh()));
+
+        Button closeButton = new Button("Đóng");
+        closeButton.getStyleClass().add("quick-button");
+        HBox actions = new HBox(10, imageButton, closeButton);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox card = new VBox(16, titleLabel, scrollPane, actions);
+        card.getStyleClass().add("detail-card");
+        card.setMaxWidth(820);
+        card.setMaxHeight(620);
+        StackPane overlay = DetailDialogUtils.showCard(scene, card);
+        closeButton.setOnAction(event -> DetailDialogUtils.closeOverlay(overlay));
+    }
+
+    private void addDetailRow(GridPane grid, int row, String key, String value) {
+        Label keyLabel = new Label(key);
+        keyLabel.getStyleClass().add("muted-text");
+        keyLabel.setMinWidth(140);
+        Label valueLabel = new Label(value == null || value.isBlank() ? "-" : value);
+        valueLabel.getStyleClass().add("dashboard-main-text");
+        valueLabel.setWrapText(true);
+        valueLabel.setMaxWidth(Double.MAX_VALUE);
+        grid.add(keyLabel, 0, row);
+        grid.add(valueLabel, 1, row);
+        GridPane.setHgrow(valueLabel, Priority.ALWAYS);
+    }
+
+    private void showImagePreview(String path, String title) {
+        if (path == null || path.isBlank()) {
+            return;
+        }
+        File file = new File(path);
+        if (!file.exists()) {
+            DialogUtils.warning("Không tìm thấy ảnh minh chứng: " + path);
+            return;
+        }
+        Scene scene = tablePendingRecords == null ? App.getScene() : tablePendingRecords.getScene();
+        if (scene == null) {
+            return;
+        }
+        Label titleLabel = new Label(title);
+        titleLabel.getStyleClass().add("page-title");
+        ImageView imageView = new ImageView(new Image(file.toURI().toString(), 760, 460, true, true));
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+        StackPane imageWrap = new StackPane(imageView);
+        imageWrap.getStyleClass().add("proof-image-preview");
+        Label pathLabel = new Label(path);
+        pathLabel.getStyleClass().add("muted-text");
+        pathLabel.setWrapText(true);
+        Button closeButton = new Button("Đóng");
+        closeButton.getStyleClass().add("quick-button");
+        VBox card = new VBox(14, titleLabel, imageWrap, pathLabel, closeButton);
+        card.getStyleClass().add("detail-card");
+        card.setMaxWidth(840);
+        card.setMaxHeight(620);
+        StackPane overlay = DetailDialogUtils.showCard(scene, card);
+        closeButton.setOnAction(event -> DetailDialogUtils.closeOverlay(overlay));
+    }
+
+    private String noteValue(String note, String key) {
+        if (note == null || key == null) {
+            return "";
+        }
+        String marker = key + "=";
+        int start = note.indexOf(marker);
+        if (start < 0) {
+            return "";
+        }
+        int valueStart = start + marker.length();
+        int valueEnd = note.indexOf(';', valueStart);
+        if (valueEnd < 0) {
+            valueEnd = note.length();
+        }
+        return note.substring(valueStart, valueEnd).trim();
+    }
+
+    private String removeNoteValue(String note, String key) {
+        if (note == null || key == null) {
+            return "";
+        }
+        String marker = key + "=";
+        int start = note.indexOf(marker);
+        if (start < 0) {
+            return note;
+        }
+        int end = note.indexOf(';', start);
+        if (end < 0) {
+            end = note.length() - 1;
+        }
+        return (note.substring(0, start) + note.substring(Math.min(end + 1, note.length()))).trim();
     }
 
     private void applyPendingNavigationFocus() {

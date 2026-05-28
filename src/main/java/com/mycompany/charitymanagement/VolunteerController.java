@@ -1,24 +1,36 @@
 package com.mycompany.charitymanagement;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
 public class VolunteerController {
 
@@ -73,15 +85,23 @@ public class VolunteerController {
     @FXML
     private ComboBox<String> cboCampaign;
     @FXML
+    private ComboBox<String> cboProofCampaign;
+    @FXML
     private ComboBox<String> cboProofType;
     @FXML
     private TextField txtProofNote;
+    @FXML
+    private TextField txtProofImage;
+    @FXML
+    private Label lblProofCampaignStatus;
     @FXML
     private TextField txtCampaignComment;
     @FXML
     private VBox campaignCommentList;
     @FXML
     private VBox campaignPortalBox;
+    @FXML
+    private VBox taskBoard;
     @FXML
     private VBox overviewSection;
     @FXML
@@ -172,6 +192,7 @@ public class VolunteerController {
     private final ObservableList<SystemRecord> profileHistory = FXCollections.observableArrayList();
     private UserAccount currentUser;
     private String selectedCampaignId;
+    private String selectedProofImagePath = "";
 
     @FXML
     private void initialize() {
@@ -222,6 +243,7 @@ public class VolunteerController {
         tableProfileHistory.setItems(profileHistory);
 
         cboCampaign.setItems(buildCampaignChoices());
+        refreshProofCampaignChoices();
         cboProofType.setItems(FXCollections.observableArrayList(
                 "Ảnh tham gia",
                 "Ảnh phát quà",
@@ -230,6 +252,12 @@ public class VolunteerController {
                 "Ghi chú sau hoạt động"
         ));
         cboProofType.setValue("Ảnh tham gia");
+        if (cboProofCampaign != null) {
+            cboProofCampaign.valueProperty().addListener((observable, oldValue, newValue) -> updateProofCampaignStatus());
+        }
+        if (txtProofImage != null) {
+            txtProofImage.setEditable(false);
+        }
 
         tableCampaigns.setRowFactory(table -> {
             TableRow<ActivityModel> row = new TableRow<>();
@@ -255,6 +283,7 @@ public class VolunteerController {
         AppData.getOperations().addListener((ListChangeListener<SystemRecord>) change -> refreshView());
         AppData.getParticipants().addListener((ListChangeListener<ParticipantModel>) change -> {
             refreshView();
+            refreshProofCampaignChoices();
             renderCampaignPortal();
         });
 
@@ -329,11 +358,13 @@ public class VolunteerController {
 
     @FXML
     private void handleShowTasks() {
+        refreshView();
         showSection(tasksSection, btnTasks);
     }
 
     @FXML
     private void handleShowProof() {
+        refreshProofCampaignChoices();
         showSection(proofSection, btnProof);
     }
 
@@ -424,23 +455,69 @@ public class VolunteerController {
 
     @FXML
     private void handleSubmitProof() {
-        ParticipantModel profile = findParticipant();
+        ParticipantModel profile = selectedProofProfile();
         String proofType = cboProofType.getValue() == null ? "" : cboProofType.getValue();
         String note = txtProofNote.getText() == null ? "" : txtProofNote.getText().trim();
+        if (note.isEmpty() && !selectedProofImagePath.isBlank()) {
+            note = "Minh chứng ảnh: " + new File(selectedProofImagePath).getName();
+        }
         String error = BusinessRules.validateProof(currentUser, profile, proofType, note);
         if (error != null) {
             DialogUtils.warning(error);
             return;
         }
 
-        error = BusinessService.submitProof(currentUser, profile, proofType, note);
+        String storedImagePath = persistSelectedProofImage();
+        if (storedImagePath == null) {
+            return;
+        }
+        error = BusinessService.submitProof(currentUser, profile, proofType, note, storedImagePath);
         if (error != null) {
             DialogUtils.warning(error);
             return;
         }
         txtProofNote.clear();
+        selectedProofImagePath = "";
+        if (txtProofImage != null) {
+            txtProofImage.clear();
+        }
         refreshView();
         DialogUtils.info("Đã gửi minh chứng, chờ quản lý xác nhận.");
+    }
+
+    @FXML
+    private void handleChooseProofImage() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Chọn ảnh minh chứng");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Ảnh", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp"),
+                new FileChooser.ExtensionFilter("Tất cả tệp", "*.*")
+        );
+        File file = chooser.showOpenDialog(btnProof == null ? null : btnProof.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+        selectedProofImagePath = file.getAbsolutePath();
+        if (txtProofImage != null) {
+            txtProofImage.setText(file.getName());
+        }
+    }
+
+    @FXML
+    private void handlePreviewProofImage() {
+        if (selectedProofImagePath == null || selectedProofImagePath.isBlank()) {
+            DialogUtils.warning("Vui lòng chọn ảnh minh chứng trước.");
+            return;
+        }
+        showImagePreview(btnProof, selectedProofImagePath, "Ảnh minh chứng đã chọn");
+    }
+
+    @FXML
+    private void handleClearProofImage() {
+        selectedProofImagePath = "";
+        if (txtProofImage != null) {
+            txtProofImage.clear();
+        }
     }
 
     @FXML
@@ -474,16 +551,14 @@ public class VolunteerController {
         lblStatus.setText(profile == null ? "Chưa đăng ký" : profile.getTrangThaiDuyet());
         lblScore.setText(profile == null || profile.getDiemDanhGia().isEmpty() ? "Chưa có" : profile.getDiemDanhGia());
 
-        volunteerTasks.setAll(AppData.getOperations().filtered(record ->
-                record.getMaLienKet().equalsIgnoreCase(currentUser.getUsername())
-                || (!campaignId.isEmpty() && record.getMaChienDich().equalsIgnoreCase(campaignId))
-        ));
+        volunteerTasks.setAll(AppData.getOperations().filtered(this::isVolunteerTaskRecord));
         volunteerNotifications.setAll(NotificationCenter.notificationsFor(currentUser));
         if (lblNotificationCount != null) {
             lblNotificationCount.setText(String.valueOf(NotificationCenter.unreadCount(currentUser)));
         }
         NotificationCenter.updateBell(btnNotificationBell, currentUser);
         refreshProfile();
+        renderTaskBoard();
     }
 
     private void showSection(VBox activeSection, Button activeButton) {
@@ -523,6 +598,47 @@ public class VolunteerController {
             choices.add(activity.getMaChienDich() + " - " + activity.getTenChienDich());
         }
         return choices;
+    }
+
+    private void refreshProofCampaignChoices() {
+        if (cboProofCampaign == null) {
+            return;
+        }
+        String selected = extractCampaignId(cboProofCampaign.getValue());
+        ObservableList<String> choices = FXCollections.observableArrayList();
+        for (ParticipantModel profile : AppData.getParticipants()) {
+            if (!profile.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername())) {
+                continue;
+            }
+            choices.add(profile.getMaChienDich() + " - " + profile.getTenChienDich()
+                    + " (" + profile.getTrangThaiDuyet() + ")");
+        }
+        cboProofCampaign.setItems(choices);
+        String preserved = "";
+        for (String item : choices) {
+            if (extractCampaignId(item).equalsIgnoreCase(selected)) {
+                preserved = item;
+                break;
+            }
+        }
+        if (!preserved.isBlank()) {
+            cboProofCampaign.setValue(preserved);
+        } else if (!choices.isEmpty()) {
+            cboProofCampaign.setValue(choices.get(0));
+        }
+        updateProofCampaignStatus();
+    }
+
+    private void updateProofCampaignStatus() {
+        if (lblProofCampaignStatus == null) {
+            return;
+        }
+        ParticipantModel profile = selectedProofProfile();
+        if (profile == null) {
+            lblProofCampaignStatus.setText("Bạn chưa có chiến dịch nào để gửi minh chứng.");
+            return;
+        }
+        lblProofCampaignStatus.setText(profile.getTenChienDich() + " · " + profile.getTrangThaiDuyet());
     }
 
     private String extractCampaignId(String value) {
@@ -580,6 +696,20 @@ public class VolunteerController {
         return latest;
     }
 
+    private ParticipantModel selectedProofProfile() {
+        String campaignId = cboProofCampaign == null ? "" : extractCampaignId(cboProofCampaign.getValue());
+        if (campaignId.isBlank()) {
+            return findParticipant();
+        }
+        for (ParticipantModel item : AppData.getParticipants()) {
+            if (item.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername())
+                    && item.getMaChienDich().equalsIgnoreCase(campaignId)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     private void refreshProfile() {
         ParticipantModel profile = findParticipant();
         ObservableList<ParticipantModel> profiles = AppData.getParticipants().filtered(item ->
@@ -619,6 +749,23 @@ public class VolunteerController {
         }
         for (ParticipantModel profile : profiles) {
             if (profile.getMaChienDich().equalsIgnoreCase(record.getMaChienDich())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isVolunteerTaskRecord(SystemRecord record) {
+        if (record.getMaLienKet().equalsIgnoreCase(currentUser.getUsername())) {
+            return true;
+        }
+        if (!groupCode(record).contains("cong viec")) {
+            return false;
+        }
+        for (ParticipantModel profile : AppData.getParticipants()) {
+            if (profile.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername())
+                    && profile.getMaChienDich().equalsIgnoreCase(record.getMaChienDich())
+                    && "Đã duyệt".equals(profile.getTrangThaiDuyet())) {
                 return true;
             }
         }
@@ -717,6 +864,152 @@ public class VolunteerController {
         VBox section = new VBox(12, header, grid);
         section.getStyleClass().add("portal-section");
         campaignPortalBox.getChildren().add(section);
+    }
+
+    private void renderTaskBoard() {
+        if (taskBoard == null) {
+            return;
+        }
+        taskBoard.getChildren().clear();
+        ObservableList<ParticipantModel> profiles = AppData.getParticipants().filtered(item ->
+                item.getMaTaiKhoan().equalsIgnoreCase(currentUser.getUsername()));
+        if (profiles.isEmpty()) {
+            taskBoard.getChildren().add(emptyTaskCard("Chưa có chiến dịch", "Bạn cần đăng ký tham gia chiến dịch trước khi nhận nhiệm vụ."));
+            return;
+        }
+        for (ParticipantModel profile : profiles) {
+            ActivityModel campaign = AppData.findCampaign(profile.getMaChienDich());
+            if (campaign == null) {
+                continue;
+            }
+            taskBoard.getChildren().add(registrationTaskCard(profile, campaign));
+            if ("Đã duyệt".equals(profile.getTrangThaiDuyet())) {
+                taskBoard.getChildren().add(checkInTaskCard(profile, campaign));
+                taskBoard.getChildren().add(proofTaskCard(profile, campaign));
+                addWorkCards(profile, campaign);
+            }
+        }
+    }
+
+    private VBox registrationTaskCard(ParticipantModel profile, ActivityModel campaign) {
+        return taskCard("Hồ sơ tham gia", campaign.getTenChienDich(),
+                "Trạng thái duyệt: " + profile.getTrangThaiDuyet(),
+                profile.getTrangThaiDuyet(),
+                taskButton("Xem chiến dịch", () -> showCampaignDetail(campaign)));
+    }
+
+    private VBox checkInTaskCard(ParticipantModel profile, ActivityModel campaign) {
+        boolean checkedToday = AppData.getOperations().stream()
+                .anyMatch(record -> groupCode(record).contains("diem danh")
+                && record.getMaLienKet().equalsIgnoreCase(currentUser.getUsername())
+                && record.getMaChienDich().equalsIgnoreCase(profile.getMaChienDich())
+                && record.getNgayTao().equals(AppData.todayText()));
+        return taskCard("Điểm danh", campaign.getTenChienDich(),
+                checkedToday ? "Bạn đã gửi điểm danh hôm nay." : "Gửi điểm danh khi có mặt tại hoạt động.",
+                checkedToday ? "Đã gửi" : "Cần thao tác",
+                taskButton(checkedToday ? "Đã điểm danh" : "Điểm danh", () -> {
+                    cboCampaign.setValue(campaign.getMaChienDich() + " - " + campaign.getTenChienDich());
+                    handleCheckIn();
+                }));
+    }
+
+    private VBox proofTaskCard(ParticipantModel profile, ActivityModel campaign) {
+        long proofCount = AppData.getOperations().stream()
+                .filter(record -> groupCode(record).contains("minh chung"))
+                .filter(record -> record.getMaLienKet().equalsIgnoreCase(currentUser.getUsername()))
+                .filter(record -> record.getMaChienDich().equalsIgnoreCase(profile.getMaChienDich()))
+                .count();
+        return taskCard("Minh chứng", campaign.getTenChienDich(),
+                proofCount == 0 ? "Gửi ảnh hoặc ghi chú sau khi tham gia hoạt động." : "Đã gửi " + proofCount + " minh chứng.",
+                proofCount == 0 ? "Chưa gửi" : "Đã gửi",
+                taskButton("Gửi minh chứng", () -> {
+                    setProofCampaign(campaign.getMaChienDich());
+                    handleShowProof();
+                }));
+    }
+
+    private void addWorkCards(ParticipantModel profile, ActivityModel campaign) {
+        int added = 0;
+        for (SystemRecord record : AppData.getOperations()) {
+            if (!groupCode(record).contains("cong viec")
+                    || !record.getMaChienDich().equalsIgnoreCase(profile.getMaChienDich())) {
+                continue;
+            }
+            taskBoard.getChildren().add(taskCard("Nhiệm vụ được phân công", campaign.getTenChienDich(),
+                    record.getTieuDe() + " · " + emptyAsDash(record.getNoiDung()),
+                    record.getTrangThai(),
+                    taskButton("Xem chi tiết", () -> showTaskDetail(record))));
+            added++;
+        }
+        if (added == 0) {
+            taskBoard.getChildren().add(taskCard("Nhiệm vụ chiến dịch", campaign.getTenChienDich(),
+                    "Admin chưa phân công đầu việc cụ thể. Bạn vẫn có thể điểm danh và gửi minh chứng khi tham gia.",
+                    "Đang chờ phân công",
+                    taskButton("Xem chiến dịch", () -> showCampaignDetail(campaign))));
+        }
+    }
+
+    private VBox emptyTaskCard(String title, String detail) {
+        return taskCard(title, "Tình nguyện viên", detail, "Trống", null);
+    }
+
+    private VBox taskCard(String type, String title, String detail, String status, Button action) {
+        VBox card = new VBox(8);
+        card.getStyleClass().add("volunteer-task-card");
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+        Label typeLabel = new Label(type);
+        typeLabel.getStyleClass().add("task-type-chip");
+        Label statusLabel = new Label(status);
+        statusLabel.getStyleClass().add("task-status-chip");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        header.getChildren().addAll(typeLabel, spacer, statusLabel);
+        Label titleLabel = new Label(title);
+        titleLabel.getStyleClass().add("task-card-title");
+        titleLabel.setWrapText(true);
+        Label detailLabel = new Label(detail);
+        detailLabel.getStyleClass().add("task-card-detail");
+        detailLabel.setWrapText(true);
+        card.getChildren().addAll(header, titleLabel, detailLabel);
+        if (action != null) {
+            HBox actions = new HBox(action);
+            actions.setAlignment(Pos.CENTER_RIGHT);
+            card.getChildren().add(actions);
+        }
+        return card;
+    }
+
+    private Button taskButton(String text, Runnable action) {
+        Button button = new Button(text);
+        button.getStyleClass().add("quick-button");
+        button.setOnAction(event -> {
+            event.consume();
+            action.run();
+        });
+        return button;
+    }
+
+    private void setProofCampaign(String campaignId) {
+        if (cboProofCampaign == null || campaignId == null) {
+            return;
+        }
+        for (String item : cboProofCampaign.getItems()) {
+            if (extractCampaignId(item).equalsIgnoreCase(campaignId)) {
+                cboProofCampaign.setValue(item);
+                return;
+            }
+        }
+    }
+
+    private void showTaskDetail(SystemRecord record) {
+        DetailDialogUtils.showDetails(tasksSection, record.getTieuDe(), new String[][]{
+            {"Chiến dịch", record.getTenChienDich()},
+            {"Nội dung", record.getNoiDung()},
+            {"Ngày", record.getNgayTao()},
+            {"Trạng thái", record.getTrangThai()},
+            {"Ghi chú", record.getGhiChu()}
+        });
     }
 
     private HBox featuredCampaignCard(ActivityModel campaign) {
@@ -974,6 +1267,68 @@ public class VolunteerController {
             return record.getMaLienKet();
         }
         return "";
+    }
+
+    private String persistSelectedProofImage() {
+        if (selectedProofImagePath == null || selectedProofImagePath.isBlank()) {
+            return "";
+        }
+        try {
+            Path source = Paths.get(selectedProofImagePath);
+            if (!Files.exists(source)) {
+                DialogUtils.warning("Không tìm thấy ảnh minh chứng đã chọn.");
+                return null;
+            }
+            Path uploadDir = Paths.get("proof-images").toAbsolutePath();
+            Files.createDirectories(uploadDir);
+            String fileName = source.getFileName().toString();
+            String extension = "";
+            int dot = fileName.lastIndexOf('.');
+            if (dot >= 0) {
+                extension = fileName.substring(dot);
+                fileName = fileName.substring(0, dot);
+            }
+            String safeName = currentUser.getUsername() + "_" + System.currentTimeMillis() + extension;
+            Path target = uploadDir.resolve(safeName);
+            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+            return target.toString();
+        } catch (IOException ex) {
+            DialogUtils.warning("Không lưu được ảnh minh chứng: " + ex.getMessage());
+            return null;
+        }
+    }
+
+    private void showImagePreview(Button owner, String path, String title) {
+        File file = new File(path);
+        if (!file.exists()) {
+            DialogUtils.warning("Không tìm thấy ảnh: " + path);
+            return;
+        }
+        Scene scene = owner == null ? App.getScene() : owner.getScene();
+        if (scene == null) {
+            return;
+        }
+
+        Label titleLabel = new Label(title);
+        titleLabel.getStyleClass().add("page-title");
+        ImageView imageView = new ImageView(new Image(file.toURI().toString(), 760, 460, true, true));
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+        StackPane imageWrap = new StackPane(imageView);
+        imageWrap.getStyleClass().add("proof-image-preview");
+
+        Label pathLabel = new Label(path);
+        pathLabel.getStyleClass().add("muted-text");
+        pathLabel.setWrapText(true);
+
+        Button close = new Button("Đóng");
+        close.getStyleClass().add("quick-button");
+        VBox card = new VBox(14, titleLabel, imageWrap, pathLabel, close);
+        card.getStyleClass().add("detail-card");
+        card.setMaxWidth(840);
+        card.setMaxHeight(620);
+        StackPane overlay = DetailDialogUtils.showCard(scene, card);
+        close.setOnAction(event -> DetailDialogUtils.closeOverlay(overlay));
     }
 
     private String groupCode(SystemRecord record) {
