@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -80,11 +81,15 @@ public class SponsorsController {
         colMaChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
         colGiaTriTaiTro.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGiaTriTaiTroText()));
         colNgayKyKet.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayKyKet()));
+        TableSortUtils.configureMoneyColumn(colGiaTriTaiTro);
+        TableSortUtils.configureDateColumn(colNgayKyKet);
 
         tableSponsors.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableSponsors.setFixedCellSize(32.0);
         filteredSponsors = new FilteredList<>(AppData.getSponsors(), item -> true);
-        tableSponsors.setItems(filteredSponsors);
+        SortedList<SponsorModel> sortedSponsors = new SortedList<>(filteredSponsors);
+        sortedSponsors.comparatorProperty().bind(tableSponsors.comparatorProperty());
+        tableSponsors.setItems(sortedSponsors);
         setupSponsorFilters();
         tableSponsors.setRowFactory(table -> {
             TableRow<SponsorModel> row = new TableRow<>();

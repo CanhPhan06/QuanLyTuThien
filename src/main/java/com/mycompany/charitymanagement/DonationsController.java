@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -79,11 +80,15 @@ public class DonationsController {
         colNoiDungQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNoiDungQuyenGop()));
         colSoTien.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSoTienText()));
         colTrangThaiXuLy.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThaiXuLy()));
+        TableSortUtils.configureDateColumn(colNgayQuyenGop);
+        TableSortUtils.configureMoneyColumn(colSoTien);
 
         tableDonations.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableDonations.setFixedCellSize(32.0);
         filteredDonations = new FilteredList<>(AppData.getDonations(), item -> true);
-        tableDonations.setItems(filteredDonations);
+        SortedList<DonationModel> sortedDonations = new SortedList<>(filteredDonations);
+        sortedDonations.comparatorProperty().bind(tableDonations.comparatorProperty());
+        tableDonations.setItems(sortedDonations);
         cboCampaignFilter.setItems(buildCampaignFilterChoices());
         cboTypeFilter.setItems(buildTypeFilterChoices());
         cboCampaignFilter.setValue("Tất cả chiến dịch");

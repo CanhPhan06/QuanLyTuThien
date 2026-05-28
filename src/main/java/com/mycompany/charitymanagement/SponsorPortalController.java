@@ -302,6 +302,22 @@ public class SponsorPortalController {
     }
 
     @FXML
+    private void handleChangePassword() {
+        String[] result = CrudDialogUtils.showForm("Đổi mật khẩu",
+                new String[]{"Mật khẩu hiện tại", "Mật khẩu mới", "Xác nhận mật khẩu mới"},
+                new String[]{"", "", ""});
+        if (result == null) {
+            return;
+        }
+        String error = AccountSecurityService.changePassword(currentUser, result[0], result[1], result[2]);
+        if (error != null) {
+            DialogUtils.warning(error);
+            return;
+        }
+        DialogUtils.info("Đã đổi mật khẩu. Lần đăng nhập sau hãy dùng mật khẩu mới.");
+    }
+
+    @FXML
     private void handleCampaigns() {
         showSection(overviewSection, btnCampaigns);
         renderCampaignPortal();

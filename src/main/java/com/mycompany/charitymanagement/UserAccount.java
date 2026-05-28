@@ -7,7 +7,7 @@ public class UserAccount {
     public static final String ROLE_SPONSOR = "SPONSOR";
 
     private final String username;
-    private final String password;
+    private String password;
     private final String role;
     private final String displayName;
     private final String linkedId;
@@ -26,6 +26,10 @@ public class UserAccount {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password == null ? "" : password;
     }
 
     public String getRole() {

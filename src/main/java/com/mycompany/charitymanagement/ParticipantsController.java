@@ -5,6 +5,7 @@ import java.text.Normalizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
@@ -73,11 +74,14 @@ public class ParticipantsController {
         colMaChienDich.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
         colTrangThaiDuyet.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThaiDuyet()));
         colDiemDanhGia.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDiemDanhGia()));
+        TableSortUtils.configureNumberColumn(colDiemDanhGia);
 
         tableParticipants.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableParticipants.setFixedCellSize(32.0);
         filteredParticipants = new FilteredList<>(AppData.getParticipants(), item -> true);
-        tableParticipants.setItems(filteredParticipants);
+        SortedList<ParticipantModel> sortedParticipants = new SortedList<>(filteredParticipants);
+        sortedParticipants.comparatorProperty().bind(tableParticipants.comparatorProperty());
+        tableParticipants.setItems(sortedParticipants);
         setupParticipantFilters();
         tableParticipants.setRowFactory(table -> {
             TableRow<ParticipantModel> row = new TableRow<>();

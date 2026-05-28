@@ -105,6 +105,22 @@ public final class DatabaseRepository {
         });
     }
 
+    public static void updateAccountPassword(UserAccount account) {
+        if (account == null) {
+            return;
+        }
+        runAsync("đổi mật khẩu " + account.getUsername(), () -> {
+            try (Connection connection = DatabaseConfig.getConnection();
+                    PreparedStatement statement = connection.prepareStatement(
+                            "UPDATE TAI_KHOAN SET MAT_KHAU = ? WHERE MA_TAI_KHOAN = ? OR TEN_DANG_NHAP = ?")) {
+                statement.setString(1, account.getPassword());
+                statement.setString(2, account.getUsername());
+                statement.setString(3, account.getUsername());
+                statement.executeUpdate();
+            }
+        });
+    }
+
     public static void saveParticipant(ParticipantModel participant) {
         if (participant == null) {
             return;

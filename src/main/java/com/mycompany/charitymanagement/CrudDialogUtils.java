@@ -9,6 +9,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -94,6 +95,12 @@ public final class CrudDialogUtils {
     }
 
     private static Control createInput(String label, String value) {
+        if (label != null && label.toLowerCase().contains("mật khẩu")) {
+            PasswordField field = new PasswordField();
+            field.setText(value);
+            field.setPromptText(label);
+            return field;
+        }
         if (isDateLabel(label)) {
             DatePicker picker = new DatePicker(UiFormOptions.parseDate(value));
             UiFormOptions.configureDatePicker(picker);

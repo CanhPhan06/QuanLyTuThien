@@ -41,4 +41,23 @@ public class PrimaryController {
             lblMessage.setText("Vai trò tài khoản chưa được hỗ trợ");
         }
     }
+
+    @FXML
+    private void handleForgotPassword() {
+        String username = txtUsername.getText() == null ? "" : txtUsername.getText().trim();
+        String[] result = CrudDialogUtils.showForm("Quên mật khẩu",
+                new String[]{"Tài khoản", "Mật khẩu mới", "Xác nhận mật khẩu mới"},
+                new String[]{username, "", ""});
+        if (result == null) {
+            return;
+        }
+        String error = AccountSecurityService.resetPassword(result[0], result[1], result[2]);
+        if (error != null) {
+            lblMessage.setText(error);
+            return;
+        }
+        txtUsername.setText(result[0].trim());
+        txtPassword.clear();
+        lblMessage.setText("Đã đặt lại mật khẩu. Vui lòng đăng nhập lại.");
+    }
 }

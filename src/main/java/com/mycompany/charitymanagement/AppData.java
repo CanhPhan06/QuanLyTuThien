@@ -304,6 +304,16 @@ public final class AppData {
                 .orElse(null);
     }
 
+    public static UserAccount findAccount(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return null;
+        }
+        return accounts.stream()
+                .filter(account -> account.getUsername().equalsIgnoreCase(username.trim()))
+                .findFirst()
+                .orElse(null);
+    }
+
     public static ObservableList<UserAccount> getAccounts() {
         return accounts;
     }

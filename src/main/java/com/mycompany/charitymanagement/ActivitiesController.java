@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -88,11 +89,16 @@ public class ActivitiesController {
         colMucTieuTien.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMucTieuTienText()));
         colDiaDiem.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDiaDiem()));
         colTrangThai.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThai()));
+        TableSortUtils.configureDateColumn(colNgayBatDau);
+        TableSortUtils.configureDateColumn(colNgayKetThuc);
+        TableSortUtils.configureMoneyColumn(colMucTieuTien);
 
         tableActivities.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tableActivities.setFixedCellSize(32.0);
         filteredActivities = new FilteredList<>(AppData.getActivities(), item -> true);
-        tableActivities.setItems(filteredActivities);
+        SortedList<ActivityModel> sortedActivities = new SortedList<>(filteredActivities);
+        sortedActivities.comparatorProperty().bind(tableActivities.comparatorProperty());
+        tableActivities.setItems(sortedActivities);
         setupActivityFilters();
         tableActivities.setRowFactory(table -> {
             TableRow<ActivityModel> row = new TableRow<>();

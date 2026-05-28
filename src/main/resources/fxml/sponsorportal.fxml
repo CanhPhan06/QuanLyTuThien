@@ -158,7 +158,7 @@
                             </VBox>
                             <VBox spacing="12" alignment="CENTER_RIGHT">
                                 <Button text="✎  Chỉnh sửa hồ sơ" onAction="#handleEditProfile" styleClass="profile-outline-button"/>
-                                <Button text="▣  Đổi mật khẩu" styleClass="quick-button"/>
+                                <Button text="▣  Đổi mật khẩu" onAction="#handleChangePassword" styleClass="quick-button"/>
                             </VBox>
                         </HBox>
 
