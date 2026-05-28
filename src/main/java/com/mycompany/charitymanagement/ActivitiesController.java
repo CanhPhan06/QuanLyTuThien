@@ -1,7 +1,6 @@
 package com.mycompany.charitymanagement;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.text.Normalizer;
 import javafx.fxml.FXML;
 import javafx.collections.FXCollections;
@@ -14,7 +13,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
@@ -45,14 +43,6 @@ public class ActivitiesController {
     private ComboBox<String> cboActivityLocationFilter;
     @FXML
     private TextField txtActivitySearch;
-    @FXML
-    private DatePicker dtpActivityStartMin;
-    @FXML
-    private DatePicker dtpActivityStartMax;
-    @FXML
-    private TextField txtActivityMoneyMin;
-    @FXML
-    private TextField txtActivityMoneyMax;
 
     @FXML
     private TableView<ActivityModel> tableActivities;
@@ -217,18 +207,6 @@ public class ActivitiesController {
         cboActivityStatusFilter.setValue("Tất cả trạng thái");
         cboActivityLocationFilter.setValue("Tất cả địa điểm");
         txtActivitySearch.clear();
-        if (dtpActivityStartMin != null) {
-            dtpActivityStartMin.setValue(null);
-        }
-        if (dtpActivityStartMax != null) {
-            dtpActivityStartMax.setValue(null);
-        }
-        if (txtActivityMoneyMin != null) {
-            txtActivityMoneyMin.clear();
-        }
-        if (txtActivityMoneyMax != null) {
-            txtActivityMoneyMax.clear();
-        }
         applyActivityFilters();
     }
 
@@ -429,15 +407,9 @@ public class ActivitiesController {
         cboActivityLocationFilter.setItems(buildLocationFilterChoices());
         cboActivityStatusFilter.setValue("Tất cả trạng thái");
         cboActivityLocationFilter.setValue("Tất cả địa điểm");
-        UiFormOptions.configureDatePicker(dtpActivityStartMin);
-        UiFormOptions.configureDatePicker(dtpActivityStartMax);
         cboActivityStatusFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyActivityFilters());
         cboActivityLocationFilter.valueProperty().addListener((observable, oldValue, newValue) -> applyActivityFilters());
         txtActivitySearch.textProperty().addListener((observable, oldValue, newValue) -> applyActivityFilters());
-        dtpActivityStartMin.valueProperty().addListener((observable, oldValue, newValue) -> applyActivityFilters());
-        dtpActivityStartMax.valueProperty().addListener((observable, oldValue, newValue) -> applyActivityFilters());
-        txtActivityMoneyMin.textProperty().addListener((observable, oldValue, newValue) -> applyActivityFilters());
-        txtActivityMoneyMax.textProperty().addListener((observable, oldValue, newValue) -> applyActivityFilters());
     }
 
     private void refreshActivityView() {
@@ -458,17 +430,11 @@ public class ActivitiesController {
         String status = cboActivityStatusFilter.getValue() == null ? "" : cboActivityStatusFilter.getValue();
         String location = cboActivityLocationFilter.getValue() == null ? "" : cboActivityLocationFilter.getValue();
         String query = normalize(value(txtActivitySearch));
-        LocalDate startMin = dateValue(dtpActivityStartMin);
-        LocalDate startMax = dateValue(dtpActivityStartMax);
-        Double moneyMin = numberValue(txtActivityMoneyMin);
-        Double moneyMax = numberValue(txtActivityMoneyMax);
         boolean allStatuses = status.isEmpty() || "Tất cả trạng thái".equals(status);
         boolean allLocations = location.isEmpty() || "Tất cả địa điểm".equals(location);
         filteredActivities.setPredicate(activity
                 -> (allStatuses || safe(activity.getTrangThai()).equalsIgnoreCase(status))
                 && (allLocations || safe(activity.getDiaDiem()).equalsIgnoreCase(location))
-                && inDateRange(activity.getNgayBatDau(), startMin, startMax)
-                && inNumberRange(activity.getMucTieuTien(), moneyMin, moneyMax)
                 && (query.isEmpty() || normalize(safe(activity.getTenChienDich()) + " "
                 + safe(activity.getMoTa()) + " " + safe(activity.getDiaDiem()) + " "
                 + safe(activity.getTrangThai())).contains(query)));
@@ -673,37 +639,6 @@ public class ActivitiesController {
 
     private String value(TextField textField) {
         return textField == null || textField.getText() == null ? "" : textField.getText().trim();
-    }
-
-    private LocalDate dateValue(DatePicker picker) {
-        return picker == null ? null : picker.getValue();
-    }
-
-    private Double numberValue(TextField textField) {
-        String raw = value(textField);
-        if (raw.isEmpty()) {
-            return null;
-        }
-        try {
-            return FormatUtils.parseMoney(raw);
-        } catch (NumberFormatException ex) {
-            return null;
-        }
-    }
-
-    private boolean inDateRange(String dateText, LocalDate min, LocalDate max) {
-        if (min == null && max == null) {
-            return true;
-        }
-        LocalDate date = UiFormOptions.parseDate(dateText);
-        if (date == null) {
-            return false;
-        }
-        return (min == null || !date.isBefore(min)) && (max == null || !date.isAfter(max));
-    }
-
-    private boolean inNumberRange(double value, Double min, Double max) {
-        return (min == null || value >= min) && (max == null || value <= max);
     }
 
     private String safe(String value) {

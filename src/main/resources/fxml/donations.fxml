@@ -28,20 +28,12 @@
         </VBox>
     </HBox>
 
-    <VBox spacing="10" styleClass="filter-card">
-        <HBox spacing="12">
-            <ComboBox fx:id="cboCampaignFilter" promptText="Lọc theo chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <ComboBox fx:id="cboTypeFilter" promptText="Lọc theo hình thức" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="txtDonationSearch" promptText="Tìm người/tổ chức, mô tả, trạng thái..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
-            <Button text="Bỏ lọc" onAction="#handleClearDonationFilters" styleClass="quick-button"/>
-        </HBox>
-        <HBox spacing="12">
-            <DatePicker fx:id="dtpDonationDateMin" promptText="Ghi nhận từ" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <DatePicker fx:id="dtpDonationDateMax" promptText="Ghi nhận đến" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="txtDonationAmountMin" promptText="Giá trị min" styleClass="input-field" HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="txtDonationAmountMax" promptText="Giá trị max" styleClass="input-field" HBox.hgrow="ALWAYS"/>
-        </HBox>
-    </VBox>
+    <HBox spacing="12" styleClass="filter-card">
+        <ComboBox fx:id="cboCampaignFilter" promptText="Lọc theo chiến dịch" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="cboTypeFilter" promptText="Lọc theo hình thức" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtDonationSearch" promptText="Tìm người/tổ chức, mô tả, trạng thái..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+        <Button text="Bỏ lọc" onAction="#handleClearDonationFilters" styleClass="quick-button"/>
+    </HBox>
 
     <HBox spacing="12" styleClass="action-bar">
         <Button text="Ghi nhận đóng góp" onAction="#handleAddDonation" styleClass="primary-button"/>

@@ -9,20 +9,12 @@
 
     <Label text="CHIẾN DỊCH" styleClass="page-title"/>
 
-    <VBox spacing="10" styleClass="filter-card">
-        <HBox spacing="12">
-            <ComboBox fx:id="cboActivityStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <ComboBox fx:id="cboActivityLocationFilter" promptText="Lọc địa điểm" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="txtActivitySearch" promptText="Tìm tên chiến dịch, mô tả, địa điểm..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
-            <Button text="Bỏ lọc" onAction="#handleClearActivityFilters" styleClass="quick-button"/>
-        </HBox>
-        <HBox spacing="12">
-            <DatePicker fx:id="dtpActivityStartMin" promptText="Bắt đầu từ" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <DatePicker fx:id="dtpActivityStartMax" promptText="Bắt đầu đến" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="txtActivityMoneyMin" promptText="Mục tiêu min" styleClass="input-field" HBox.hgrow="ALWAYS"/>
-            <TextField fx:id="txtActivityMoneyMax" promptText="Mục tiêu max" styleClass="input-field" HBox.hgrow="ALWAYS"/>
-        </HBox>
-    </VBox>
+    <HBox spacing="12" styleClass="filter-card">
+        <ComboBox fx:id="cboActivityStatusFilter" promptText="Lọc trạng thái" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="cboActivityLocationFilter" promptText="Lọc địa điểm" styleClass="input-field" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="txtActivitySearch" promptText="Tìm tên chiến dịch, mô tả, địa điểm..." styleClass="input-field wide-search-field" HBox.hgrow="ALWAYS"/>
+        <Button text="Bỏ lọc" onAction="#handleClearActivityFilters" styleClass="quick-button"/>
+    </HBox>
 
     <HBox spacing="10" styleClass="action-bar">
         <Button text="Xem chi tiết chiến dịch" onAction="#handleOpenSelectedCampaignDetail" styleClass="primary-button"/>
