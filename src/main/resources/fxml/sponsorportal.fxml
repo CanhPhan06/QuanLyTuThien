@@ -46,7 +46,7 @@
                 </content>
             </ScrollPane>
 
-            <GridPane hgap="12" vgap="12" styleClass="form-card" visible="false" managed="false">
+            <GridPane hgap="12" vgap="12" styleClass="form-card">
                 <ComboBox fx:id="cboCampaign" promptText="Chọn chiến dịch" styleClass="input-field" maxWidth="Infinity"
                           GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                 <ComboBox fx:id="cboSupportType" promptText="Chọn hình thức quyên góp" styleClass="input-field" maxWidth="Infinity"
@@ -70,7 +70,7 @@
                 </VBox>
             </GridPane>
 
-            <HBox spacing="12" styleClass="action-bar" visible="false" managed="false">
+            <HBox spacing="12" styleClass="action-bar">
                 <Button text="Tham gia tài trợ" onAction="#handleJoinCampaign" styleClass="primary-button"/>
                 <Button text="Gửi đề xuất tài trợ" onAction="#handleCreateSupport" styleClass="primary-button"/>
                 <Button text="Xem chi tiết chiến dịch" onAction="#handleViewCampaignDetail" styleClass="quick-button"/>
@@ -78,7 +78,7 @@
                 <Button text="Làm mới" onAction="#handleRefresh" styleClass="quick-button"/>
             </HBox>
 
-            <VBox spacing="10" styleClass="comment-panel" visible="false" managed="false">
+            <VBox spacing="10" styleClass="comment-panel">
                 <VBox spacing="3">
                     <Label text="Bình luận chiến dịch" styleClass="portal-section-title"/>
                     <Label fx:id="lblSelectedCommentThread" text="Chọn chiến dịch để xem bình luận" styleClass="muted-text"/>
@@ -94,7 +94,7 @@
                 </HBox>
             </VBox>
 
-            <TabPane VBox.vgrow="ALWAYS" visible="false" managed="false">
+            <TabPane VBox.vgrow="ALWAYS">
                 <tabs>
                     <Tab text="Chiến dịch cần hỗ trợ" closable="false">
                         <TableView fx:id="tableCampaigns" styleClass="activity-table">
@@ -115,6 +115,7 @@
                                 <TableColumn fx:id="colHinhThuc" text="Hình thức" prefWidth="150"/>
                                 <TableColumn fx:id="colNoiDungQuyenGop" text="Nội dung" prefWidth="360"/>
                                 <TableColumn fx:id="colSoTien" text="Giá trị" prefWidth="150"/>
+                                <TableColumn fx:id="colSupportStatus" text="Trạng thái xác nhận" prefWidth="150"/>
                             </columns>
                         </TableView>
                     </Tab>

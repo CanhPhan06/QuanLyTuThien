@@ -116,6 +116,8 @@ public class SponsorPortalController {
     private TableColumn<DonationModel, String> colNoiDungQuyenGop;
     @FXML
     private TableColumn<DonationModel, String> colSoTien;
+    @FXML
+    private TableColumn<DonationModel, String> colSupportStatus;
 
     @FXML
     private TableView<SponsorModel> tableSponsorPartnerHistory;
@@ -169,6 +171,7 @@ public class SponsorPortalController {
         colHinhThuc.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getHinhThuc()));
         colNoiDungQuyenGop.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNoiDungQuyenGop()));
         colSoTien.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSoTienText()));
+        colSupportStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTrangThaiXuLy()));
         colSponsorPartnerCampaign.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTenChienDich()));
         colSponsorPartnerField.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getLinhVuc()));
         colSponsorPartnerDate.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNgayKyKet()));
@@ -230,6 +233,11 @@ public class SponsorPortalController {
             renderCampaignPortal();
         });
         AppData.getDonations().addListener((ListChangeListener<DonationModel>) change -> refreshView());
+        AppData.getOperations().addListener((ListChangeListener<SystemRecord>) change -> {
+            refreshView();
+            tableSupport.refresh();
+            tableSponsorContributionHistory.refresh();
+        });
 
         if (!cboCampaign.getItems().isEmpty()) {
             cboCampaign.setValue(cboCampaign.getItems().get(0));
@@ -341,10 +349,17 @@ public class SponsorPortalController {
             DialogUtils.warning("Vui lòng chọn chiến dịch muốn tham gia tài trợ.");
             return;
         }
+        showSupportDialog(campaign);
+    }
 
-        String type = value(cboSupportType);
-        String content = value(txtSupportContent);
-        String valueText = value(txtSupportValue);
+    private void submitSupport(ActivityModel campaign, String type, String content, String valueText) {
+        if (campaign == null) {
+            DialogUtils.warning("Vui lòng chọn chiến dịch muốn tài trợ.");
+            return;
+        }
+        type = type == null ? "" : type.trim();
+        content = content == null ? "" : content.trim();
+        valueText = valueText == null ? "" : valueText.trim();
         if (content.isEmpty() && valueText.isEmpty()) {
             type = "Vật phẩm";
             content = "Đăng ký đồng hành chiến dịch " + campaign.getTenChienDich();
@@ -373,9 +388,28 @@ public class SponsorPortalController {
         }
     }
 
+    private void showSupportDialog(ActivityModel campaign) {
+        if (campaign == null) {
+            DialogUtils.warning("Vui lòng chọn chiến dịch muốn tài trợ.");
+            return;
+        }
+        String defaultContent = value(txtSupportContent);
+        if (defaultContent.isEmpty()) {
+            defaultContent = "Tài trợ cho chiến dịch " + campaign.getTenChienDich();
+        }
+        String[] result = CrudDialogUtils.showForm("Tài trợ chiến dịch - " + campaign.getTenChienDich(),
+                new String[]{"Hình thức tài trợ", "Nội dung tài trợ", "Giá trị tiền/ước tính"},
+                new String[]{value(cboSupportType), defaultContent, value(txtSupportValue)});
+        if (result == null) {
+            return;
+        }
+        submitSupport(campaign, result[0], result[1], result[2]);
+    }
+
     @FXML
     private void handleCreateSupport() {
-        String campaignId = extractCampaignId(cboCampaign.getValue());
+        ActivityModel campaign = selectedCampaign();
+        String campaignId = campaign == null ? "" : campaign.getMaChienDich();
         String type = value(cboSupportType);
         String content = value(txtSupportContent);
         String valueText = value(txtSupportValue);
@@ -389,22 +423,7 @@ public class SponsorPortalController {
             return;
         }
 
-        try {
-            double amount = valueText.isEmpty() ? 0 : FormatUtils.parseMoney(valueText);
-            String error = BusinessService.recordDonation(currentUser, campaignId, type, content, amount);
-            if (error != null) {
-                DialogUtils.warning(error);
-                return;
-            }
-            txtSupportContent.clear();
-            txtSupportValue.clear();
-            refreshView();
-            updateCampaignSummary(AppData.findCampaign(campaignId));
-            renderCampaignPortal();
-            DialogUtils.info("Đã gửi đề xuất tài trợ để quản lý ghi nhận.");
-        } catch (NumberFormatException ex) {
-            DialogUtils.warning("Giá trị tài trợ không hợp lệ.");
-        }
+        submitSupport(campaign, type, content, valueText);
     }
 
     @FXML
