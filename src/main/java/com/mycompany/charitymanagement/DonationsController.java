@@ -310,6 +310,7 @@ public class DonationsController {
         lblTotalDonation.setText(FormatUtils.money(AppData.getTotalDonationAmount()));
         lblDonationCount.setText(String.valueOf(AppData.getDonations().size()));
         long materialCount = AppData.getDonations().stream()
+                .filter(AppData::isDonationConfirmed)
                 .filter(item -> item.getSoTien() <= 0)
                 .count();
         lblMaterialDonation.setText(String.valueOf(materialCount));

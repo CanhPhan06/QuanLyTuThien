@@ -48,7 +48,7 @@
 
                 <VBox styleClass="dashboard-stat-card" HBox.hgrow="ALWAYS">
                     <Label fx:id="lblDonationTotal" text="320.750.000" styleClass="dashboard-small-number"/>
-                    <Label text="Tổng quyên góp (VNĐ)" styleClass="dashboard-main-text"/>
+                    <Label text="Tổng quyên góp đã xác nhận (VNĐ)" styleClass="dashboard-main-text"/>
                     <Label text="Tổng số tiền đã quyên góp" styleClass="dashboard-muted-text"/>
                 </VBox>
             </HBox>

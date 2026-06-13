@@ -235,8 +235,13 @@ public class ReportsController {
                 ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
                 String campaignId = UiText.clean(rs.getString("MA_CHIEN_DICH"));
-                double donations = rs.getDouble("TONG_QUYEN_GOP_TIEN");
-                double sponsors = rs.getDouble("TONG_TAI_TRO");
+                boolean hasLocalCampaign = AppData.findCampaign(campaignId) != null;
+                double donations = hasLocalCampaign
+                        ? AppData.getConfirmedDonationAmount(campaignId)
+                        : rs.getDouble("TONG_QUYEN_GOP_TIEN");
+                double sponsors = hasLocalCampaign
+                        ? AppData.getSponsorAmount(campaignId)
+                        : rs.getDouble("TONG_TAI_TRO");
                 double expense = normalizeExpense(campaignId, donations + sponsors, rs.getDouble("TONG_CHI_TIEU"));
                 int volunteers = Math.max(rs.getInt("SO_TNV"), (int) AppData.getCampaignParticipantCount(campaignId));
                 rows.add(new CampaignReportRow(
@@ -258,20 +263,14 @@ public class ReportsController {
     private List<CampaignReportRow> loadCampaignReportRowsFromMemory() {
         List<CampaignReportRow> rows = new ArrayList<>();
         for (ActivityModel activity : AppData.getActivities()) {
-            double donations = AppData.getDonations().stream()
-                    .filter(item -> item.getHoatDong().equalsIgnoreCase(activity.getMaChienDich()))
-                    .mapToDouble(DonationModel::getSoTien)
-                    .sum();
-            double sponsors = AppData.getSponsors().stream()
-                    .filter(item -> item.getMaChienDich().equalsIgnoreCase(activity.getMaChienDich()))
-                    .mapToDouble(SponsorModel::getGiaTriTaiTro)
-                    .sum();
+            double donations = AppData.getConfirmedDonationAmount(activity.getMaChienDich());
+            double sponsors = AppData.getSponsorAmount(activity.getMaChienDich());
             double income = donations + sponsors;
             double expenses = expenseAmountForCampaign(activity.getMaChienDich(), income);
             int volunteers = (int) AppData.getCampaignParticipantCount(activity.getMaChienDich());
             double targetRate = activity.getMucTieuTien() <= 0
                     ? 0
-                    : Math.round((donations + sponsors) / activity.getMucTieuTien() * 10000.0) / 100.0;
+                    : Math.round(income / activity.getMucTieuTien() * 10000.0) / 100.0;
             rows.add(new CampaignReportRow(
                     activity.getMaChienDich(),
                     activity.getTenChienDich(),

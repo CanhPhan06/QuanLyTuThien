@@ -35,7 +35,7 @@
                     <Label fx:id="lblSupportCount" text="0" styleClass="stat-number green"/>
                 </VBox>
                 <VBox styleClass="stat-card wide-stat-card">
-                    <Label text="Tổng tài trợ bằng tiền" styleClass="muted-text"/>
+                    <Label text="Tổng tài trợ đã xác nhận" styleClass="muted-text"/>
                     <Label fx:id="lblSupportTotal" text="0 VNĐ" styleClass="stat-number purple"/>
                 </VBox>
             </HBox>

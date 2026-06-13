@@ -350,20 +350,54 @@ public final class AppData {
 
     public static double getTotalDonationAmount() {
         return donations.stream()
+                .filter(AppData::isDonationConfirmed)
                 .mapToDouble(DonationModel::getSoTien)
                 .sum();
     }
 
-    public static double getCampaignMoneyTotal(String campaignId) {
-        double donationTotal = donations.stream()
-                .filter(item -> item.getHoatDong().equalsIgnoreCase(campaignId))
+    public static double getConfirmedDonationAmount(String campaignId) {
+        return donations.stream()
+                .filter(AppData::isDonationConfirmed)
+                .filter(item -> sameText(item.getHoatDong(), campaignId))
                 .mapToDouble(DonationModel::getSoTien)
                 .sum();
-        double sponsorTotal = sponsors.stream()
-                .filter(item -> item.getMaChienDich().equalsIgnoreCase(campaignId))
+    }
+
+    public static double getSponsorAmount(String campaignId) {
+        return sponsors.stream()
+                .filter(item -> sameText(item.getMaChienDich(), campaignId))
                 .mapToDouble(SponsorModel::getGiaTriTaiTro)
                 .sum();
-        return donationTotal + sponsorTotal;
+    }
+
+    public static double getCampaignMoneyTotal(String campaignId) {
+        return getConfirmedDonationAmount(campaignId) + getSponsorAmount(campaignId);
+    }
+
+    public static boolean isDonationConfirmed(DonationModel donation) {
+        if (donation == null) {
+            return false;
+        }
+        String donationId = donation.getMaQuyenGop();
+        for (SystemRecord record : operations) {
+            if ("Quyên góp".equals(record.getNhomBang())
+                    && sameText(record.getMaLienKet(), donationId)) {
+                return isConfirmedDonationStatus(record.getTrangThai());
+            }
+        }
+        return true;
+    }
+
+    private static boolean isConfirmedDonationStatus(String status) {
+        return "Đã xác nhận".equals(status)
+                || "Xác nhận".equals(status)
+                || "Đã duyệt".equals(status)
+                || "Hoàn thành".equals(status)
+                || "Đã ghi nhận".equals(status);
+    }
+
+    private static boolean sameText(String first, String second) {
+        return first != null && second != null && first.equalsIgnoreCase(second);
     }
 
     public static long getCampaignParticipantCount(String campaignId) {

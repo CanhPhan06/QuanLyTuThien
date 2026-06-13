@@ -581,6 +581,7 @@ public class SponsorPortalController {
                 .mapToDouble(SponsorModel::getGiaTriTaiTro)
                 .sum();
         double donationTotal = sponsorContributionHistory.stream()
+                .filter(AppData::isDonationConfirmed)
                 .mapToDouble(DonationModel::getSoTien)
                 .sum();
         return sponsorTotal + donationTotal;
@@ -619,7 +620,7 @@ public class SponsorPortalController {
             }
         }
         for (DonationModel donation : sponsorContributionHistory) {
-            if (donation.getSoTien() > bestValue) {
+            if (AppData.isDonationConfirmed(donation) && donation.getSoTien() > bestValue) {
                 bestValue = donation.getSoTien();
                 bestCampaignId = donation.getHoatDong();
             }

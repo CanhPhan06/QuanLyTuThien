@@ -160,10 +160,7 @@ public class SecondaryController {
         long participantCount = AppData.getParticipants().stream()
                 .filter(item -> item.getMaChienDich().equalsIgnoreCase(campaignId))
                 .count();
-        double donationTotal = AppData.getDonations().stream()
-                .filter(item -> item.getHoatDong().equalsIgnoreCase(campaignId))
-                .mapToDouble(DonationModel::getSoTien)
-                .sum();
+        double donationTotal = AppData.getCampaignMoneyTotal(campaignId);
 
         lblFeaturedTitle.setText("Chương trình \"" + campaign.getTenChienDich() + "\"");
         lblFeaturedStartDate.setText("Ngày bắt đầu: " + emptyText(campaign.getNgayBatDau()));
@@ -186,9 +183,7 @@ public class SecondaryController {
     }
 
     private double totalDonations() {
-        return AppData.getDonations().stream()
-                .mapToDouble(DonationModel::getSoTien)
-                .sum();
+        return AppData.getTotalDonationAmount();
     }
 
     private String emptyText(String value) {
